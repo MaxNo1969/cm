@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7CFC6852-6D04-4E99-8DF4-FC35AF781803}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>CM</RootNamespace>
+    <AssemblyName>CM</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CONTROLS\UCTube.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CONTROLS\UCTube.designer.cs">
+      <DependentUpon>UCTube.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CONTROLS\UCTubeAllSensors.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CONTROLS\UCTubeAllSensors.Designer.cs">
+      <DependentUpon>UCTubeAllSensors.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DATA\PhysTube.cs" />
+    <Compile Include="DATA\Tube.cs" />
+    <Compile Include="FORMS\FRAllSensorsView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FORMS\FRAllSensorsView.Designer.cs">
+      <DependentUpon>FRAllSensorsView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FORMS\FRMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FORMS\FRMain.Designer.cs">
+      <DependentUpon>FRMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FORMS\FRRowAllSensorsView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FORMS\FRRowAllSensorsView.designer.cs">
+      <DependentUpon>FRRowAllSensorsView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FORMS\FRSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FORMS\FRSettings.Designer.cs">
+      <DependentUpon>FRSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FORMS\FormSp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FORMS\FRTubeView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FORMS\FRTubeView.designer.cs">
+      <DependentUpon>FRTubeView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PARS\AppPars.cs" />
+    <Compile Include="PARS\ComPortPars.cs" />
+    <Compile Include="PARS\RectifierPars.cs" />
+    <Compile Include="PARS\SensorsPars.cs" />
+    <Compile Include="PARS\TypeSize.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UTIL\ChartExtras.cs" />
+    <Compile Include="UTIL\CmdLineHelper.cs" />
+    <Compile Include="UTIL\ColorHelper.cs" />
+    <Compile Include="UTIL\CsvHelper.cs" />
+    <Compile Include="UTIL\DefaultValues.cs" />
+    <Compile Include="UTIL\DumpHelper.cs" />
+    <Compile Include="UTIL\ImgHelper.cs" />
+    <Compile Include="UTIL\PropGridHelper.cs" />
+    <Compile Include="CONTROLS\UCGraph.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CONTROLS\UCGraph.designer.cs">
+      <DependentUpon>UCGraph.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="CONTROLS\UCTube.resx">
+      <DependentUpon>UCTube.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CONTROLS\UCTubeAllSensors.resx">
+      <DependentUpon>UCTubeAllSensors.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FORMS\FRAllSensorsView.resx">
+      <DependentUpon>FRAllSensorsView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FORMS\FRMain.resx">
+      <DependentUpon>FRMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FORMS\FRRowAllSensorsView.resx">
+      <DependentUpon>FRRowAllSensorsView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FORMS\FRSettings.resx">
+      <DependentUpon>FRSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FORMS\FRTubeView.resx">
+      <DependentUpon>FRTubeView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FormPosSaver\FormPosSaver.csproj">
+      <Project>{3e850b02-f522-4d55-a462-cb8f2455a5f4}</Project>
+      <Name>FormPosSaver</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Protocol\Protocol.csproj">
+      <Project>{052293b5-d827-4a1a-ac75-06c109f72a1c}</Project>
+      <Name>Protocol</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\exitImage.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
