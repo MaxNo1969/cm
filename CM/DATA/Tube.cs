@@ -6,18 +6,8 @@ using System.Linq;
 
 namespace CM
 {
-    /// <summary>
-    /// Делегат, если данные поменялись
-    /// </summary>
-    public delegate void DataChanged(IEnumerable<double> _data);
-    public interface IWriteable<T>
-    {
-        int write(IEnumerable<T> _data);
-        event DataChanged onDataChanged;
-    }
-
     [Serializable]
-    public class Tube : IWriteable<double>
+    public class Tube : IDataWriter<double>
     {
         /// <summary>
         /// Событие, вызывается если данные поменялись
@@ -82,7 +72,7 @@ namespace CM
         {
             List<double> data = DumpHelper.readDumpFile(_fileName);
             raw.Clear();
-            write(data);
+            Write(data);
             return raw.Count;
         }
         public bool writeDump(string _fileName)
@@ -97,7 +87,7 @@ namespace CM
         {
             List<double> data = CsvHelper.readCsvFile(_fileName);
             raw.Clear();
-            write(data);
+            Write(data);
             return raw.Count;
         }
         public bool writeCSV(string _fileName)
@@ -343,13 +333,25 @@ namespace CM
                 }
             }
         }
-
-        public int write(IEnumerable<double> _data)
+        
+        #region IDataWriter implementation
+        public int Write(IEnumerable<double> _data)
         {
             raw.AddRange(_data);
             fillSensorAvgAndDeviationValues();
             onDataChanged?.Invoke(_data);
             return _data.Count();
         }
+
+        public bool Start()
+        {
+            return true;
+        }
+
+        public bool Stop()
+        {
+            return true;
+        }
+        #endregion IDataWriter implementation
     }
 }
