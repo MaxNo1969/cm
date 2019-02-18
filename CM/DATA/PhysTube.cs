@@ -46,7 +46,8 @@ namespace CM
         /// <summary>
         /// Скорость движения трубы
         /// </summary>
-        private readonly double speed;
+        public double speed = DefaultValues.speed;
+
         /// <summary>
         /// Время прохождения одной ячейки
         /// </summary>
