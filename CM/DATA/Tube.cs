@@ -67,36 +67,6 @@ namespace CM
             }
         }
 
-        #region Работа с дампом
-        public int readDump(string _fileName)
-        {
-            List<double> data = DumpHelper.readDumpFile(_fileName);
-            raw.Clear();
-            Write(data);
-            return raw.Count;
-        }
-        public bool writeDump(string _fileName)
-        {
-            if (DumpHelper.writeDumpFile(_fileName, raw)) return true;
-            return false;
-        }
-        #endregion Работа с дампом
-
-        #region Работа с CSV
-        public int readCSV(string _fileName)
-        {
-            List<double> data = CsvHelper.readCsvFile(_fileName);
-            raw.Clear();
-            Write(data);
-            return raw.Count;
-        }
-        public bool writeCSV(string _fileName)
-        {
-            if (CsvHelper.writeCsvFile(_fileName, raw)) return true;
-            return false;
-        }
-        #endregion Работа с CSV
-
         #region Сериализация
         /// <summary>
         /// Сериализация в файл для сохранения данных по трубе 

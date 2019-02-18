@@ -1,4 +1,6 @@
-﻿namespace CM
+﻿using System.Collections.Generic;
+
+namespace CM
 {
     public interface IDataReader<T>
     {
@@ -16,6 +18,6 @@
         /// Синхронное чтение данных с АЦП
         /// </summary>
         /// <returns>Массив прочитанных данных с АЦП</returns>
-	    T[] Read();
+	    IEnumerable<T> Read();
     }
 }

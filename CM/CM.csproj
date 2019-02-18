@@ -59,6 +59,7 @@
     <Compile Include="CONTROLS\UCTubeAllSensors.Designer.cs">
       <DependentUpon>UCTubeAllSensors.cs</DependentUpon>
     </Compile>
+    <Compile Include="DATA\DumpReader.cs" />
     <Compile Include="DATA\PhysTube.cs" />
     <Compile Include="DATA\Tube.cs" />
     <Compile Include="FORMS\FRAllSensorsView.cs">

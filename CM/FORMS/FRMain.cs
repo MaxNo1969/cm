@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -151,6 +152,40 @@ namespace CM
             }
             FRTubeView tubeView = new FRTubeView(ptube, this);
             tubeView.Show();
+        }
+
+        private void importDumpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog
+            {
+                DefaultExt = "bin",
+                AddExtension = true,
+                Filter = "Файлы дампа (*.dbl)|*.dbl|Все файлы (*.*)|*.*",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            };
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    DumpReader reader = new DumpReader(ofd.FileName);
+                    IDataWriter<double> writer = tube;
+                    writer.Write(reader.Read());
+                    ptube = new PhysTube(tube);
+                    viewTubeToolStripMenuItem_Click(this, null);
+                }
+                catch (Exception ex)
+                {
+                    #region Логирование 
+                    {
+                        string msg = string.Format("{0}", ex.Message);
+                        string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                        log.add(logstr, LogRecord.LogReason.error);
+                        Debug.WriteLine(logstr, "Error");
+                        MessageBox.Show(msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    }
+                    #endregion
+                }
+            }
         }
     }
 }

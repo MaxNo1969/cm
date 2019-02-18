@@ -1,5 +1,7 @@
 ﻿using Protocol;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
@@ -15,7 +17,7 @@ namespace CM
     /// </summary>
     public class ReadDataThread : IDisposable
     {
-        public delegate void OnDataRead(double[] _data);
+        public delegate void OnDataRead(IEnumerable<double> _data);
         /// <summary>
         /// Событие при чтении данных с АЦП
         /// </summary>
@@ -31,7 +33,7 @@ namespace CM
         private bool isRunning;
 
         private Thread thread;
-        private double[] data;
+        private IEnumerable<double> data;
         /// <summary>
         /// Блокировка
         /// </summary>

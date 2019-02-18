@@ -16,12 +16,15 @@ namespace ConsoleApp
             string tubeName = "tube1.bin";
             string dumpFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
                System.IO.Path.DirectorySeparatorChar + fileName;
-            TypeSize ts = new TypeSize("НКТ 73х01");
-            ts.sensors = new SensorPars(1, 4, 8, 16);
+            TypeSize ts = new TypeSize("НКТ 73х01")
+            {
+                sensors = new SensorPars(1, 4, 8, 16),
+            };
             Tube tube = new Tube(ts, DefaultValues.tubeLen);
             Console.WriteLine("Set tube.typeSize.Sensors:{0}", tube.typeSize.sensors.ToString());
             Console.WriteLine(string.Format(@"Reading file: {0}...", dumpFileName));
-            int size = tube.readDump(dumpFileName);
+            DumpReader reader = new DumpReader(dumpFileName); 
+            int size = tube.Write(reader.Read());
             Console.WriteLine(string.Format("{0} values readed from file \"{1}\" ({2}M)",
                 size, dumpFileName, size * sizeof(double) / 1024));
             if (!Tube.save(tube, tubeName))
@@ -36,11 +39,14 @@ namespace ConsoleApp
             dumpFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
                System.IO.Path.DirectorySeparatorChar + fileName;
             Console.WriteLine(string.Format(@"Reading file: {0}...", dumpFileName));
-            ts = new TypeSize("СБТ 127х9,2");
-            ts.sensors = new SensorPars(1, 4, 8, 32);
+            ts = new TypeSize("СБТ 127х9,2")
+            {
+                sensors = new SensorPars(1, 4, 8, 32),
+            };
             tube = new Tube(ts, DefaultValues.tubeLen);
             Console.WriteLine("Set tube.typeSize.Sensors:{0}", tube.typeSize.sensors.ToString());
-            size = tube.readDump(dumpFileName);
+            reader = new DumpReader(dumpFileName);
+            size = tube.Write(reader.Read());
             Console.WriteLine(string.Format("{0} values readed from file \"{1}\" ({2}M)",
                 size, dumpFileName, size * sizeof(double) / 1024));
             if (!Tube.save(tube, tubeName))
