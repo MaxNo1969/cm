@@ -25,7 +25,8 @@ namespace CM
         /// </summary>
         public StateChanged stateChanged = null;
 
-        IWriteable<double> writer;
+        IDataWriter<double> writer;
+        IDataReader<double> reader;
         
         private bool isRunning;
 
@@ -40,26 +41,26 @@ namespace CM
         /// </summary>
         /// <param name="_lcard">Класс модуля АЦП</param>
         /// <param name="_tube">Абстракция трубы для записи данных</param>
-        public ReadDataThread(LCard _lcard, Tube _tube)
+        public ReadDataThread(IDataReader<double> _reader, IDataWriter<double> _writer)
         {
-            string s = GetType().Name + string.Format(": Конструктор");
-            log.add(s, LogRecord.LogReason.info);
-            Debug.WriteLine(s);
-            //size = _size;
+            #region Логирование 
+            {
+                string msg = string.Format("reader={0},writer={1}", _reader.GetType().Name, _writer.GetType().Name);
+                string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                log.add(logstr, LogRecord.LogReason.info);
+                Debug.WriteLine(logstr, "Message");
+            }
+            #endregion
+            reader = _reader;
+            writer = _writer;
+            thread = new Thread(threadFunc)
+            {
+                IsBackground = true,
+                Name = "ReadDataThread",
+            };
             isRunning = false;
-            l502 = _lcard;
-            tube = _tube;
-            //Будем считывать за раз показания по матрице целиком
-            //size = tube.settings.matrixSettings.numCols * tube.settings.matrixSettings.numRows;
         }
-        /// <summary>
-        /// Модуль АЦП (L502). Будем синхронно читать данные в потоке
-        /// </summary>
-        LCard l502;
-        /// <summary>
-        /// Труба для записи считанных данных 
-        /// </summary>
-        Tube tube;
+
         private void threadFunc(object _params)
         {
             while (isRunning)
@@ -67,73 +68,58 @@ namespace CM
                 //записываем если ещё есть место в буфере
                 lock (block)
                 {
-                    data = l502.Read();
+                    data = reader.Read();
                     if (data != null)
                     {
 
-                        if (tube.write(data) == -1)
+                        if (writer.Write(data) == -1)
                         {
                             #region Логирование
                             {
-                                string msg = "Данные не помещаюся в буфер.";
+                                string msg = string.Format("{0}:Ошибка записи данных.",writer.GetType().Name);
                                 string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                                 log.add(logstr, LogRecord.LogReason.warning);
-                                Debug.WriteLine(logstr);
+                                Debug.WriteLine(logstr,"Warning");
                             }
                             #endregion 
-                            break;
                         }
-                        onDataRead?.Invoke(data);
+                        else
+                            onDataRead?.Invoke(data);
+                    }
+                    else
+                    {
+                        #region Логирование
+                        {
+                            string msg = string.Format("{0}:Ошибка чтения данных.", reader.GetType().Name);
+                            string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                            log.add(logstr, LogRecord.LogReason.warning);
+                            Debug.WriteLine(logstr, "Warning");
+                        }
+                        #endregion
                     }
                 }
             }
-            string _s = GetType().Name + ": " + System.Reflection.MethodBase.GetCurrentMethod().Name + ": Вышли";
-            log.add(_s, LogRecord.LogReason.info);
             stateChanged?.Invoke(thread.ThreadState);
         }
         /// <summary>
-        /// Задержка после запуска платы тактирования перед запуском АЦП
+        /// Запуск потока сбора данных
         /// </summary>
-        const int MTADCWaitTimeout = 200;
-        /// <summary>
-        /// Запуск потока сбора данных с АЦП
-        /// </summary>
-        public bool start()
+        public bool Start()
         {
-            string s;
             if (!isRunning)
             {
-                //Запускаем сбор данных
-                if (l502 is LCardVirtual) ((LCardVirtual)l502).index = 0;
-                if (!l502.Start())
-                {
-                    s = string.Format("{0}: {1}: Ошибка: не удалось запустить L502", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-                    log.add(s, LogRecord.LogReason.error);
-                    Debug.WriteLine(s);
-                    return false;
-                }
-                Thread.Sleep(MTADCWaitTimeout);
-                //Запускаем тактирование АЦП
-                if (!MTADC.MTADC.start())
-                {
-                    s = string.Format("{0}: {1}: Ошибка: не удалось запустить плату тактирования АЦП", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-                    log.add(s, LogRecord.LogReason.error);
-                    Debug.WriteLine(s);
-                    return false;
-                }
                 isRunning = true;
-                tube.reset(true);
-                thread = new Thread(threadFunc)
+                if (reader.Start() && writer.Start())
                 {
-                    IsBackground = true,
-                    Name = "ReadDataThread",
-                };
-                thread.Start();
-                stateChanged?.Invoke(thread.ThreadState);
-                s = GetType().Name + ": " + System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.add(s, LogRecord.LogReason.info);
-                Debug.WriteLine(s);
-                return true;
+                    thread.Start();
+                    stateChanged?.Invoke(thread.ThreadState);
+                    return true;
+                }
+                else
+                {
+                    isRunning = false;
+                    return false;
+                }
             }
             else
             {
@@ -143,20 +129,16 @@ namespace CM
         /// <summary>
         /// Остановка потока сбора данных с АЦП
         /// </summary>
-        public void stop()
+        public void Stop()
         {
             if (isRunning)
             {
                 isRunning = false;
                 thread.Join();
-                MTADC.MTADC.stop();
-                l502.Stop();
+                writer.Stop();
+                reader.Stop();
                 stateChanged?.Invoke(thread.ThreadState);
-                stateChanged = null;
                 thread = null;
-                string s = GetType().Name + ": " + System.Reflection.MethodBase.GetCurrentMethod().Name;
-                log.add(s, LogRecord.LogReason.info);
-                Debug.WriteLine(s);
             }
             else
             {
@@ -170,7 +152,8 @@ namespace CM
         public void Dispose()
         {
             onDataRead = null;
-            stop();
+            stateChanged = null;
+            Stop();
         }
     }
 }
