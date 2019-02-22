@@ -83,14 +83,11 @@
     <Compile Include="FORMS\FRRowAllSensorsView.designer.cs">
       <DependentUpon>FRRowAllSensorsView.cs</DependentUpon>
     </Compile>
-    <Compile Include="FORMS\FRSettings.cs">
+    <Compile Include="SETTINGS\FRSettings.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FORMS\FRSettings.Designer.cs">
+    <Compile Include="SETTINGS\FRSettings.Designer.cs">
       <DependentUpon>FRSettings.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FORMS\FormSp.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="FORMS\FRTubeView.cs">
       <SubType>Form</SubType>
@@ -153,7 +150,7 @@
     <EmbeddedResource Include="FORMS\FRRowAllSensorsView.resx">
       <DependentUpon>FRRowAllSensorsView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FORMS\FRSettings.resx">
+    <EmbeddedResource Include="SETTINGS\FRSettings.resx">
       <DependentUpon>FRSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FORMS\FRTubeView.resx">

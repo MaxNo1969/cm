@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormPosSaver", "..\FormPosS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protocol", "..\Protocol\Protocol.csproj", "{052293B5-D827-4A1A-AC75-06C109F72A1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMSettings", "..\CMSettings\CMSettings.csproj", "{C6B655D5-FB3B-4F56-BCA7-26393039D8C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{052293B5-D827-4A1A-AC75-06C109F72A1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{052293B5-D827-4A1A-AC75-06C109F72A1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{052293B5-D827-4A1A-AC75-06C109F72A1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6B655D5-FB3B-4F56-BCA7-26393039D8C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6B655D5-FB3B-4F56-BCA7-26393039D8C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6B655D5-FB3B-4F56-BCA7-26393039D8C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6B655D5-FB3B-4F56-BCA7-26393039D8C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

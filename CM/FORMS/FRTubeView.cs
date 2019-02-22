@@ -12,7 +12,7 @@ namespace CM
     /// <summary>
     /// Отображение трубы
     /// </summary>
-    public partial class FRTubeView : Form
+    public partial class FRTubeView : FormSp
     {
         #region Доступ к статусу из других потоков
         /// <summary>

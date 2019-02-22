@@ -72,14 +72,6 @@ namespace ConsoleApp
             SensorSettings sensorSettings = new SensorSettings(1,4,8,16);
 
 
-            TypeSizeTest tst;
-            tst = new TypeSizeTest("НКТ 73")
-            {
-                diameter = 73,
-                sensors = sensorSettings,
-            };
-            serializationTest("TypeSize.xml", tst);
-
             Console.WriteLine("All done. Press any key...");
             Console.ReadKey();
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FPS;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -19,7 +20,7 @@ namespace CM
     /// Показывает данные по всем датчикам в одном ряду
     /// </list>
     /// </remarks>
-    public partial class FRRowAllSensorsView : Form
+    public partial class FRRowAllSensorsView : FormSp
     {
         /// <summary>
         /// Конструктор
