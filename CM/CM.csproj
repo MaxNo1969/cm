@@ -12,6 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -22,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -31,6 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -95,13 +98,29 @@
     <Compile Include="FORMS\FRTubeView.designer.cs">
       <DependentUpon>FRTubeView.cs</DependentUpon>
     </Compile>
-    <Compile Include="PARS\AppPars.cs" />
-    <Compile Include="PARS\ComPortPars.cs" />
-    <Compile Include="PARS\RectifierPars.cs" />
-    <Compile Include="PARS\SensorsPars.cs" />
-    <Compile Include="PARS\TypeSize.cs" />
+    <Compile Include="SETTINGS\Access.cs" />
+    <Compile Include="SETTINGS\MyListEditor\FRListEdtor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SETTINGS\MyListEditor\FRListEdtor.designer.cs">
+      <DependentUpon>FRListEdtor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SETTINGS\Interfaces.cs" />
+    <Compile Include="SETTINGS\MyListEditor\LBLine.cs" />
+    <Compile Include="SETTINGS\MyListEditor\MyListEditor.cs" />
+    <Compile Include="SETTINGS\AppSettings.cs" />
+    <Compile Include="SETTINGS\AppSettingsSerialization.cs" />
+    <Compile Include="SETTINGS\ComPortSettings.cs" />
+    <Compile Include="SETTINGS\L_TypeSize.cs" />
+    <Compile Include="SETTINGS\MTADCSettings.cs" />
+    <Compile Include="SETTINGS\ParBase.cs" />
+    <Compile Include="SETTINGS\ParListBase.cs" />
+    <Compile Include="SETTINGS\RectifierSettings.cs" />
+    <Compile Include="SETTINGS\SensorsSettings.cs" />
+    <Compile Include="SETTINGS\TypeSize.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SETTINGS\User.cs" />
     <Compile Include="THREADS\IDataReader.cs" />
     <Compile Include="THREADS\IDataWriter.cs" />
     <Compile Include="THREADS\ReadDataThread.cs" />
@@ -139,6 +158,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FORMS\FRTubeView.resx">
       <DependentUpon>FRTubeView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SETTINGS\MyListEditor\FRListEdtor.resx">
+      <DependentUpon>FRListEdtor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

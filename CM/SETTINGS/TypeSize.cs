@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace CM
 {
@@ -9,16 +10,21 @@ namespace CM
     [DisplayName("Типоразмер"), Description("Настройка типоразмеров")]
     [TypeConverter(typeof(ExpandableObjectConverter))]
     [Serializable]
-    public class TypeSize
+    public class TypeSize:ParBase
     {
         /// <summary>
         /// Имя типоразмера
         /// </summary>
         [DisplayName(" 1.Наименование"), Description("Наименование типоразмера в формате <Тип(\"НКТ\" или \"СБТ\">-<Диаметр>-<Дополнительный признак>")]
         public string Name { get; set; }
+
+        //[DisplayName(" 3.Диаметр"), Description("Диаметр")]
+        //public int diameter { get; set; }
+
         /// <summary>
         /// Признак типа трубы НКТ или СБТ
         /// </summary>
+        [XmlIgnore]
         [DisplayName(" 2.Тип"), Description("Тип \"НКТ\" или \"СБТ\"")]
         public string type
         {
@@ -34,6 +40,7 @@ namespace CM
         /// <summary>
         /// Диаметр
         /// </summary>
+        [XmlIgnore]
         [DisplayName(" 3.Диаметр"), Description("Диаметр")]
         public int diameter
         {
@@ -45,9 +52,11 @@ namespace CM
                     return -1;
             }
         }
+
         /// <summary>
         /// Дополнительные признаки из названия типоразмера (до первого разделителя)
         /// </summary>
+        [XmlIgnore]
         [DisplayName(" 4.Дополнительно"), Description("Диаметр")]
         public string dop
         {
@@ -59,26 +68,31 @@ namespace CM
                     return null;
             }
         }
+
         /// <summary>
         /// Минимальный годный участок
         /// </summary>
         [DisplayName(" 4.Минимальный годный участок"), Description("Минимальный годный участок")]
         public int MinGoodLength { get; set; }
+        
         /// <summary>
         /// Порог класса 1
         /// </summary>
         [DisplayName("Порог 1 класса, %"), Browsable(true)]
         public double Border1 { get; set; }
+        
         /// <summary>
         /// Порог класса 2
         /// </summary>
         [DisplayName("Порог 2 класса, %"), Browsable(true)]
         public double Border2 { get; set; }
+        
         /// <summary>
         /// Мервая зона в начале трубы
         /// </summary>
         [DisplayName("Мертвая зона в начале, мм"), Browsable(true)]
         public int DeadZoneStart { get; set; }
+        
         /// <summary>
         /// Мервая зона в конце трубы
         /// </summary>
@@ -86,10 +100,10 @@ namespace CM
         public int DeadZoneFinish { get; set; }
 
         [DisplayName("Датчики"), Browsable(true)]
-        public SensorPars sensors { get; set; }
+        public SensorSettings sensors { get; set; }
 
         [DisplayName("Блок питания"), Browsable(true)]
-        public RectifierPars rectifier { get; set; }
+        public RectifierSettings rectifier { get; set; }
 
         /// <summary>
         /// Преобразование в строку для вывода в PropertyGrid
@@ -99,11 +113,19 @@ namespace CM
         {
             return Name;
         }
+
         public TypeSize(string _name)
         {
-            Name = Name;
-            sensors = new SensorPars();
-            rectifier = new RectifierPars();
+            Name = _name;
+            sensors = new SensorSettings();
+            rectifier = new RectifierSettings();
+        }
+
+        public TypeSize()
+        {
+            Name = "Новый";
+            sensors = new SensorSettings();
+            rectifier = new RectifierSettings();
         }
         #region Разбор имени типоразмера
         /// <summary>

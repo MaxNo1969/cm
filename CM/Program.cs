@@ -15,6 +15,7 @@ namespace CM
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
+        public static AppSettings settings = null;
         [STAThread]
         static void Main(string[] args)
         {
@@ -32,6 +33,7 @@ namespace CM
                     Debug.WriteLine(logstr, "Message");
                 }
                 #endregion
+                settings = AppSettingsSerialization.load(DefaultValues.defaultAppSettingsFileName);
                 Application.Run(new FRMain());
             }
             catch (Exception ex)
@@ -42,6 +44,7 @@ namespace CM
                     string logstr = string.Format("{0}: {1}: {2}", "Program", System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                     log.add(logstr, LogRecord.LogReason.error);
                     Debug.WriteLine(logstr, "Error");
+                    Debug.Write(ex.StackTrace);
 
                 }
                 #endregion
@@ -49,6 +52,7 @@ namespace CM
             finally
             {
                 FormPosSaver.ser();
+                AppSettingsSerialization.save(settings, DefaultValues.defaultAppSettingsFileName);
             }
         }
     }

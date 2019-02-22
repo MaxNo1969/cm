@@ -1,23 +1,30 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace CM
 {
-    [DisplayName("Размер"), Description("Размер")]
+    [DisplayName("Размеры"), Description("Размеры")]
     [TypeConverter(typeof(ExpandableObjectConverter))]
     [Serializable]
     public class Dim
     {
-        [DisplayName("Столбцов"), Description("Столбцов"), DefaultValue(1)]
+        [DisplayName("Столбцов"), Description("Столбцов"), /*DefaultValue(1)*/]
         public int cols { get; set; }
-        [DisplayName("Строк"), Description("Строк"), DefaultValue(1)]
+        [DisplayName("Строк"), Description("Строк"), /*DefaultValue(1)*/]
         public int rows { get; set; }
+        [XmlIgnore]
         public int size { get { return cols * rows; } }
         public override string ToString()
         {
             return string.Format("{0}X{1}", cols, rows);
         }
-        public Dim(int _cols=1,int _rows=1)
+        public Dim()
+        {
+            cols = 1;
+            rows = 1;
+        }
+        public Dim(int _cols,int _rows)
         {
             cols = _cols;
             rows = _rows;
@@ -51,7 +58,11 @@ namespace CM
         {
             return dim.ToString();
         }
-        public Block(int _cols=1,int _rows=1,string _order="1,2,3,4")
+        public Block()
+        {
+            dim = new Dim();
+        }
+        public Block(int _cols,int _rows,string _order="1,2,3,4")
         {
             dim = new Dim(_cols, _rows);
             sensorOrder = _order;
@@ -106,7 +117,15 @@ namespace CM
         {
             return dim.ToString();
         }
-        public HallSensors(int _cols=1,int _rows=1)
+        public HallSensors()
+        {
+            dim = new Dim();
+            elementWidth = DefaultValues.hallSensorWidth;
+            elementHeight = DefaultValues.hallSensorHeight;
+            xGap = DefaultValues.xGap;
+            yGap = DefaultValues.yGap;
+        }
+        public HallSensors(int _cols,int _rows)
         {
             dim = new Dim(_cols, _rows);
             elementWidth = DefaultValues.hallSensorWidth;
@@ -124,7 +143,7 @@ namespace CM
     [DisplayName("Настройки датчиков"), Description("Настройка датчиков")]
     [TypeConverter(typeof(ExpandableObjectConverter))]
     [Serializable]
-    public class SensorPars
+    public class SensorSettings:ParBase
     {
         /// <summary>
         /// Матрица больших датчиков
@@ -145,13 +164,24 @@ namespace CM
             return string.Format("{0}X{1}", sensors.ToString(), hallSensors.ToString());
         }
 
+        [XmlIgnore]
         public int sectionSize { get { return sensors.size * hallSensors.size; } }
+        [XmlIgnore]
         public int mcols { get { return sensors.dim.cols; } }
+        [XmlIgnore]
         public int mrows { get { return sensors.dim.rows; } }
+        [XmlIgnore]
         public int cols { get { return hallSensors.dim.cols; } }
+        [XmlIgnore]
         public int rows { get { return hallSensors.dim.rows; } }
 
-        public SensorPars(int _mcols = 1, int _mrows = 1, int _cols = 1, int _rows = 1)
+        public SensorSettings()
+        {
+            sensors = new Block(1, 1);
+            hallSensors = new HallSensors(1, 1);
+        }
+
+        public SensorSettings(int _mcols = 1, int _mrows = 1, int _cols = 1, int _rows = 1)
         {
             sensors = new Block(_mcols, _mrows);
             hallSensors = new HallSensors(_cols, _rows);

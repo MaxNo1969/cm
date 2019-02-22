@@ -26,27 +26,7 @@ namespace CM
         }
     }
 
-    class TypeSizeTypeConverter : TypeConverter
-    {
-        /// <summary>
-        /// Только в строку
-        /// </summary>
-        public override bool CanConvertTo(ITypeDescriptorContext context, Type destType)
-        {
-            return destType == typeof(string);
-        }
-
-        /// <summary>
-        /// И только так
-        /// </summary>
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destType)
-        {
-            return "<" + (value as ICollection).Count + ">";
-            //return (context.Instance as Settings).currentTypeSize.Name;
-        }
-    }
-
-    class EnumTypeConverter : EnumConverter
+     class EnumTypeConverter : EnumConverter
     {
         private Type _enumType;
         public EnumTypeConverter(Type type)

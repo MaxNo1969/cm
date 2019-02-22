@@ -133,7 +133,7 @@ namespace CM
         /// <param name="_data">Данные для разбора</param>
         /// <returns>Массив данных по одному датчику</returns>
         public static double[] getSensorData(int _mc, int _mr, int _c, int _r, 
-            SensorPars _sensor, double[] _data)
+            SensorSettings _sensor, double[] _data)
         {
             int dim = _data.Length / _sensor.sectionSize;
             double[] ret = new double[dim];

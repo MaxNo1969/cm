@@ -63,9 +63,9 @@ namespace CM
             WindowState = FormWindowState.Maximized;
             TypeSize ts = new TypeSize("СБТ 73 01")
             {
-                sensors = new SensorPars(1, 4, 8, 16),
+                sensors = new SensorSettings(1, 4, 8, 16),
             };
-            tube = new Tube(ts,DefaultValues.tubeLen);
+            tube = new Tube(ts,DefaultValues.TubeLen);
             ptube = new PhysTube(tube);
         }
 
@@ -186,6 +186,15 @@ namespace CM
                     #endregion
                 }
             }
+        }
+
+        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FRSettings frSettings = new FRSettings(ref Program.settings)
+            {
+                MdiParent = this,
+            };
+            frSettings.Show();
         }
     }
 }

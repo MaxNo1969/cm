@@ -8,9 +8,10 @@ namespace CM
     /// <summary>
     /// Параметры для настройки платы татирования АЦП
     /// </summary>
+    [DisplayName("Настройки COM порта"), Description("Настройки COM порта")]
     [TypeConverter(typeof(ExpandableObjectConverter))]
     [Serializable]
-    public class ComPortPars
+    public class ComPortSettings
     {
         class PortConverter : StringConverter
         {
@@ -27,7 +28,7 @@ namespace CM
         /// <summary>
         /// Имя порта
         /// </summary>
-        [DisplayName("Порт"), DefaultValue("COM1"), Browsable(true)]
+        [DisplayName("Порт"), /*DefaultValue("COM1"),*/ Browsable(true)]
         [TypeConverter(typeof(PortConverter))]
         public string Port { get; set; }
 
@@ -37,13 +38,13 @@ namespace CM
             public override bool GetStandardValuesExclusive(ITypeDescriptorContext context) { return true; }
             public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
             {
-                return (new StandardValuesCollection(new List<int>() { 9600, 19200 }));
+                return (new StandardValuesCollection(new List<int>() { 2400, 9600, 19200 }));
             }
         }
         /// <summary>
         /// Скорость порта
         /// </summary>
-        [DisplayName("Скорость"), DefaultValue(19200), Browsable(true)]
+        [DisplayName("Скорость"), /*DefaultValue(9600),*/ Browsable(true)]
         [TypeConverter(typeof(BaudConverter))]
         public int BaudRate { get; set; }
 
@@ -56,7 +57,7 @@ namespace CM
         /// <summary>
         /// Количество бит
         /// </summary>
-        [DisplayName("Битов"), DefaultValue(8), Browsable(true)]
+        [DisplayName("Битов"), /*DefaultValue(8),*/ Browsable(true)]
         [TypeConverter(typeof(ByteSizeConverter))]
         public int DataBits { get; set; }
 
@@ -87,7 +88,8 @@ namespace CM
         /// <summary>
         /// Четность
         /// </summary>
-        [DisplayName("Четность"), TypeConverter(typeof(ParityConverter)), DefaultValue(0), Browsable(true)]
+        [DisplayName("Четность"), DefaultValue(0), Browsable(true)]
+        [TypeConverter(typeof(ParityConverter))]
         public int Parity { get; set; }
 
         static string[] stopbits = { "1", "1.5", "2" };
@@ -154,12 +156,16 @@ namespace CM
         /// <summary>
         /// Время ожидания, мс
         /// </summary>
-        [DisplayName("Время ожидания, мс"), DefaultValue(1), TypeConverter(typeof(TimeoutConverter)), Browsable(true)]
+        [DisplayName("Время ожидания, мс"), DefaultValue(1), Browsable(true)]
+        [TypeConverter(typeof(TimeoutConverter))]
         public int Timeout { get; set; }
         /// <summary>
         /// Строковое предствление для PropertyGrid
         /// </summary>
         /// <returns>Строковое предствление для PropertyGrid</returns>
-        public override string ToString() { return (Port); }
+        public override string ToString()
+        {
+            return string.Format("{0}({1},{2} bits,{3},{4})", Port, BaudRate, DataBits, parities[Parity], stopbits[StopBits]);
+        }
     }
 }

@@ -47,7 +47,7 @@ namespace CM
         {
             tube = _tube;
             tube.onDataChanged += new DataChanged(x => Invalidate());
-            bitmapWidth = (int)((double)tube.len / DefaultValues.speed * DefaultValues.freq / tube.sectionSize / 1000);
+            bitmapWidth = (int)((double)tube.len / DefaultValues.Speed * DefaultValues.freq / tube.sectionSize / 1000);
             backBuffer = new Bitmap(tube.sections, tube.sectionSize);
             //backBuffer = new Bitmap(bitmapWidth, tube.sectionSize);
             p = new Pen(Color.White, 2);

@@ -46,7 +46,7 @@ namespace CM
         /// <summary>
         /// Скорость движения трубы
         /// </summary>
-        public double speed = DefaultValues.speed;
+        public double speed = DefaultValues.Speed;
 
         /// <summary>
         /// Время прохождения одной ячейки
@@ -113,7 +113,7 @@ namespace CM
             try
             {
                 data = new double[Width, Height];
-                int zones = (int)len / DefaultValues.zoneSize;
+                int zones = (int)len / DefaultValues.ZoneSize;
                 write(tube, 0, tube.sections, 0, zones);
             }
             catch (InsufficientMemoryException ex)
@@ -230,7 +230,7 @@ namespace CM
         {
             get
             {
-                return DefaultValues.zoneSize;
+                return DefaultValues.ZoneSize;
             }
         }
         /// <summary>
