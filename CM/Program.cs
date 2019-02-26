@@ -1,11 +1,11 @@
-﻿using FPS;
-using Protocol;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using FormsExtras;
+using Protocol;
 
 namespace CM
 {
@@ -29,7 +29,7 @@ namespace CM
                 {
                     string msg = string.Format("{0}", @"Program: Начало выполнения программы.");
                     string logstr = string.Format("{0}: {1}: {2}", @"Program", System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                    log.add(logstr, LogRecord.LogReason.info);
+                    Log.add(logstr, LogRecord.LogReason.info);
                     Debug.WriteLine(logstr, "Message");
                 }
                 #endregion
@@ -42,7 +42,7 @@ namespace CM
                 {
                     string msg = string.Format("{0}", ex.Message);
                     string logstr = string.Format("{0}: {1}: {2}", "Program", System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                    log.add(logstr, LogRecord.LogReason.error);
+                    Log.add(logstr, LogRecord.LogReason.error);
                     Debug.WriteLine(logstr, "Error");
                     Debug.Write(ex.StackTrace);
 

@@ -1,5 +1,4 @@
-﻿using Protocol;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -7,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using FormsExtras;
+using Protocol;
 
 namespace CM
 {
@@ -25,7 +26,7 @@ namespace CM
                 #region Логирование
                 {
                     string logstr = string.Format("{0}: {1}", className, System.Reflection.MethodBase.GetCurrentMethod().Name);
-                    log.add(logstr, LogRecord.LogReason.info);
+                    Log.add(logstr, LogRecord.LogReason.info);
                     Debug.WriteLine(logstr);
                 }
                 #endregion 
@@ -44,7 +45,7 @@ namespace CM
                 {
                     string msg = "Первый запуск - файл настроек ещё не записан";
                     string logstr = string.Format("{0}: {1}: {2}", className, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                    log.add(logstr, LogRecord.LogReason.info);
+                    Log.add(logstr, LogRecord.LogReason.info);
                     Debug.WriteLine(logstr);
                 }
                 #endregion 
@@ -67,7 +68,7 @@ namespace CM
                 #region Логирование
                 {
                     string logstr = string.Format("{0}: {1}", className, System.Reflection.MethodBase.GetCurrentMethod().Name);
-                    log.add(logstr, LogRecord.LogReason.info);
+                    Log.add(logstr, LogRecord.LogReason.info);
                     Debug.WriteLine(logstr);
                 }
                 #endregion 
@@ -88,7 +89,7 @@ namespace CM
                     {
                         string msg = ex.Message;
                         string logstr = string.Format("{0}: {1}: {2}", className, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                        log.add(logstr, LogRecord.LogReason.error);
+                        Log.add(logstr, LogRecord.LogReason.error);
                         Debug.WriteLine(logstr);
                     }
                     #endregion

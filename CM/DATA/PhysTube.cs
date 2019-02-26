@@ -122,7 +122,7 @@ namespace CM
                 {
                     string msg = string.Format("Не удалось выделить {0,6N2} М.", Width * Height * sizeof(double));
                     string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                    log.add(logstr, LogRecord.LogReason.error);
+                    Log.add(logstr, LogRecord.LogReason.error);
                     Debug.WriteLine(logstr, "Error");
                 }
                 #endregion
@@ -261,7 +261,7 @@ namespace CM
                     string msg = string.Format("Попытка записи за границу массива:_znStart={0}, _znCnt={1}, logZoneSize={2}, logDataSize={3}",
                         _znStart, _znCnt, logZoneSize, logDataSize);
                     string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                    log.add(logstr, LogRecord.LogReason.info);
+                    Log.add(logstr, LogRecord.LogReason.info);
                     Debug.WriteLine(logstr, "Message");
                 }
                 #endregion

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using System.Data.SqlClient;
 using System.IO;
 using System.Diagnostics;
-using FPS;
+using FormsExtras;
 
 namespace Protocol
 {
@@ -100,7 +100,7 @@ namespace Protocol
                 {
                     string msg = string.Format("{0}", "Открыли файл протокола.");
                     string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                    log.add(logstr, LogRecord.LogReason.info);
+                    Log.add(logstr, LogRecord.LogReason.info);
                     Debug.WriteLine(logstr, "Message");
                 }
                 #endregion
@@ -112,7 +112,7 @@ namespace Protocol
                 {
                     string msg = string.Format("{0}", ex.Message );
                     string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                    log.add(logstr, LogRecord.LogReason.error);
+                    Log.add(logstr, LogRecord.LogReason.error);
                     Debug.WriteLine(logstr, "Error");
 
                 }
@@ -130,7 +130,7 @@ namespace Protocol
                     {
                         string msg = string.Format("{0}", "Закрываем файл протокола.");
                         string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                        log.add(logstr, LogRecord.LogReason.info);
+                        Log.add(logstr, LogRecord.LogReason.info);
                         Debug.WriteLine(logstr, "Message");
                     }
                     #endregion
@@ -144,7 +144,7 @@ namespace Protocol
                     {
                         string msg = string.Format("{0}", ex.Message);
                         string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                        log.add(logstr, LogRecord.LogReason.error);
+                        Log.add(logstr, LogRecord.LogReason.error);
                         Debug.WriteLine(logstr, "Error");
 
                     }
@@ -237,7 +237,7 @@ namespace Protocol
             lvProt.Columns[1].Width = colSizes[1];
             if (updateMethod == UpdateMethod._event)
             {
-                log.onLogChanged += new log.OnLogChanged(invokeUpdateList);
+                Log.onLogChanged += new Log.OnLogChanged(invokeUpdateList);
                 logToList();
             }
         }
@@ -258,9 +258,9 @@ namespace Protocol
 
         void logToList()
         {
-            while (log.size() > 0)
+            while (Log.size() > 0)
             {
-                LogRecord rec = log.get();
+                LogRecord rec = Log.get();
                 if (rec != null)
                 {
                     string[] subitems = { rec.dt.ToString("dd/MM/yy HH:mm:ss.ff"), rec.text };
@@ -274,9 +274,9 @@ namespace Protocol
             
             if (updateMethod == UpdateMethod._timer)
             {
-                while (log.size() > 0)
+                while (Log.size() > 0)
                 {
-                    LogRecord rec = log.get();
+                    LogRecord rec = Log.get();
                     if (rec != null)
                     {
                         string[] subitems = { rec.dt.ToString("dd/MM/yy HH:mm:ss.ff"), rec.text };
@@ -322,7 +322,7 @@ namespace Protocol
         }
         private void FRProt_FormClosing(object sender, FormClosingEventArgs e)
         {
-            log.onLogChanged -= invokeUpdateList;
+            Log.onLogChanged -= invokeUpdateList;
             FormPosSaver.save(this, string.Format("{0},{1}", lvProt.Columns[0].Width, lvProt.Columns[1].Width));
             switch (e.CloseReason)
             {

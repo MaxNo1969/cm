@@ -183,17 +183,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FormPosSaver\FormPosSaver.csproj">
+    <None Include="Resources\exitImage.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FormPosSaver\FormsExtras.csproj">
       <Project>{3e850b02-f522-4d55-a462-cb8f2455a5f4}</Project>
-      <Name>FormPosSaver</Name>
+      <Name>FormsExtras</Name>
     </ProjectReference>
     <ProjectReference Include="..\Protocol\Protocol.csproj">
       <Project>{052293b5-d827-4a1a-ac75-06c109f72a1c}</Project>
       <Name>Protocol</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\exitImage.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

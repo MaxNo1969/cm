@@ -1,6 +1,4 @@
-﻿using FPS;
-using Protocol;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using FormsExtras;
+using Protocol;
 
 namespace CM
 {
@@ -32,7 +32,7 @@ namespace CM
             {
                 string msg = string.Format("Изменено {0} {1}=>{2}", e.ChangedItem.Label, e.OldValue, e.ChangedItem.Value);
                 string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                log.add(logstr, LogRecord.LogReason.info);
+                Log.add(logstr, LogRecord.LogReason.info);
                 Debug.WriteLine(logstr);
             }
             #endregion

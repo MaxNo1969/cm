@@ -84,9 +84,9 @@
       <Project>{7cfc6852-6d04-4e99-8df4-fc35af781803}</Project>
       <Name>CM</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FormPosSaver\FormPosSaver.csproj">
+    <ProjectReference Include="..\FormPosSaver\FormsExtras.csproj">
       <Project>{3e850b02-f522-4d55-a462-cb8f2455a5f4}</Project>
-      <Name>FormPosSaver</Name>
+      <Name>FormsExtras</Name>
     </ProjectReference>
     <ProjectReference Include="..\Protocol\Protocol.csproj">
       <Project>{052293b5-d827-4a1a-ac75-06c109f72a1c}</Project>

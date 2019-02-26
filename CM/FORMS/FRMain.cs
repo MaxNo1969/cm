@@ -1,4 +1,4 @@
-﻿using FPS;
+﻿using FormsExtras;
 using Protocol;
 using System;
 using System.Collections.Generic;
@@ -179,7 +179,7 @@ namespace CM
                     {
                         string msg = string.Format("{0}", ex.Message);
                         string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                        log.add(logstr, LogRecord.LogReason.error);
+                        Log.add(logstr, LogRecord.LogReason.error);
                         Debug.WriteLine(logstr, "Error");
                         MessageBox.Show(msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     }

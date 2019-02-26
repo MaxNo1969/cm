@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
-using Protocol;
 
 namespace CM
 {
@@ -17,8 +16,8 @@ namespace CM
         public InsertPosition IP { get; private set; }
         public int CurrentIndex { get; private set; }
 
-        Color ColorLine;
-        Color ColorEmpty;
+        readonly Color ColorLine;
+        readonly Color ColorEmpty;
         public LBLine(ListBox _LB)
         {
             LB = _LB;

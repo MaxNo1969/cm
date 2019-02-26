@@ -57,7 +57,7 @@ namespace Protocol
     /// <summary>
     /// Класс для логирования
     /// </summary>
-    public static class log
+    public static class Log
     {
         /// <summary>
         /// Запись в лог

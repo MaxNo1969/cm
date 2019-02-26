@@ -9,9 +9,9 @@ using System.Windows.Forms;
 using System.Collections;
 using System.Reflection;
 using System.Drawing.Design;
-using Protocol;
 using System.Diagnostics;
-using FPS;
+using FormsExtras;
+using Protocol;
 
 namespace CM
 {
@@ -28,13 +28,11 @@ namespace CM
         private void FLBaseT_Load(object sender, EventArgs e)
         {
             PropertyInfo pii = (L as IParentBase).Parent.GetType().GetProperty((L as IParentBase).PropertyName);
-            DisplayNameAttribute dn = Attribute.GetCustomAttribute(pii, typeof(DisplayNameAttribute)) as DisplayNameAttribute;
-            if (dn != null)
+            if (Attribute.GetCustomAttribute(pii, typeof(DisplayNameAttribute)) is DisplayNameAttribute dn)
                 Text = dn.DisplayName;
             else
             {
-                DisplayNameAttribute dn1 = Attribute.GetCustomAttribute(L.GetType(), typeof(DisplayNameAttribute)) as DisplayNameAttribute;
-                if (dn1 != null)
+                if (Attribute.GetCustomAttribute(L.GetType(), typeof(DisplayNameAttribute)) is DisplayNameAttribute dn1)
                     Text = dn1.DisplayName;
             }
             //LB.AllowDrop = Attribute.GetCustomAttribute(L.GetType(), typeof(SortableAttribute)) as SortableAttribute != null;
@@ -73,7 +71,7 @@ namespace CM
             {
                 string msg = string.Format("Изменено {0} {1}=>{2}", e.ChangedItem.Label, e.OldValue, e.ChangedItem.Value);
                 string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                log.add(logstr, LogRecord.LogReason.info);
+                Log.add(logstr, LogRecord.LogReason.info);
                 Debug.WriteLine(logstr);
             }
             #endregion

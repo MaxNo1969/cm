@@ -53,9 +53,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FormPosSaver\FormPosSaver.csproj">
+    <ProjectReference Include="..\FormPosSaver\FormsExtras.csproj">
       <Project>{3e850b02-f522-4d55-a462-cb8f2455a5f4}</Project>
-      <Name>FormPosSaver</Name>
+      <Name>FormsExtras</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

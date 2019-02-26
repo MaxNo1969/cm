@@ -1,5 +1,4 @@
-﻿using Protocol;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -7,6 +6,8 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using FormsExtras;
+using Protocol;
 
 namespace CM
 {
@@ -190,7 +191,7 @@ namespace CM
                 {
                     string msg = ex.Message;
                     string logstr = string.Format("{0}: {1}: {2}",GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name,msg);
-                    log.add(logstr, LogRecord.LogReason.error);
+                    Log.add(logstr, LogRecord.LogReason.error);
                     Debug.WriteLine(logstr);
                 }
                 #endregion

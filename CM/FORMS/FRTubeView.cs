@@ -1,9 +1,8 @@
 ﻿using System.Windows.Forms;
 using System.Drawing;
 using System;
-using Protocol;
 using System.Diagnostics;
-using FPS;
+using FormsExtras;
 using System.Collections;
 using System.Collections.Generic;
 

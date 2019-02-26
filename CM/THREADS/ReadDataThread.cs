@@ -1,4 +1,5 @@
-﻿using Protocol;
+﻿using FormsExtras;
+using Protocol;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -49,7 +50,7 @@ namespace CM
             {
                 string msg = string.Format("reader={0},writer={1}", _reader.GetType().Name, _writer.GetType().Name);
                 string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                log.add(logstr, LogRecord.LogReason.info);
+                Log.add(logstr, LogRecord.LogReason.info);
                 Debug.WriteLine(logstr, "Message");
             }
             #endregion
@@ -80,7 +81,7 @@ namespace CM
                             {
                                 string msg = string.Format("{0}:Ошибка записи данных.",writer.GetType().Name);
                                 string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                                log.add(logstr, LogRecord.LogReason.warning);
+                                Log.add(logstr, LogRecord.LogReason.warning);
                                 Debug.WriteLine(logstr,"Warning");
                             }
                             #endregion 
@@ -94,7 +95,7 @@ namespace CM
                         {
                             string msg = string.Format("{0}:Ошибка чтения данных.", reader.GetType().Name);
                             string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                            log.add(logstr, LogRecord.LogReason.warning);
+                            Log.add(logstr, LogRecord.LogReason.warning);
                             Debug.WriteLine(logstr, "Warning");
                         }
                         #endregion

@@ -5,7 +5,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
-namespace FPS
+namespace FormsExtras
 {
     /// <summary>
     /// Класс для сохранения расположения формы
@@ -80,14 +80,16 @@ namespace FPS
             FormAttrs fa = fl.Find(x => x.name == _frm.Name);
             if (fa == null)
             {
-                fa = new FormAttrs();
-                fa.name = _frm.Name;
-                fa.visible = _frm.Visible;
-                fa.left = _frm.Left;
-                fa.top = _frm.Top;
-                fa.width = _frm.Width;
-                fa.height = _frm.Height;
-                fa.dop = _dop;
+                fa = new FormAttrs()
+                {
+                    name = _frm.Name,
+                    visible = _frm.Visible,
+                    left = _frm.Left,
+                    top = _frm.Top,
+                    width = _frm.Width,
+                    height = _frm.Height,
+                    dop = _dop,
+                };
                 fl.Add(fa);
             }
             else
