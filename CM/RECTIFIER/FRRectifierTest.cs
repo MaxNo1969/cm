@@ -36,7 +36,12 @@ namespace CM
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Program.rectifier.start();
+            Program.rectifier.Start();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Program.rectifier.Stop();
         }
     }
 }

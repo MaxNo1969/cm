@@ -1,6 +1,7 @@
 ﻿using Protocol;
 using System;
 using System.Diagnostics;
+using System.Threading;
 
 namespace CM
 {
@@ -234,10 +235,27 @@ namespace CM
             if (!modbus.setSingleRegister(abonent, _pos, (ushort)_val))
                 throw new Exception(modbus.err);
         }
-        /// <summary>
-        /// Установка рабочей силы тока
-        /// </summary>
-        public void setWorkAmperage()
+
+        private void setInt1(int _pos, int _val)
+        {
+            ushort res;
+            modbus.ReadInputRegisterE(abonent, _pos, out res);
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            while (res != _val)
+            {
+                modbus.setSingleRegister(abonent, _pos, (ushort)_val);
+                modbus.ReadInputRegisterE(abonent, _pos, out res);
+                //Задержка
+                Thread.Sleep(100);
+                if (sw.ElapsedMilliseconds > 1000) break;
+            }
+        }
+
+            /// <summary>
+            /// Установка рабочей силы тока
+            /// </summary>
+            public void setWorkAmperage()
         {
             if (settings.TpIU == EIU.ByI)
                 setDouble(50, settings.NominalI);
@@ -349,7 +367,17 @@ namespace CM
                 Debug.WriteLine(logstr, "Message");
             }
             #endregion
-            setInt(61, 1);
+            switch (settings.TpIU)
+            {
+                case EIU.ByI:
+                    setInt1(61, 1);
+                    break;
+                case EIU.ByU:
+                    setInt1(60, 1);
+                    break;
+                default:
+                    break;
+            }
         }
         public void Stop()
         {
@@ -362,7 +390,17 @@ namespace CM
                 Debug.WriteLine(logstr, "Message");
             }
             #endregion
-            setInt(61, 0);
+            switch (settings.TpIU)
+            {
+                case EIU.ByI:
+                    setInt1(61, 0);
+                    break;
+                case EIU.ByU:
+                    setInt1(60, 0);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
