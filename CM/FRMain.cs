@@ -181,7 +181,7 @@ namespace CM
             frADC.Show();
         }
         /// <summary>
-        /// Выпрямитель
+        /// Блок питания
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

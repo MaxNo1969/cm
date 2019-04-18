@@ -89,7 +89,7 @@ namespace CM
         readonly RectifierSettings settings;
         readonly int abonent;
         /// <summary>
-        /// Выпрямитель запущен в работу
+        /// Блок питания запущен в работу
         /// </summary>
         public bool started = false;
         /// <summary>
@@ -238,8 +238,7 @@ namespace CM
 
         private void setInt1(int _pos, int _val)
         {
-            ushort res;
-            modbus.ReadInputRegisterE(abonent, _pos, out res);
+            modbus.ReadInputRegisterE(abonent, _pos, out ushort res);
             Stopwatch sw = new Stopwatch();
             sw.Start();
             while (res != _val)

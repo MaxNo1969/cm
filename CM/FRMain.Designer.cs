@@ -330,7 +330,7 @@
             // 
             this.rectifierToolStripMenuItem.Name = "rectifierToolStripMenuItem";
             this.rectifierToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
-            this.rectifierToolStripMenuItem.Text = "Выпрямитель";
+            this.rectifierToolStripMenuItem.Text = "Блок питания";
             this.rectifierToolStripMenuItem.Click += new System.EventHandler(this.rectifierToolStripMenuItem_Click);
             // 
             // emulToolStripMenuItem
@@ -408,7 +408,7 @@
             // 
             this.rectifierTestToolStripMenuItem.Name = "rectifierTestToolStripMenuItem";
             this.rectifierTestToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
-            this.rectifierTestToolStripMenuItem.Text = "Выпрямитель";
+            this.rectifierTestToolStripMenuItem.Text = "Блок питания";
             this.rectifierTestToolStripMenuItem.Click += new System.EventHandler(this.rectifierTestToolStripMenuItem_Click);
             // 
             // FRMain

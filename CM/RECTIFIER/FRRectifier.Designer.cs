@@ -38,7 +38,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FRRectifier";
-            this.Text = "Выпрямитель";
+            this.Text = "Блок питания";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FRRectifier_FormClosing);
             this.ResumeLayout(false);
 

@@ -53,7 +53,7 @@ namespace CM
         public TypeSize Current { get; set; }
 
         [Browsable(true)]
-        [DisplayName("Выпрямитель"), Description("Настройки порта для выпрямителя/стабилизатора"), Category("3.Оборудование")]
+        [DisplayName("Блок питания"), Description("Настройки порта для выпрямителя/стабилизатора"), Category("3.Оборудование")]
         public ModbusRectifierSettings rectifierSettings { get; set; }
 
         [Browsable(true)]
