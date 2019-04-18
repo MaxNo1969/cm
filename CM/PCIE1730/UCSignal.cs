@@ -83,7 +83,9 @@ namespace CM
 
         private void label1_Click(object sender, EventArgs e)
         {
-            if (!input)
+            //Пока сделаем примитивную проверку на наличие файла
+            bool bSce = System.IO.File.Exists("signal control enabled");
+            if (!input && (bSce || Program.cmdLineArgs.ContainsKey("NOA1730")))
             {
                 //bool b = sOut.Val;
                 //if (b == true) sOut.Val = false;
