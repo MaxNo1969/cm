@@ -12,10 +12,14 @@ namespace CM
     static class Program
     {
         public static Dictionary<string, string> cmdLineArgs;
+        public static AppSettings settings = null;
+        public static Tube tube;
+        public static LCard lCard;
+        public static SignalListDef signals;
+        public static Rectifier rectifier;
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        public static AppSettings settings = null;
         [STAThread]
         static void Main(string[] args)
         {
@@ -34,6 +38,17 @@ namespace CM
                 }
                 #endregion
                 settings = AppSettingsSerialization.load(DefaultValues.defaultAppSettingsFileName);
+                //cmdLineArgs.Add("NOCOM", "true");
+                rectifier = new Rectifier(new ModBus(Program.settings.rectifierSettings.Port));
+                if (settings.Current.Name != "Новый")
+                    tube = new Tube(settings.Current, settings.TubeLen);
+                else
+                    tube = new Tube(settings.TypeSizes[0], settings.TubeLen);
+                if(cmdLineArgs.ContainsKey("NOLCARD"))
+                    lCard = new LCardVirtual(settings.lCardSettings);
+                else
+                    lCard = new LCardReal(settings.lCardSettings);
+                signals = new SignalListDef();
                 Application.Run(new FRMain());
             }
             catch (Exception ex)
@@ -51,6 +66,7 @@ namespace CM
             }
             finally
             {
+                signals.Dispose();
                 FormPosSaver.ser();
                 AppSettingsSerialization.save(settings, DefaultValues.defaultAppSettingsFileName);
             }

@@ -15,7 +15,7 @@ namespace CM
         /// <summary>
         /// Имя типоразмера
         /// </summary>
-        [DisplayName(" 1.Наименование"), Description("Наименование типоразмера в формате <Тип(\"НКТ\" или \"СБТ\">-<Диаметр>-<Дополнительный признак>")]
+        [DisplayName("Наименование"), Description("Наименование типоразмера в формате <Тип(\"НКТ\" или \"СБТ\">-<Диаметр>-<Дополнительный признак>")]
         public string Name { get; set; }
 
         //[DisplayName(" 3.Диаметр"), Description("Диаметр")]
@@ -25,7 +25,7 @@ namespace CM
         /// Признак типа трубы НКТ или СБТ
         /// </summary>
         [XmlIgnore]
-        [DisplayName(" 2.Тип"), Description("Тип \"НКТ\" или \"СБТ\"")]
+        [DisplayName("Тип"), Description("Тип \"НКТ\" или \"СБТ\"")]
         public string type
         {
             get
@@ -41,7 +41,7 @@ namespace CM
         /// Диаметр
         /// </summary>
         [XmlIgnore]
-        [DisplayName(" 3.Диаметр"), Description("Диаметр")]
+        [DisplayName("Диаметр"), Description("Диаметр")]
         public int diameter
         {
             get
@@ -57,7 +57,7 @@ namespace CM
         /// Дополнительные признаки из названия типоразмера (до первого разделителя)
         /// </summary>
         [XmlIgnore]
-        [DisplayName(" 4.Дополнительно"), Description("Диаметр")]
+        [DisplayName("Дополнительно"), Description("Диаметр")]
         public string dop
         {
             get
@@ -72,7 +72,7 @@ namespace CM
         /// <summary>
         /// Минимальный годный участок
         /// </summary>
-        [DisplayName(" 4.Минимальный годный участок"), Description("Минимальный годный участок")]
+        [DisplayName("Минимальный годный участок"), Description("Минимальный годный участок")]
         public int MinGoodLength { get; set; }
         
         /// <summary>
@@ -117,15 +117,15 @@ namespace CM
         public TypeSize(string _name)
         {
             Name = _name;
-            sensors = new SensorSettings();
-            rectifier = new RectifierSettings();
+            //sensors = new SensorSettings();
+            //rectifier = new RectifierSettings();
         }
 
         public TypeSize()
         {
             Name = "Новый";
-            sensors = new SensorSettings();
-            rectifier = new RectifierSettings();
+            //sensors = new SensorSettings();
+            //rectifier = new RectifierSettings();
         }
         #region Разбор имени типоразмера
         /// <summary>

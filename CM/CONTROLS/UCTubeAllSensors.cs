@@ -48,18 +48,27 @@ namespace CM
             tube = _tube;
             tube.onDataChanged += new DataChanged(x => Invalidate());
             bitmapWidth = (int)((double)tube.len / DefaultValues.Speed * DefaultValues.freq / tube.sectionSize / 1000);
-            backBuffer = new Bitmap(tube.sections, tube.sectionSize);
-            //backBuffer = new Bitmap(bitmapWidth, tube.sectionSize);
+            if (bitmapWidth < tube.sections) bitmapWidth = tube.sections;
+            if (tube.sections > 0)
+            {
+                backBuffer = new Bitmap(tube.sections, tube.sectionSize);
+                g = Graphics.FromImage(backBuffer);
+                bitmap = new byte[tube.sections * tube.sectionSize * 4];
+                r = new Rectangle(tube.sections, 0, bitmapWidth - tube.sections, backBuffer.Height);
+            }
+            else
+            {
+                backBuffer = null;
+                bitmap = null;
+                r = new Rectangle(0, 0, Width, Height);
+            }
             p = new Pen(Color.White, 2);
-            b = new SolidBrush(Color.White);
-            r = new Rectangle(tube.sections, 0, backBuffer.Width, backBuffer.Height);
-            g = Graphics.FromImage(backBuffer);
-            bitmap = new byte[tube.sections * tube.sectionSize * 4];
-
+            b = new SolidBrush(Color.Gray);
         }
 
         private void data2bmpbytes()
         {
+            if (bitmap == null) return;
             for (int sect = 0; sect < tube.sections; sect++)
             {
                 for (int mcol = 0; mcol < tube.mcols; mcol++)
@@ -88,31 +97,44 @@ namespace CM
 
         private void data2bmpbytesParallel()
         {
-            Parallel.For(0, tube.sections, sect =>
+            if (bitmap == null) return;
+            try
             {
-                Parallel.For(0, tube.mcols, mcol =>
-                      {
-                  Parallel.For(0, tube.mrows, mrow =>
+                Parallel.For(0, tube.sections, sect =>
+                {
+                    Parallel.For(0, tube.mcols, mcol =>
                     {
-                        Parallel.For(0, tube.cols, col =>
-                         {
-                             Parallel.For(0, tube.rows, row =>
-                              {
-
-                                  int y = mcol * tube.rows * tube.cols * tube.rows +
-                                      mrow * tube.cols * tube.rows + row * tube.cols + col;
-                                  double val = tube.getNorm(mcol, mrow, col, row, sect);
-                                  Color c = ColorHelper.getColor(val);
-                                  int ind = tube.sections * 4 * y + sect * 4;
-                                  bitmap[ind + 3] = c.A;
-                                  bitmap[ind + 2] = c.R;
-                                  bitmap[ind + 1] = c.G;
-                                  bitmap[ind + 0] = c.B;
-                              });
-                         });
+                        Parallel.For(0, tube.mrows, mrow =>
+                        {
+                            Parallel.For(0, tube.cols, col =>
+                            {
+                                Parallel.For(0, tube.rows, row =>
+                                {
+                                    int y = mcol * tube.rows * tube.cols * tube.rows +
+                                        mrow * tube.cols * tube.rows + row * tube.cols + col;
+                                    double val = tube.getNorm(mcol, mrow, col, row, sect);
+                                    Color c = ColorHelper.getColor(val);
+                                    int ind = tube.sections * 4 * y + sect * 4;
+                                    bitmap[ind + 3] = c.A;
+                                    bitmap[ind + 2] = c.R;
+                                    bitmap[ind + 1] = c.G;
+                                    bitmap[ind + 0] = c.B;
+                                });
+                            });
+                        });
                     });
-              });
-            });
+                });
+            }
+            catch(Exception ex)
+            {
+                #region Логирование 
+                {
+                    string msg = string.Format("{0}", ex.Message );
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Debug.WriteLine(logstr, "Error");
+                }
+                #endregion
+            }
         }
 
         /// <summary>
@@ -120,6 +142,7 @@ namespace CM
         /// </summary>
         private void data2bitmap()
         {
+            if (backBuffer == null) return;
             for (int sect = 0; sect < tube.sections; sect++)
             {
                 for (int mcol = 0; mcol < tube.mcols; mcol++)
@@ -146,6 +169,7 @@ namespace CM
         /// </summary>
         private void sensorBounds2bitmap()
         {
+            if (backBuffer == null) return;
             //Рисуем границы матриц
             int sensorSize = tube.cols * tube.rows;
             Pen p = new Pen(Color.White, 2);
@@ -158,17 +182,19 @@ namespace CM
         /// <summary>
         /// Рисуем границы зон
         /// </summary>
-        private static void zoneBounds2bitmap()
+        private void zoneBounds2bitmap()
         {
-            //Рисуем зоны
-            //for (int i = 1; i < tube.strobes.Count; i++)
-            //{
-            //    for (int y = 0; y < tube.sectionSize; y++)
-            //    {
-            //        backBuffer.SetPixel(tube.strobes[i].bound, y, Color.White);
-            //        backBuffer.SetPixel(tube.strobes[i].bound + 1, y, Color.White);
-            //    }
-            //}
+            if (backBuffer == null) return;
+            //Рисуем границы матриц
+            int sensorSize = tube.cols * tube.rows;
+            Pen p = new Pen(Color.White, 2);
+            Graphics g = Graphics.FromImage(backBuffer);
+            int zones = (int)tube.ptube.len / tube.ptube.zoneSize;
+            int zoneSize = backBuffer.Width / zones;
+            for (int x = 1; x < zones; x++)
+            {
+                g.DrawLine(p, x*zoneSize, 0, x*zoneSize, backBuffer.Height);
+            }
         }
         /// <summary>
         /// Обработчик OnPaint
@@ -189,14 +215,25 @@ namespace CM
                 {
                     //data2bitmap();
                     data2bmpbytesParallel();
-                    if (tube.sections < bitmapWidth) g.FillRectangle(b, r);
-                    if(bitmap.Length>0)ImgHelper.setBitmapData(ref backBuffer, ref bitmap);
+                    //data2bmpbytes();
+                    if (g != null && tube.sections < bitmapWidth) g.FillRectangle(b, r);
+                    if (backBuffer != null && bitmap != null && bitmap.Length > 0)
+                        ImgHelper.setBitmapData(ref backBuffer, ref bitmap);
                     //Рисуем границы матриц
                     sensorBounds2bitmap();
                     //Рисуем зоны
-                    //zoneBounds2bitmap();
-                    Bitmap resized = ImgHelper.ResizeImage(backBuffer, Width, Height);
-                    e.Graphics.DrawImage(resized, 0, 0);
+                    zoneBounds2bitmap();
+                    if (backBuffer != null)
+                    {
+                        Bitmap resized = ImgHelper.ResizeImage(backBuffer, Width, Height);
+                        e.Graphics.DrawImage(resized, 0, 0);
+                    }
+                    else
+                    {
+                        Graphics g = e.Graphics;
+                        g.Clear(Color.Gray);
+                    }
+
                 }
                 catch (Exception ex)
                 {

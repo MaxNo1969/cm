@@ -23,6 +23,7 @@ namespace CM
         public string Description { get; set; }
     }
     public class NoCopyAttribute : Attribute { }
+    [Serializable]
     public class ParBase : IParent, IParentBase
     {
         [Browsable(false)]
@@ -49,6 +50,17 @@ namespace CM
             return (o);
         }
         public override string ToString() { return (""); }
+
+        public ParBase()
+        {
+            Type t = GetType();
+            PropertyInfo[] pii = t.GetProperties();
+            foreach (PropertyInfo pi in pii)
+            {
+                AddNew(pi);
+            }
+        }
+
         public void SimpleCopy(ParBase _src)
         {
             Type tp_dst = GetType();
@@ -59,8 +71,7 @@ namespace CM
             {
                 if (Attribute.GetCustomAttribute(pi_src, typeof(De)) == null)
                     continue;
-                NoCopyAttribute no_copy = Attribute.GetCustomAttribute(pi_src, typeof(NoCopyAttribute)) as NoCopyAttribute;
-                if (no_copy != null)
+                if (Attribute.GetCustomAttribute(pi_src, typeof(NoCopyAttribute)) is NoCopyAttribute no_copy)
                     continue;
                 PropertyInfo pi_dst = tp_dst.GetProperty(pi_src.Name);
                 pi_dst.SetValue(this, pi_src.GetValue(_src, null), null);

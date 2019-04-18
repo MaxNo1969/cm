@@ -52,7 +52,6 @@ namespace CM
                 LB.Items.Add(p);
             Type tp = L.GetType();
             PropertyInfo pi = tp.GetProperty("Current");
-            object ob = pi.GetValue(L, null);
             if (pi != null && pi.GetValue(L,null)!=null)
                 LB.SelectedItem = pi.GetValue(L, null);
             else
@@ -75,7 +74,7 @@ namespace CM
                 Debug.WriteLine(logstr);
             }
             #endregion
-            OnValueChanged(s);
+            OnValueChanged((s as PropertyGrid).SelectedObject);
         }
 
         private void FLBaseT_FormClosed(object sender, FormClosedEventArgs e)

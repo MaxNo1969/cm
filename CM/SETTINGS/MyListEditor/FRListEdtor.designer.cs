@@ -33,7 +33,7 @@ namespace CM
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.LB = new System.Windows.Forms.ListBox();
-            this.pGrid = new PropertyGrid();
+            this.pGrid = new System.Windows.Forms.PropertyGrid();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.BDelete = new System.Windows.Forms.Button();
             this.BAdd = new System.Windows.Forms.Button();
@@ -77,11 +77,12 @@ namespace CM
             this.LB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.listBox1_MouseMove);
             this.LB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.LB_MouseUp);
             // 
-            // pdView1
+            // pGrid
             // 
             this.pGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pGrid.Location = new System.Drawing.Point(0, 0);
             this.pGrid.Name = "pGrid";
+            this.pGrid.PropertySort = System.Windows.Forms.PropertySort.NoSort;
             this.pGrid.Size = new System.Drawing.Size(201, 307);
             this.pGrid.TabIndex = 0;
             // 
@@ -121,7 +122,7 @@ namespace CM
             this.BCopy.UseVisualStyleBackColor = true;
             this.BCopy.Click += new System.EventHandler(this.BCopy_Click);
             // 
-            // FLBase
+            // FRListEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -130,7 +131,7 @@ namespace CM
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.BDelete);
             this.Controls.Add(this.BAdd);
-            this.Name = "FLBase";
+            this.Name = "FRListEditor";
             this.Text = "FLBaseT";
             this.Activated += new System.EventHandler(this.FLBase_Activated);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FLBaseT_FormClosed);

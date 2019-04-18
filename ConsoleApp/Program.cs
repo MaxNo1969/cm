@@ -14,7 +14,7 @@ namespace ConsoleApp
         static void dump2tube(string _dumpName, string _tubeName, TypeSize _typeSize)
         {
             Tube tube = new Tube(_typeSize, DefaultValues.TubeLen);
-            Console.WriteLine("Set tube.typeSize.Sensors:{0}", tube.typeSize.sensors.ToString());
+            Console.WriteLine("Set tube.typeSize.Sensors:{0}", tube.rtube.ts.sensors.ToString());
             Console.WriteLine(string.Format(@"Reading file: {0}...", _dumpName));
             DumpReader reader = new DumpReader(_dumpName);
             int size = tube.Write(reader.Read());
@@ -47,30 +47,36 @@ namespace ConsoleApp
         }
         static void Main(string[] args)
         {
+            string tubeName;
+            string dumpName;
+            TypeSize ts;
 
-            //tubeName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
-            //   System.IO.Path.DirectorySeparatorChar + "tube1.bin";
-            //dumpName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
-            //   System.IO.Path.DirectorySeparatorChar + "Dump.dbl";
-            //ts = new TypeSize("НКТ 73х01")
-            //{
-            //    sensors = new SensorSettings(1, 4, 8, 16),
-            //};
-            //dump2tube(dumpName, tubeName, ts);
+            tubeName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
+               System.IO.Path.DirectorySeparatorChar + "tube1.bin";
+            dumpName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
+               System.IO.Path.DirectorySeparatorChar + "Dump.dbl";
+            ts = new TypeSize("НКТ 73х01")
+            {
+                sensors = new SensorSettings(1, 4, 8, 16),
+            };
+            Tube tube = new Tube(ts,6000);
+            Console.WriteLine("Set tube.typeSize.Sensors:{0}", tube.rtube.ts.sensors.ToString());
+            Console.WriteLine(string.Format(@"Reading file: {0}...", dumpName));
+            DumpReader reader = new DumpReader(dumpName);
+            int size = tube.Write(reader.Read());
+            Console.WriteLine(string.Format("{0} values readed from file \"{1}\" ({2}M)",
+                size, dumpName, size * sizeof(double) / 1024));
+            if (!Tube.save(tube, tubeName))
+            {
+                Console.WriteLine(string.Format("Tube.save error"));
+                return;
+            }
 
-
-            //tubeName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
-            //   System.IO.Path.DirectorySeparatorChar + "tube2.bin";
-            //dumpName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
-            //   System.IO.Path.DirectorySeparatorChar + "Dump2.dbl";
-            //ts = new TypeSize("СБТ 127х9,2")
-            //{
-            //    sensors = new SensorSettings(1, 4, 8, 32),
-            //};
-            //dump2tube(dumpName, tubeName, ts);
-
-            SensorSettings sensorSettings = new SensorSettings(1,4,8,16);
-
+            if(!Tube.load(ref tube,tubeName))
+            {
+                Console.WriteLine(string.Format("Tube.load error"));
+                return;
+            }
 
             Console.WriteLine("All done. Press any key...");
             Console.ReadKey();

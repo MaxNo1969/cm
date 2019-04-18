@@ -9,9 +9,9 @@ namespace CM
     public class DumpReader : IDataReader<double>
     {
         readonly List<double> dump;
-        public IEnumerable<double> Read()
+        public double[] Read()
         {
-            return dump;
+            return dump.ToArray();
         }
 
         public bool Start()

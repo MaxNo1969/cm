@@ -1,5 +1,6 @@
 ﻿using Protocol;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -35,7 +36,7 @@ namespace CM
         /// Длинна трубы в мм
         /// Задаём один раз в конструкторе, после этого не меняем
         /// </summary>
-        public readonly double len;
+        public double len;
 
         /// <summary>
         /// Диаметр трубы нужен только для определения ширины развертки
@@ -66,7 +67,7 @@ namespace CM
         /// <summary>
         /// Физическое отображение трубы
         /// </summary>
-        private readonly double[,] data = null;
+        private double[,] data = null;
 
         /// <summary>
         /// Указатель на текущее положение для чтения данных
@@ -89,21 +90,29 @@ namespace CM
         /// <summary>
         /// Труба
         /// </summary>
-        public Tube tube;
-        public int mcols { get { return tube.mcols; } }
-        public int mrows { get { return tube.mrows; } }
-        public int cols { get { return tube.cols; } }
-        public int rows { get { return tube.rows; } }
+        public TypeSize ts;
+        public int mcols { get { return ts.sensors.mcols; } }
+        public int mrows { get { return ts.sensors.mrows; } }
+        public int cols { get { return ts.sensors.cols; } }
+        public int rows { get { return ts.sensors.rows; } }
 
         /// <summary>
         /// Конструктор
         /// </summary>
-        /// <param name="_tube">Труба</param>
-        public PhysTube(Tube _tube)
+        /// <param name="_ts">Типоразмер</param>
+        /// <param name="_len">Длина трубы</param>
+        public PhysTube(TypeSize _ts, int _len)
         {
-            tube = _tube;
-            len = tube.len;
-            diameter = tube.typeSize.diameter;
+            #region Логирование 
+            {
+                string logstr = string.Format("{0}: {1}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                Log.add(logstr, LogRecord.LogReason.info);
+                Debug.WriteLine(logstr, "Message");
+            }
+            #endregion
+            ts = _ts;
+            len = _len;
+            diameter = ts.diameter;
 
             endWritedX = 0;
             endWritedY = 0;
@@ -113,8 +122,9 @@ namespace CM
             try
             {
                 data = new double[Width, Height];
-                int zones = (int)len / DefaultValues.ZoneSize;
-                write(tube, 0, tube.sections, 0, zones);
+                if (Program.settings.ZoneSize == 0) Program.settings.ZoneSize = 200;
+                int zones = (int)len / Program.settings.ZoneSize;
+                reset();
             }
             catch (InsufficientMemoryException ex)
             {
@@ -127,6 +137,33 @@ namespace CM
                 }
                 #endregion
                 throw ex;
+            }
+        }
+
+        public bool expand(int numZones)
+        {
+            try
+            {
+                double[,] newData = new double[Width + numZones * logZoneSize, Height];
+                for (int x = 0; x < Width; x++)
+                    for (int y = 0; y < Height; y++)
+                        newData[x, y] = data[x, y];
+                data = newData;
+                len += zoneSize * numZones;
+                return true;
+            }
+            catch(Exception ex)
+            {
+                #region Логирование 
+                {
+                    string msg = string.Format("{0}", ex.Message );
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.error);
+                    Debug.WriteLine(logstr, "Error");
+
+                }
+                #endregion
+                return false;
             }
         }
 
@@ -153,8 +190,8 @@ namespace CM
         {
             get
             {
-                if (tube.typeSize.sensors.hallSensors.elementWidth == 0) return DefaultValues.hallSensorWidth;
-                return tube.typeSize.sensors.hallSensors.elementWidth;
+                if (ts.sensors.hallSensors.elementWidth == 0) return DefaultValues.hallSensorWidth;
+                return ts.sensors.hallSensors.elementWidth;
             }
         }
 
@@ -183,7 +220,7 @@ namespace CM
         /// Ширина развертки трубы в логических единицах
         /// Берем по суммарному количеству строк во всех датчиках
         /// </summary>
-        public int Height { get { return tube.mrows * tube.rows; } }
+        public int Height { get { return ts.sensors.mrows * ts.sensors.rows; } }
         //public int logZoneSize { get { return zoneLen / xSize; } }
 
         /// <summary>
@@ -245,81 +282,6 @@ namespace CM
         }
 
         /// <summary>
-        /// Запись данных в физическую модель
-        /// </summary>
-        /// <param name="_tube">Труба для чтения и записи</param>
-        /// <param name="_start">Начало данных(номер среза) </param>
-        /// <param name="_sz">Размер записываемых данных (в срезах)</param>
-        /// <param name="_znStart">Первая зоня для записи</param>
-        /// <param name="_znCnt">Количество зон</param>
-        public bool write(Tube _tube, int _start, int _sz, int _znStart, int _znCnt)
-        {
-            if ((_znStart + _znCnt) * logZoneSize > logDataSize - logZoneSize)
-            {
-                #region Логирование 
-                {
-                    string msg = string.Format("Попытка записи за границу массива:_znStart={0}, _znCnt={1}, logZoneSize={2}, logDataSize={3}",
-                        _znStart, _znCnt, logZoneSize, logDataSize);
-                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                    Log.add(logstr, LogRecord.LogReason.info);
-                    Debug.WriteLine(logstr, "Message");
-                }
-                #endregion
-                return false;
-            }
-            double[,,,][] tmpData = createNormalizedSensorsArray(_tube, _start, _sz, _znStart, _znCnt);
-            int measPerCell = (int)Math.Round((double)_sz / logZoneSize / _znCnt);
-            double[] accum = new double[_tube.mrows * _tube.rows];
-            for (int zn = _znStart; zn < _znStart + _znCnt; zn++)
-            {
-                for (int i = 0; i < logZoneSize; i++)
-                {
-                    for (int mrow = 0; mrow < _tube.mrows; mrow++)
-                    {
-                        for (int row = 0; row < _tube.rows; row++)
-                        {
-                            int cnt = 0;
-                            accum[mrow * _tube.rows + row] = 0;
-                            for (int mcol = 0; mcol < _tube.mcols; mcol++)
-                            {
-                                for (int col = 0; col < _tube.cols; col++)
-                                {
-                                    for (int j = 0; j < measPerCell && (zn - _znStart) * logZoneSize * measPerCell + i * measPerCell + j < _sz; j++)
-                                    {
-                                        accum[mrow * _tube.rows + row] += Math.Abs(tmpData[mcol, mrow, col, row][(zn - _znStart) * logZoneSize * measPerCell + i * measPerCell + j]);
-                                        cnt++;
-                                    }
-                                }
-                            }
-                            if (cnt > 1) accum[mrow * _tube.rows + row] /= cnt;
-                            data[zn * logZoneSize + i, mrow * _tube.rows + row] = accum[mrow * _tube.rows + row];
-                        }
-                    }
-                }
-            }
-            endWritedX = (_znStart + _znCnt) * logZoneSize;
-            return true;
-        }
-
-        static double[,,,][] createNormalizedSensorsArray(Tube _tube, int _start, int _sz, int _znStart, int _znCnt)
-        {
-            double[,,,][] tmpData = new double[_tube.mcols, _tube.mrows, _tube.cols, _tube.rows][];
-            for (int mcol = 0; mcol < _tube.mcols; mcol++)
-            {
-                for (int mrow = 0; mrow < _tube.mrows; mrow++)
-                {
-                    for (int row = 0; row < _tube.rows; row++)
-                    {
-                        for (int col = 0; col < _tube.cols; col++)
-                        {
-                            tmpData[mcol, mrow, col, row] = _tube.getNormSensorData(mcol, mrow, col, row, _start, _sz);
-                        }
-                    }
-                }
-            }
-            return tmpData;
-        }
-        /// <summary>
         /// Сброс физической модели
         /// </summary>
         /// <param name="_val">Величина для заполнения</param>
@@ -333,6 +295,5 @@ namespace CM
             startReadX = 0;
             startReadY = 0;
         }
-
     }
 }

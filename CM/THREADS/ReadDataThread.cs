@@ -18,7 +18,6 @@ namespace CM
     /// </summary>
     public class ReadDataThread : IDisposable
     {
-        public delegate void OnDataRead(IEnumerable<double> _data);
         /// <summary>
         /// Событие при чтении данных с АЦП
         /// </summary>
@@ -28,8 +27,8 @@ namespace CM
         /// </summary>
         public StateChanged stateChanged = null;
 
-        IDataWriter<double> writer;
-        IDataReader<double> reader;
+        public IDataWriter<double> writer;
+        public IDataReader<double> reader;
         
         private bool isRunning;
 
@@ -56,11 +55,11 @@ namespace CM
             #endregion
             reader = _reader;
             writer = _writer;
-            thread = new Thread(threadFunc)
-            {
-                IsBackground = true,
-                Name = "ReadDataThread",
-            };
+            //thread = new Thread(threadFunc)
+            //{
+            //    IsBackground = true,
+            //    Name = "ReadDataThread",
+            //};
             isRunning = false;
         }
 
@@ -74,7 +73,6 @@ namespace CM
                     data = reader.Read();
                     if (data != null)
                     {
-
                         if (writer.Write(data) == -1)
                         {
                             #region Логирование
@@ -114,6 +112,11 @@ namespace CM
                 isRunning = true;
                 if (reader.Start() && writer.Start())
                 {
+                    thread = new Thread(threadFunc)
+                    {
+                        IsBackground = true,
+                        Name = "ReadDataThread",
+                    };
                     thread.Start();
                     stateChanged?.Invoke(thread.ThreadState);
                     return true;

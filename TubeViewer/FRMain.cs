@@ -14,7 +14,7 @@ namespace TubeViewer
 {
     public partial class FRMain : FormSp
     {
-        Tube tube;
+        //Tube tube;
         public FRMain()
         {
             InitializeComponent();
@@ -35,9 +35,10 @@ namespace TubeViewer
             };
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                if (Tube.load(out tube, ofd.FileName))
+                Tube tube = new Tube(new TypeSize(),0);
+                if (Tube.load(ref tube, ofd.FileName))
                 {
-                    ViewAllSensors_Click(this, null);
+                    ViewAllSensors_Click(tube, null);
                 }
                 else
                 {
@@ -48,7 +49,7 @@ namespace TubeViewer
 
         private void ViewAllSensors_Click(object sender, EventArgs e)
         {
-            FRAllSensorsViewTV view = new FRAllSensorsViewTV(this,tube);
+            FRAllSensorsViewTV view = new FRAllSensorsViewTV(this,sender as Tube);
             view.Show();
         }
 

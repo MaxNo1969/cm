@@ -36,6 +36,14 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Automation.BDaq, Version=1.0.1.0, Culture=neutral, PublicKeyToken=463f5928d60183a0, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\Automation.BDaq.dll</HintPath>
+    </Reference>
+    <Reference Include="lpcieNet, Version=1.1.7.0, Culture=neutral, PublicKeyToken=5913c2625c66b2fe, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\L-Card\lpcie\lpcieNet\v4.0\lpcieNet.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms.DataVisualization" />
@@ -50,6 +58,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ADC\FRModuleTADC.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ADC\FRModuleTADC.designer.cs">
+      <DependentUpon>FRModuleTADC.cs</DependentUpon>
+    </Compile>
     <Compile Include="CONTROLS\UCTube.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -64,38 +78,103 @@
     </Compile>
     <Compile Include="DATA\DumpReader.cs" />
     <Compile Include="DATA\PhysTube.cs" />
+    <Compile Include="DATA\RawTube.cs" />
+    <Compile Include="DATA\Strobe.cs" />
     <Compile Include="DATA\Tube.cs" />
-    <Compile Include="FORMS\FRAllSensorsView.cs">
+    <Compile Include="DATA\FRAllSensorsView.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FORMS\FRAllSensorsView.Designer.cs">
+    <Compile Include="DATA\FRAllSensorsView.Designer.cs">
       <DependentUpon>FRAllSensorsView.cs</DependentUpon>
     </Compile>
-    <Compile Include="FORMS\FRMain.cs">
+    <Compile Include="EMUL\FREmul.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FORMS\FRMain.Designer.cs">
+    <Compile Include="EMUL\FREmul.designer.cs">
+      <DependentUpon>FREmul.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EMUL\TubeMoveThread.cs" />
+    <Compile Include="FRMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRMain.Designer.cs">
       <DependentUpon>FRMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="FORMS\FRRowAllSensorsView.cs">
+    <Compile Include="DATA\FRRowAllSensorsView.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FORMS\FRRowAllSensorsView.designer.cs">
+    <Compile Include="DATA\FRRowAllSensorsView.designer.cs">
       <DependentUpon>FRRowAllSensorsView.cs</DependentUpon>
     </Compile>
+    <Compile Include="ADC\FRADCData.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ADC\FRADCData.designer.cs">
+      <DependentUpon>FRADCData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ADC\FRTestL502.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ADC\FRTestL502.designer.cs">
+      <DependentUpon>FRTestL502.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ADC\LCard.cs" />
+    <Compile Include="ADC\LCardReal.cs" />
+    <Compile Include="ADC\LCardVirtual.cs" />
+    <Compile Include="ADC\MTADC.cs" />
+    <Compile Include="PCIE1730\FRSignals.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PCIE1730\FRSignals.designer.cs">
+      <DependentUpon>FRSignals.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PCIE1730\Latch.cs" />
+    <Compile Include="PCIE1730\PCIE_1730.cs" />
+    <Compile Include="PCIE1730\PCIE_1730_real.cs" />
+    <Compile Include="PCIE1730\PCIE_1730_virtual.cs" />
+    <Compile Include="PCIE1730\Signal.cs" />
+    <Compile Include="PCIE1730\SignalIn.cs" />
+    <Compile Include="PCIE1730\SignalList.cs" />
+    <Compile Include="PCIE1730\SignalListDef.cs" />
+    <Compile Include="PCIE1730\SignalOut.cs" />
+    <Compile Include="PCIE1730\UCSignal.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PCIE1730\UCSignal.designer.cs">
+      <DependentUpon>UCSignal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RECTIFIER\Crc16.cs" />
+    <Compile Include="RECTIFIER\FRRectifier.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RECTIFIER\FRRectifier.Designer.cs">
+      <DependentUpon>FRRectifier.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RECTIFIER\FRRectifierTest.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RECTIFIER\FRRectifierTest.Designer.cs">
+      <DependentUpon>FRRectifierTest.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RECTIFIER\ModBus.cs" />
+    <Compile Include="RECTIFIER\Rectifier.cs" />
     <Compile Include="SETTINGS\FRSettings.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="SETTINGS\FRSettings.Designer.cs">
       <DependentUpon>FRSettings.cs</DependentUpon>
     </Compile>
-    <Compile Include="FORMS\FRTubeView.cs">
+    <Compile Include="DATA\FRTubeView.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FORMS\FRTubeView.designer.cs">
+    <Compile Include="DATA\FRTubeView.designer.cs">
       <DependentUpon>FRTubeView.cs</DependentUpon>
     </Compile>
     <Compile Include="SETTINGS\Access.cs" />
+    <Compile Include="SETTINGS\LCardChannelSettings.cs" />
+    <Compile Include="SETTINGS\LCardSettings.cs" />
+    <Compile Include="SETTINGS\L_LCardChannels.cs" />
+    <Compile Include="SETTINGS\L_SignalSettings.cs" />
     <Compile Include="SETTINGS\MyListEditor\FRListEdtor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -112,15 +191,22 @@
     <Compile Include="SETTINGS\MTADCSettings.cs" />
     <Compile Include="SETTINGS\ParBase.cs" />
     <Compile Include="SETTINGS\ParListBase.cs" />
+    <Compile Include="SETTINGS\PCIE1730Settings.cs" />
     <Compile Include="SETTINGS\RectifierSettings.cs" />
     <Compile Include="SETTINGS\SensorsSettings.cs" />
+    <Compile Include="SETTINGS\SignalSettings.cs" />
     <Compile Include="SETTINGS\TypeSize.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SETTINGS\User.cs" />
     <Compile Include="THREADS\IDataReader.cs" />
     <Compile Include="THREADS\IDataWriter.cs" />
+    <Compile Include="THREADS\MainWorkCycle.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="THREADS\ReadDataThread.cs" />
+    <Compile Include="THREADS\StrobeThread.cs" />
+    <Compile Include="THREADS\WorkThread.cs" />
     <Compile Include="UTIL\ChartExtras.cs" />
     <Compile Include="UTIL\CmdLineHelper.cs" />
     <Compile Include="UTIL\ColorHelper.cs" />
@@ -135,25 +221,49 @@
     <Compile Include="CONTROLS\UCGraph.designer.cs">
       <DependentUpon>UCGraph.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="ADC\FRModuleTADC.resx">
+      <DependentUpon>FRModuleTADC.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="CONTROLS\UCTube.resx">
       <DependentUpon>UCTube.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="CONTROLS\UCTubeAllSensors.resx">
       <DependentUpon>UCTubeAllSensors.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FORMS\FRAllSensorsView.resx">
+    <EmbeddedResource Include="DATA\FRAllSensorsView.resx">
       <DependentUpon>FRAllSensorsView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FORMS\FRMain.resx">
+    <EmbeddedResource Include="EMUL\FREmul.resx">
+      <DependentUpon>FREmul.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRMain.resx">
       <DependentUpon>FRMain.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FORMS\FRRowAllSensorsView.resx">
+    <EmbeddedResource Include="DATA\FRRowAllSensorsView.resx">
       <DependentUpon>FRRowAllSensorsView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ADC\FRADCData.resx">
+      <DependentUpon>FRADCData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ADC\FRTestL502.resx">
+      <DependentUpon>FRTestL502.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PCIE1730\FRSignals.resx">
+      <DependentUpon>FRSignals.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PCIE1730\UCSignal.resx">
+      <DependentUpon>UCSignal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RECTIFIER\FRRectifier.resx">
+      <DependentUpon>FRRectifier.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RECTIFIER\FRRectifierTest.resx">
+      <DependentUpon>FRRectifierTest.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SETTINGS\FRSettings.resx">
       <DependentUpon>FRSettings.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FORMS\FRTubeView.resx">
+    <EmbeddedResource Include="DATA\FRTubeView.resx">
       <DependentUpon>FRTubeView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SETTINGS\MyListEditor\FRListEdtor.resx">
@@ -195,5 +305,6 @@
       <Name>Protocol</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -33,40 +33,46 @@ namespace CM
         /// </summary>
         [Browsable(true)]
         [DisplayName("Размер зоны"), Description("Размер зоны (мм)"), Category("1.Труба")]
-        public int zoneSize { get; set; }
+        public int ZoneSize { get; set; }
+
+        //[Browsable(true)]
+        //[DisplayName("Максимальное количество зон"), Description("Максимальное количество зон"), Category("1.Труба")]
+        //public int MaxZones { get; set; }
 
         [Browsable(true)]
-        [DisplayName("Максимальное количество зон"), Description("Максимальное количество зон"), Category("1.Труба")]
-        public int MaxZones { get; set; }
+        [DisplayName("Длина трубы"), Description("Длина трубы"), Category("1.Труба")]
+        public int TubeLen { get; set; }
 
-        [Browsable(false)]
-        public TypeSize Current { get { return TypeSizes?.Current; } set { if(TypeSizes != null)TypeSizes.Current = value; } }
+        [Browsable(true)]
+        public TypeSize Current { get; set; }
 
         [Browsable(true)]
         [DisplayName("Типоразмер"), Description("Настройка типоразмера"), Category("1.Труба")]
         public L_TypeSize TypeSizes { get; set; }
 
         [Browsable(true)]
+        [DisplayName("Выпрямитель"), Description("Настройки порта для выпрямителя/стабилизатора"), Category("3.Оборудование")]
+        public ModbusRectifierSettings rectifierSettings { get; set; }
+
+        [Browsable(true)]
+        [DisplayName("L502"), Description("Настройки АЦП"), Category("3.Оборудование")]
+        public LCardSettings lCardSettings { get; set; }
+
+        [Browsable(true)]
         [DisplayName("Плата тактирования АЦП"), Description("Настройки платы тактирования АЦП"), Category("3.Оборудование")]
         public MTADCSettings mtadcSettings { get; set; }
 
         [Browsable(true)]
-        [DisplayName("Выпрямитель"), Description("Настройки порта для выпрямителя/стабилизатора"), Category("3.Оборудование")]
-        public ModbusRectifierSettings rectifierSettings { get; set; }
+        [DisplayName("PCIE-1730"), Description("Настройки платы ввода/вывода (Advantech PCIE-1730)"), Category("3.Оборудование")]
+        public PCIE1730Settings pCIE1730Settings { get; set; }
 
-        public AppSettings()
+        public AppSettings():base()
         {
             //zoneSize = DefaultValues.ZoneSize;
             //MaxZones = DefaultValues.MaxZones;
             //TypeSizes = new L_TypeSize(this);
             //mtadcSettings = new MTADCSettings();
             //rectifierSettings = new ModbusRectifierSettings();
-            Type t = GetType();
-            PropertyInfo[] pii = t.GetProperties();
-            foreach(PropertyInfo pi in pii)
-            {
-                AddNew(pi);
-            }
         }
     }
 }

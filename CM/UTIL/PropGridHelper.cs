@@ -7,6 +7,23 @@ using System.Reflection;
 
 namespace CM
 {
+    public class RExpandableObjectConverter : ExpandableObjectConverter
+    {
+        public override bool GetPropertiesSupported(ITypeDescriptorContext context)
+        {
+            return true;
+        }
+
+        public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value, Attribute[] attributes)
+        {
+            //
+            // This override returns a list of properties in order
+            //
+            PropertyDescriptorCollection pdc = TypeDescriptor.GetProperties(value, attributes);
+            return (pdc);
+        }
+    }
+
     class CollectionTypeConverter : TypeConverter
     {
         /// <summary>
@@ -81,6 +98,29 @@ namespace CM
             }
 
             return Enum.Parse(_enumType, (string)value);
+        }
+    }
+    public class BooleanconverterRUS : BooleanConverter
+    {
+        private readonly string trueString = "Да";
+        private readonly string falseString = "Нет";
+        public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
+        {
+            if (value != null && value is string)
+            {
+                if ((string)value == trueString) return true;
+                if ((string)value == falseString) return false;
+            }
+            return base.ConvertFrom(context, culture, value);
+        }
+        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
+        {
+            if (destinationType == typeof(string) && value != null && value is bool)
+            {
+                if ((bool)value == true) return trueString;
+                if ((bool)value == false) return falseString;
+            }
+            return base.ConvertTo(context, culture, value, destinationType);
         }
     }
 }

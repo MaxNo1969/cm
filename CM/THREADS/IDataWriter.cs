@@ -8,5 +8,5 @@ public interface IDataWriter<T>
     bool Start();
     bool Stop();
     int Write(IEnumerable<T> _data);
-    event DataChanged onDataChanged;
+    //event DataChanged onDataChanged;
 }

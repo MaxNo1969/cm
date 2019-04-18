@@ -18,6 +18,6 @@ namespace CM
         /// Синхронное чтение данных с АЦП
         /// </summary>
         /// <returns>Массив прочитанных данных с АЦП</returns>
-	    IEnumerable<T> Read();
+	    T[] Read();
     }
 }

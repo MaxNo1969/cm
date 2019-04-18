@@ -11,7 +11,7 @@ namespace CM
     /// <summary>
     /// Отображение трубы
     /// </summary>
-    public partial class FRTubeView : FormSp
+    public partial class FRTubeView : MyMDIForm
     {
         #region Доступ к статусу из других потоков
         /// <summary>
@@ -50,7 +50,7 @@ namespace CM
             }
         }
         #endregion
-        PhysTube ptube = null;
+        Tube tube = null;
         FRMain frm;
         
         /// <summary>
@@ -62,13 +62,13 @@ namespace CM
         /// Конструктор
         /// </summary>
         /// <param name="_tube">Труба для рисования</param>
-        public FRTubeView(PhysTube _ptube,FRMain _frMain)
+        public FRTubeView(Tube _tube,FRMain _frMain)
         {
-            ptube = _ptube;
+            tube = _tube;
             frm = _frMain;
             MdiParent = frm;
             InitializeComponent();
-            ucTube.Init(ptube,this);
+            ucTube.Init(tube, this);
         }
         /// <summary>
         /// Бработка изменения размеров
@@ -83,48 +83,45 @@ namespace CM
         private void FRTubeModel_Load(object sender, System.EventArgs e)
         {
             //восстановление размеров главного окна        
-            FormPosSaver.load(this);
-            ptube.tube.onDataChanged += tube_onDataChanged;
+            tube.onDataChanged += tube_onDataChanged;
         }
 
         void tube_onDataChanged(IEnumerable<double> _data)
         {
-            if (ptube.endWritedX % (ptube.logZoneSize*(ucTube.numZones+1)) == 0)
-                ucTube.winStart = ptube.endWritedX;
-            ucTube.curCellX = ptube.endWritedX % (ptube.logZoneSize*ucTube.numZones);
-            ucTube.curCellY = ptube.endWritedY;
+            if (tube.ptube.endWritedX % (tube.ptube.logZoneSize*(ucTube.numZones+1)) == 0)
+                ucTube.winStart = tube.ptube.endWritedX;
+            ucTube.curCellX = tube.ptube.endWritedX % (tube.ptube.logZoneSize*ucTube.numZones);
+            ucTube.curCellY = tube.ptube.endWritedY;
             ucTube.Invalidate();
             updateSb();
         }
 
         private void FRTubeView_FormClosing(object sender, FormClosingEventArgs e)
         {
-            ptube.tube.onDataChanged -= tube_onDataChanged;
-            //Сохраняем положение главного окна
-            FormPosSaver.save(this);
+            tube.onDataChanged -= tube_onDataChanged;
         }
         /// <summary>
         /// Вывод информации в строку статуса
         /// </summary>
         public void updateSb()
         {
-            setSb("Zone",string.Format("Зона: {0} ({1,5:f2}-{2,5:f2})", ucTube.GetZoneNum(), 
-                ptube.l2px(ucTube.GetZoneNum() * ptube.logZoneSize) / 1000f,
-                ptube.l2px((ucTube.GetZoneNum() + 1) * ptube.logZoneSize) / 1000f));
-            setSb("PositionX", string.Format("{0,6:f3} М", ptube.l2px(ucTube.winStart + ucTube.curCellX) / 1000f));
-            setSb("PositionY", string.Format("{0,3} мм", ptube.l2py(ucTube.curCellY)));
+            setSb("Zone",string.Format("Зона: {0} ({1,5:f2}-{2,5:f2})", ucTube.GetZoneNum(),
+                tube.ptube.l2px(ucTube.GetZoneNum() * tube.ptube.logZoneSize) / 1000f,
+                tube.ptube.l2px((ucTube.GetZoneNum() + 1) * tube.ptube.logZoneSize) / 1000f));
+            setSb("PositionX", string.Format("{0,6:f3} М", tube.ptube.l2px(ucTube.winStart + ucTube.curCellX) / 1000f));
+            setSb("PositionY", string.Format("{0,3} мм", tube.ptube.l2py(ucTube.curCellY)));
 
             double val = PhysTube.undefined;
-            if (ucTube.winStart + ucTube.curCellX < ptube.Width && ucTube.curCellY < ptube.Height)
-                val = ptube[ucTube.winStart + ucTube.curCellX, ucTube.curCellY];
-            if (val == PhysTube.undefined || ucTube.winStart + ucTube.curCellX >= ptube.Width ||
-                ucTube.curCellY >= ptube.Height)
+            if (ucTube.winStart + ucTube.curCellX < tube.ptube.Width && ucTube.curCellY < tube.ptube.Height)
+                val = tube.ptube[ucTube.winStart + ucTube.curCellX, ucTube.curCellY];
+            if (val == PhysTube.undefined || ucTube.winStart + ucTube.curCellX >= tube.ptube.Width ||
+                ucTube.curCellY >= tube.ptube.Height)
             {
                 setSb("Value","Н/Д");
             }
             else
             {
-                setSb("Value", string.Format("{0,5:f3}", ptube[ucTube.winStart + ucTube.curCellX, ucTube.curCellY]));
+                setSb("Value", string.Format("{0,5:f3}", tube.ptube[ucTube.winStart + ucTube.curCellX, ucTube.curCellY]));
             }
         }
 
@@ -141,7 +138,7 @@ namespace CM
                 };
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
-                    Tube.save(ptube.tube, sfd.FileName);
+                    Tube.save(tube, sfd.FileName);
                 }
             }
         }
@@ -156,12 +153,12 @@ namespace CM
             };
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                if (!Tube.load(out ptube.tube, ofd.FileName))
+                if (!Tube.load(ref tube, ofd.FileName))
                 {
                     MessageBox.Show(string.Format("Не удалось загрузить трубу из файла {0}", ofd.FileName), "Ошибка");
                 }
-                ptube.endWritedX = 0;
-                ptube.endWritedY = 0;
+                tube.ptube.endWritedX = 0;
+                tube.ptube.endWritedY = 0;
             }
         }
 

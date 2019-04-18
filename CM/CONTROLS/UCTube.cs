@@ -18,7 +18,9 @@ namespace CM
     {
         private FRTubeView frTubeView;
 
-        private PhysTube ptube = null;
+        private Tube tube = null;
+        //private PhysTube ptube = null;
+
         private float cellXSize;
         private int xCells;
         private float cellYSize;
@@ -42,6 +44,12 @@ namespace CM
         /// Буфер для отрисовки
         /// </summary>
         private Image backBuffer = null;
+
+        /// <summary>
+        /// Перо для рисования всяких границ
+        /// </summary>
+        private readonly Pen white2pix;
+
         /// <summary>
         /// Количество зон отображаемых в верхнем окне
         /// </summary>
@@ -78,6 +86,8 @@ namespace CM
             upWinPercent = 50;
             normalizedClass2Value = 0.7;
 
+            white2pix = new Pen(Color.White, 2);
+
             winStart = 0;
             curCellX = 0;
             curCellY = 0;
@@ -87,12 +97,13 @@ namespace CM
         /// </summary>
         /// <param name="_tube"></param>
         /// <param name="_frTubeView"></param>
-        public void Init(PhysTube _ptube, FRTubeView _frTubeView)
+        public void Init(Tube _tube, FRTubeView _frTubeView)
         {
-            ptube = _ptube;
+            tube = _tube;
+            //ptube = tube.ptube;
             //xCells берем по размеру зоны и количеству зон в отображени
-            xCells = ptube.logZoneSize * numZones;
-            yCells = ptube.mrows * ptube.rows;
+            xCells = tube.ptube.logZoneSize * numZones;
+            yCells = tube.ptube.mrows * tube.ptube.rows;
             frTubeView = _frTubeView;
             frTubeView.updateSb();
         }
@@ -103,7 +114,7 @@ namespace CM
         /// <param name="e"></param>
         private void UCTube_Paint(object sender, PaintEventArgs e)
         {
-            if (ptube == null) return;
+            if (tube == null) return;
             try
             {
                 //Ширину ячеек выбираем в зависимости от ширины окна
@@ -120,21 +131,21 @@ namespace CM
                     {
                         for (int y = 0; y < yCells; y++)
                         {
-                            Brush b = (y < ptube.Height && winStart + x < ptube.Width) ? ColorHelper.getBrush(ptube[winStart + x, y]) : Brushes.White;
+                            Brush b = (y < tube.ptube.Height && winStart + x < tube.ptube.Width) ? ColorHelper.getBrush(tube[winStart + x, y]) : Brushes.White;
                             g.FillRectangle(b, x * cellXSize, y * cellYSize, cellXSize, cellYSize);
                             g.DrawRectangle(Pens.Black, x * cellXSize, y * cellYSize, cellXSize, cellYSize);
                         }
                     }
                     //рисуем границы зон
-                    for (int x = 0; x < xCells; x += ptube.logZoneSize)
+                    for (int x = 0; x < xCells; x += tube.ptube.logZoneSize)
                     {
                         g.DrawLine(zoneBorderPen, x * cellXSize, 0, x * cellXSize, Height);
                     }
                     //Рисуем границы матриц
-                    for (int i = 1; i < ptube.mrows; i++)
+                    for (int i = 1; i < tube.ptube.mrows; i++)
                     {
-                        g.DrawLine(zoneBorderPen, 0, i * cellYSize * ptube.mrows*ptube.rows, Width, 
-                            i * cellYSize * ptube.mrows * ptube.rows);
+                        g.DrawLine(zoneBorderPen, 0, i * cellYSize * tube.ptube.mrows*tube.ptube.rows, Width, 
+                            i * cellYSize * tube.ptube.mrows * tube.ptube.rows);
                     }
                     //Рисуем курсор текущей ячейки
                     g.DrawRectangle(zoneBorderPen, curCellX * cellXSize, curCellY * cellYSize, cellXSize, cellYSize);
@@ -145,40 +156,50 @@ namespace CM
                 //float cntWins = model.Width / xCells;
                 //Размер одного окна в нижней части
                 //winWidth = (float)Width * xCells / (float)tube.Width;
-                winWidth = ptube.logZoneSize * numZones;
+                winWidth = tube.ptube.logZoneSize * numZones;
                 //Вычислим высоту нижней части
                 height = Height * (100 - upWinPercent) / 100;
-                backBuffer = new Bitmap(ptube.Width, ptube.Height);
+                backBuffer = new Bitmap(tube.ptube.Width, tube.ptube.Height);
                 //ToDo - сделать заполнение Bitmap-а как UCTubeAllSensors 
-                for (int x = 0; x < ptube.Width; x++)
-                    for (int y = 0; y < ptube.Height; y++)
+                for (int x = 0; x < tube.ptube.Width; x++)
+                    for (int y = 0; y < tube.ptube.Height; y++)
                     {
-                        (backBuffer as Bitmap).SetPixel(x, y, ColorHelper.getColor(ptube[x, y]));
+                        (backBuffer as Bitmap).SetPixel(x, y, ColorHelper.getColor(tube[x, y]));
                     }
-                if (winStart + 1 < ptube.Width)
+
+                using (Graphics g = Graphics.FromImage(backBuffer))
                 {
-                    for (int y = 0; y < ptube.Height; y++)
-                    {
-                        (backBuffer as Bitmap).SetPixel(winStart, y, Color.White);
-                        (backBuffer as Bitmap).SetPixel(winStart + 1, y, Color.White);
-                    }
+                    if (winStart + 1 < tube.ptube.Width)
+                        g.DrawLine(white2pix, winStart, 0, winStart, backBuffer.Height);
+                    if (winStart + winWidth + 1 < tube.ptube.Width)
+                        g.DrawLine(white2pix, winStart + winWidth, 0, winStart + winWidth, backBuffer.Height);
+                    for (int i = 1; i < tube.ptube.mrows; i++)
+                        g.DrawLine(Pens.White, 0, i * tube.ptube.rows, backBuffer.Width, i * tube.ptube.rows);
                 }
-                if (winStart + winWidth + 1 < ptube.Width)
-                {
-                    for (int y = 0; y < ptube.Height; y++)
-                    {
-                        (backBuffer as Bitmap).SetPixel(winStart + winWidth, y, Color.White);
-                        (backBuffer as Bitmap).SetPixel(winStart + winWidth + 1, y, Color.White);
-                    }
-                }
+                //if (winStart + 1 < tube.ptube.Width)
+                //{
+                //    for (int y = 0; y < tube.ptube.Height; y++)
+                //    {
+                //        (backBuffer as Bitmap).SetPixel(winStart, y, Color.White);
+                //        (backBuffer as Bitmap).SetPixel(winStart + 1, y, Color.White);
+                //    }
+                //}
+                //if (winStart + winWidth + 1 < tube.ptube.Width)
+                //{
+                //    for (int y = 0; y < tube.ptube.Height; y++)
+                //    {
+                //        (backBuffer as Bitmap).SetPixel(winStart + winWidth, y, Color.White);
+                //        (backBuffer as Bitmap).SetPixel(winStart + winWidth + 1, y, Color.White);
+                //    }
+                //}
                 //Рисуем границы матриц
-                for (int i = 1; i < ptube.mrows; i++)
-                {
-                    for (int x = 0; x < ptube.Width; x++)
-                    {
-                        (backBuffer as Bitmap).SetPixel(x, i * ptube.rows, Color.White);
-                    }
-                }
+                //for (int i = 1; i < tube.ptube.mrows; i++)
+                //{
+                //    for (int x = 0; x < tube.ptube.Width; x++)
+                //    {
+                //        (backBuffer as Bitmap).SetPixel(x, i * tube.ptube.rows, Color.White);
+                //    }
+                //}
 
                 backBuffer = ImgHelper.ResizeImage(backBuffer, Width, height);
                 e.Graphics.DrawImage(backBuffer, 0, Height * upWinPercent / 100);
@@ -217,7 +238,7 @@ namespace CM
             if (e.Y < Height * upWinPercent / 100)
             {
                 int tmp = (int)((float)e.X / cellXSize);
-                if (winStart + tmp < ptube.Width) 
+                if (winStart + tmp < tube.ptube.Width) 
                 {
                     curCellX = tmp;
                     curCellY = (int)((float)e.Y / cellYSize);
@@ -226,7 +247,7 @@ namespace CM
             }
             else
             {
-                winStart = ((e.X * ptube.Width / Width) / ptube.logZoneSize) * ptube.logZoneSize;
+                winStart = ((e.X * tube.ptube.Width / Width) / tube.ptube.logZoneSize) * tube.ptube.logZoneSize;
                 curCellX = 0;
                 curCellY = 0;
                 needInvalidate = true;
@@ -248,16 +269,16 @@ namespace CM
                     case Keys.Left:
                         if (winStart > 0)
                         {
-                            winStart -= ptube.logZoneSize;
+                            winStart -= tube.ptube.logZoneSize;
                             curCellX = 0;
                             curCellY = 0;
                             needInvalidate = true;
                         }
                         break;
                     case Keys.Right:
-                        if (winStart < ptube.Width - ptube.logZoneSize - 1)
+                        if (winStart < tube.ptube.Width - tube.ptube.logZoneSize - 1)
                         {
-                            winStart += ptube.logZoneSize;
+                            winStart += tube.ptube.logZoneSize;
                             curCellX = 0;
                             curCellY = 0;
                             needInvalidate = true;
@@ -272,18 +293,18 @@ namespace CM
                 switch (e.KeyCode)
                 {
                     case Keys.Left:
-                        if (winStart >= ptube.logZoneSize * numZones)
+                        if (winStart >= tube.ptube.logZoneSize * numZones)
                         {
-                            winStart -= ptube.logZoneSize * numZones;
+                            winStart -= tube.ptube.logZoneSize * numZones;
                             curCellX = 0;
                             curCellY = 0;
                             needInvalidate = true;
                         }
                         break;
                     case Keys.Right:
-                        if (winStart < ptube.Width - ptube.logZoneSize * numZones - 1)
+                        if (winStart < tube.ptube.Width - tube.ptube.logZoneSize * numZones - 1)
                         {
-                            winStart += ptube.logZoneSize * numZones;
+                            winStart += tube.ptube.logZoneSize * numZones;
                             curCellX = 0;
                             curCellY = 0;
                             needInvalidate = true;
@@ -331,25 +352,25 @@ namespace CM
                 if (editable)
                 {
                     //Проверка на выход за пределы трубы
-                    if (winStart + curCellX < ptube.Width)
+                    if (winStart + curCellX < tube.ptube.Width)
                     {
                         switch (e.KeyCode)
                         {
 
                             case Keys.G:
-                                ptube[winStart + curCellX, curCellY] = 0;
+                                tube.ptube[winStart + curCellX, curCellY] = 0;
                                 needInvalidate = true;
                                 break;
                             case Keys.B:
-                                ptube[winStart + curCellX, curCellY] = 1;
+                                tube.ptube[winStart + curCellX, curCellY] = 1;
                                 needInvalidate = true;
                                 break;
                             case Keys.D2:
-                                ptube[winStart + curCellX, curCellY] = normalizedClass2Value;
+                                tube.ptube[winStart + curCellX, curCellY] = normalizedClass2Value;
                                 needInvalidate = true;
                                 break;
                             case Keys.N:
-                                ptube[winStart + curCellX, curCellY] = PhysTube.undefined;
+                                tube.ptube[winStart + curCellX, curCellY] = PhysTube.undefined;
                                 needInvalidate = true;
                                 break;
                             default:
@@ -383,7 +404,7 @@ namespace CM
         /// <returns></returns>
         public int GetZoneNum()
         {
-            return (winStart + curCellX) / ptube.logZoneSize;
+            return (winStart + curCellX) / tube.ptube.logZoneSize;
         }
 
         private void UCTube_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -391,9 +412,9 @@ namespace CM
             if (e.Y < Height * upWinPercent / 100)
             {
                 int row =(int)(e.Y / cellYSize);
-                int mrow = row / ptube.rows;
-                row = row % ptube.rows;
-                FRRowAllSensorsView frm = new FRRowAllSensorsView(frTubeView.MdiParent, ptube.tube, mrow, row);
+                int mrow = row / tube.ptube.rows;
+                row = row % tube.ptube.rows;
+                FRRowAllSensorsView frm = new FRRowAllSensorsView(frTubeView.MdiParent, tube, mrow, row);
                 frm.Show();
             }
         }

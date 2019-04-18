@@ -13,7 +13,7 @@ using Protocol;
 
 namespace CM
 {
-    public partial class FRSettings : FormSp
+    public partial class FRSettings : MyMDIForm
     {
         AppSettings settings;
         public FRSettings(ref AppSettings _settings)

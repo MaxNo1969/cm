@@ -26,7 +26,6 @@ namespace TubeViewer
             tube = _tube;
             InitializeComponent();
             ucTubeView.Init(tube);
-            Control c = this;
         }
 
         private void FRAllSensorsView_Resize(object sender, EventArgs e)
