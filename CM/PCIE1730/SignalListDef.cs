@@ -81,6 +81,13 @@ namespace CM
         /// 1 РАБ3-МНК1 готов к контролю трубы.(Digital=True,EOn=,EOff=,Timeout=00:00:00,No_reset=False,Verbal=False)
         /// </summary>
         public SignalOut oWRK;
+
+        private readonly Signal oPOWER_;
+        /// <summary>
+        /// 2 Питание датчиков (Включать при запуске программы и выключать при выходе).(Digital=True,EOn=,EOff=,Timeout=00:00:00,No_reset=False,Verbal=False)
+        /// </summary>
+        public SignalOut oPOWER;
+
         private readonly Signal oGLOBRES_;
         /// <summary>
         /// 3 ПЕРЕКЛ-Установленый сигнал является признаком завершения цикла контроля очередной трубы.(Digital=True,EOn=,EOff=,Timeout=00:00:00,No_reset=False,Verbal=False)
@@ -121,6 +128,7 @@ namespace CM
                 iSOL_ = Find("СОЛ", true); iSOL = new SignalIn(iSOL_); MIn.Add(iSOL);
 
                 oWRK_ = Find("РАБ3", false); oWRK = new SignalOut(oWRK_); MOut.Add(oWRK);
+                oPOWER_ = Find("ПИТАНИЕ", false); oPOWER = new SignalOut(oPOWER_); MOut.Add(oPOWER);
                 oGLOBRES_ = Find("ОБЩРЕЗ", false); oGLOBRES = new SignalOut(oGLOBRES_); MOut.Add(oGLOBRES);
                 oSTRB_ = Find("СТРОБВ", false); oSTRB = new SignalOut(oSTRB_); MOut.Add(oSTRB);
                 oZONRES_ = Find("ЗОНРЕЗ", false); oZONRES = new SignalOut(oZONRES_); MOut.Add(oZONRES);

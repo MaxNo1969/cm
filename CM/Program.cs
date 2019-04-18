@@ -49,6 +49,8 @@ namespace CM
                 else
                     lCard = new LCardReal(settings.lCardSettings);
                 signals = new SignalListDef();
+                //Включаем питание датчиков
+                signals.oPOWER.Val = true;
                 Application.Run(new FRMain());
             }
             catch (Exception ex)
@@ -66,6 +68,8 @@ namespace CM
             }
             finally
             {
+                //Выключаем питание датчиков
+                signals.oPOWER.Val = false;
                 signals.Dispose();
                 FormPosSaver.ser();
                 AppSettingsSerialization.save(settings, DefaultValues.defaultAppSettingsFileName);

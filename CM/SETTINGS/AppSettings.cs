@@ -43,12 +43,14 @@ namespace CM
         [DisplayName("Длина трубы"), Description("Длина трубы"), Category("1.Труба")]
         public int TubeLen { get; set; }
 
-        [Browsable(true)]
-        public TypeSize Current { get; set; }
 
         [Browsable(true)]
-        [DisplayName("Типоразмер"), Description("Настройка типоразмера"), Category("1.Труба")]
+        [DisplayName("Типоразмеры"), Description("Список допустимых тпоразмеров"), Category("1.Труба")]
         public L_TypeSize TypeSizes { get; set; }
+
+        [Browsable(true)]
+        [DisplayName("Типоразмер"), Description("Текущий типоразмер"), Category("1.Труба")]
+        public TypeSize Current { get; set; }
 
         [Browsable(true)]
         [DisplayName("Выпрямитель"), Description("Настройки порта для выпрямителя/стабилизатора"), Category("3.Оборудование")]
