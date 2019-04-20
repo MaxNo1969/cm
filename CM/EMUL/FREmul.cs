@@ -138,7 +138,7 @@ namespace CM
         /// <summary>
         /// Задержка в цикле ожидания сигнала
         /// </summary>
-        const int signalWaitCycleTime = 100;
+        const int signalWaitCycleTime = 1000;
         const int updateCountersPeriod = 1000;
         void worker_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -152,10 +152,11 @@ namespace CM
             #endregion 
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            worker.ReportProgress(101, "Включаем сигнал \"Цепи управления\"");
-            sl.set(sl.iCC, true);
-            worker.ReportProgress(101, "Включаем сигнал \"Цикл 3\"");
-            sl.set(sl.iCYC, true);
+            //Сигнал должен быть включен всегда
+            //worker.ReportProgress(101, "Включаем сигнал \"Цепи управления\"");
+            //sl.set(sl.iCC, true);
+            //worker.ReportProgress(101, "Включаем сигнал \"Цикл 3\"");
+            //sl.set(sl.iCYC, true);
             //Тут сделаем цикл по трубам
             while (true)
             {
@@ -165,17 +166,17 @@ namespace CM
                     return;
                 }
                 //Ждем выставления сигнала "Перекладка"
-                worker.ReportProgress(102, "Ждем выставления сигнала \"ПЕРЕКЛАДКА\"...");
-                while (sl.oGLOBRES.Val == false)
-                {
-                    //Проверяем кнопку СТОП
-                    if (worker.CancellationPending)
-                    {
-                        e.Cancel = true;
-                        return;
-                    }
-                    Thread.Sleep(signalWaitCycleTime);
-                }
+                //worker.ReportProgress(102, "Ждем выставления сигнала \"ПЕРЕКЛАДКА\"...");
+                //while (sl.oGLOBRES.Val == false)
+                //{
+                //    //Проверяем кнопку СТОП
+                //    if (worker.CancellationPending)
+                //    {
+                //        e.Cancel = true;
+                //        return;
+                //    }
+                //    Thread.Sleep(signalWaitCycleTime);
+                //}
                 worker.ReportProgress(101, "Выставляем сигнал \"Готовность 3\"...");
                 sl.set(sl.iREADY, true);
                 if (worker.CancellationPending)
@@ -183,36 +184,31 @@ namespace CM
                     e.Cancel = true;
                     return;
                 }
-                //Ожидаем сигнал "Работа 3"
-                worker.ReportProgress(101, "Ожидаем сигнал \"РАБОТА3\"(модуль готов к работе)...");
-                while (sl.oWRK.Val == false)
+                worker.ReportProgress(101, "Выставляем сигнал \"Соленоид\"...");
+                sl.set(sl.iSOL, true);
+                if (worker.CancellationPending)
                 {
-                    //Проверяем кнопку СТОП
-                    if (worker.CancellationPending)
-                    {
-                        e.Cancel = true;
-                        return;
-                    }
-                    Thread.Sleep(signalWaitCycleTime);
+                    e.Cancel = true;
+                    return;
                 }
-                //Начинаем  движение трубы
-                worker.ReportProgress(101, "Начинаем движение трубы...");
-                //Снимаем сигнал "Готовность 3" (начинается движение трубы)
-                worker.ReportProgress(101, "Снимаем сигнал \"ГОТОВНОСТЬ3\"...");
-                sl.set(sl.iREADY, false);
+                //Ожидаем сигнал "Работа 3"
+                //worker.ReportProgress(101, "Начинаем движение трубы...");
+                ////Снимаем сигнал "Готовность 3" (начинается движение трубы)
+                //worker.ReportProgress(101, "Снимаем сигнал \"ГОТОВНОСТЬ3\"...");
+                //sl.set(sl.iREADY, false);
                 tubeStartTime = DateTime.Now;
                 //Ждем пока труба доедет до входа в модуль (~30 сек.)
-                startWait = sw.ElapsedMilliseconds;
-                while (sw.ElapsedMilliseconds - startWait < 1000)
-                {
-                    //Проверяем кнопку СТОП
-                    if (worker.CancellationPending)
-                    {
-                        e.Cancel = true;
-                        return;
-                    }
-                    Thread.Sleep(signalWaitCycleTime);
-                }
+                //startWait = sw.ElapsedMilliseconds;
+                //while (sw.ElapsedMilliseconds - startWait < 1000)
+                //{
+                //    //Проверяем кнопку СТОП
+                //    if (worker.CancellationPending)
+                //    {
+                //        e.Cancel = true;
+                //        return;
+                //    }
+                //    Thread.Sleep(signalWaitCycleTime);
+                //}
                 //Запускаем движение трубы
                 tMover.start();
                 //Труба на входе в модуль мнк3
@@ -252,6 +248,8 @@ namespace CM
                 worker.ReportProgress(101, "Труба вышла из МНК3...");
                 worker.ReportProgress(101, "Снимаем сигнал \"КОНТРОЛЬ3\"...");
                 sl.set(sl.iCNTR, false);
+                worker.ReportProgress(101, "Снимаем сигнал \"СОЛЕНОИД\"...");
+                sl.set(sl.iSOL, false);
                 tMover.stop();
             }
         }

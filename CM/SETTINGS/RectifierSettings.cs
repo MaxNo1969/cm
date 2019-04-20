@@ -54,7 +54,7 @@ namespace CM
         /// <returns>Строковое представлениедля отображения в PropertyGrid</returns>
         public override string ToString()
         {
-            return string.Format("Аб.{0},Порт: {1},Пер: {2}c, ", Abonent.ToString(), Port.Port, Period.ToString());
+            return string.Format("Аб.{0},Порт: {1},Пер: {2}c, ", Abonent.ToString(), Port.PortName, Period.ToString());
         }
         public ModbusRectifierSettings()
         {

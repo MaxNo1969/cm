@@ -99,10 +99,12 @@ namespace CM
             {
                 if (ptube.startReadX < ptube.Width)
                 {
+                    //Генерируем строб
                     if (ptube.l2px(ptube.startReadX) % Program.settings.ZoneSize == 0)
                     {
                         sl.set(sl.iSTRB, true);
                     }
+                    //Сдвигаем трубу
                     lock (block)
                     {
                         ptube.startReadX++;

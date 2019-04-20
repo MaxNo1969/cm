@@ -8,12 +8,12 @@ namespace CM
     /// <summary>
     /// Основной поток работы программы
     /// </summary>
-    class WorkThread : IDisposable
+    class WorkThread1 : IDisposable
     {
         public bool isRunning { get; private set; }
         private Thread thread;
         SignalListDef sl = Program.signals;
-        
+
         /// <summary>
         /// Блокировка
         /// </summary>
@@ -26,11 +26,11 @@ namespace CM
         /// <summary>
         /// Конструктор
         /// </summary>
-        public WorkThread(Tube _tube, FRMain _frm)
+        public WorkThread1(Tube _tube, FRMain _frm)
         {
             #region Логирование 
             {
-                string msg = string.Format("{0}", "" );
+                string msg = string.Format("{0}", "");
                 string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                 Log.add(logstr, LogRecord.LogReason.info);
                 Debug.WriteLine(logstr, "Message");
@@ -40,22 +40,34 @@ namespace CM
             frm = _frm;
         }
 
+
+        //17.04.2019, 13:29 - Алексей Червонцев: Нет в цикле сперва ждем готовность и соленоид, а при появлении ждем контроль
+        //17.04.2019, 13:30 - Алексей Червонцев: Контроль появится когда труба булет уже в модуле на входе и выходе одновременно
+        //17.04.2019, 13:30 - Алексей Червонцев: И снимется когда труба выйдет с датчика на входе
+        //17.04.2019, 13:31 - Алексей Червонцев: Т.е.Контрольль стоит когда оба датчика на входе и выходе замкнуты
+        //17.04.2019, 13:31 - Алексей Червонцев: С пропаданием контроля снимается и сигнал соленоид
+        //17.04.2019, 13:32 - Алексей Червонцев: Чтобы резко снять магнитеое поле, если его снимать по команде пойдут искажения сигнала
+        //17.04.2019, 13:34 - Алексей Червонцев: По появлению контроля уже все включено, надо только запустить п217
+        //17.04.2019, 13:35 - Алексей Червонцев: Сбор пойдет
+        //17.04.2019, 13:35 - Алексей Червонцев: И выключить п217 при пропадании контроля
+        //17.04.2019, 13:35 - Алексей Червонцев: Ну потом выключить питание
+        //17.04.2019, 13:37 - Алексей Червонцев: Скорость мерить по сигналу соленоид до появления контроля
+        //17.04.2019, 13:37 - Алексей Червонцев: Расстояние я скажу
+
         //Перечисление для текущуго состояния конечного автомата
-        public enum WrkStates 
+        public enum WrkStates
         {
             none, //Не установлено
             startWorkCycle, //Начало рабочего цикла по трубе
-            waitNextTube, //Ожидаем трубу на входе в установку
-            moduleReady, //Установка готова к работе
+            waitNextTube, //Ждем следующую трубу
             waitCntrl, //Ждем появления сигнала "Контроль"
             work, //Работа - крутим цикл приема данных до снятия сигнала "Контроль"
             endWork, //Работа закончена
             error //Приключилась ошибка
         }
         public WrkStates curState;
-        private static WrkStates prevState = WrkStates.none;
-        private static TimeSpan waitReadyStarted;
-        private static TimeSpan waitControlStarted;
+        private WrkStates prevState = WrkStates.none;
+        private TimeSpan waitControlStarted;
         private void threadFunc(object _params)
         {
             try
@@ -63,9 +75,6 @@ namespace CM
                 //начинаем отсчет времени
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                //Выставляем сигнал "Перекладка" - установка готова к следующему рабочему циклу
-                //sl.oPEREKL.Val = true;
-                //В эту строку запишем сообщение об ошибке
                 string errStr = string.Empty;
                 string s;
                 curState = WrkStates.startWorkCycle;
@@ -83,7 +92,7 @@ namespace CM
                         string msg = string.Format("{0} -> {1}", Enum.GetName(typeof(WrkStates), prevState), Enum.GetName(typeof(WrkStates), curState));
                         #region Логирование
                         {
-                            string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name,msg);
+                            string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                             Log.add(logstr, LogRecord.LogReason.info);
                             Debug.WriteLine(logstr);
                         }
@@ -95,23 +104,26 @@ namespace CM
                     {
                         //Проверяем наличие ошибки - если выставлено, то закрываем всё и выходим из цикла
                         case WrkStates.error:
-                            s = string.Format("{0}: {1}: Ошибка: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, errStr);
-                            Log.add(errStr, LogRecord.LogReason.error);
-                            Debug.WriteLine(errStr);
+                            #region Логирование
+                            {
+                                s = string.Format("{0}: {1}: Ошибка: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, errStr);
+                                Log.add(errStr, LogRecord.LogReason.error);
+                                Debug.WriteLine(errStr);
+                            }
+                            #endregion Логирование
                             isRunning = false;
-                            //frm.startStop();
                             break;
-                        //Начало рабочего цикла - снимаем сигнал "Перекладка" для сигнализации того, что
+                        //Начало рабочего цикла - снимаем сигнал "" для сигнализации того, что
                         //установка ждет следующую трубу
                         case WrkStates.startWorkCycle:
                             sl.oGLOBRES.Val = false;
                             curState = WrkStates.waitNextTube;
                             break;
                         case WrkStates.waitNextTube:
-                            //Труба поступила на вход установки
-                            if (sl.iREADY.Val == true)
+                            //Сперва ждем готовность и соленоид
+                            if (sl.iREADY.Val == true && sl.iSOL.Val==true)
                             {
-                                //Если перекладка не снята - снимаем её
+                                //Если 
                                 sl.oGLOBRES.Val = false;
                                 //Здесь подготовка модуля к работе
                                 {
@@ -121,20 +133,21 @@ namespace CM
                                 }
                                 //Выставляем сигнал "РАБОТА3"
                                 sl.oWRK.Val = true;
-                                waitReadyStarted = sw.Elapsed;
-                                curState = WrkStates.moduleReady;
+                                waitControlStarted = sw.Elapsed;
+                                curState = WrkStates.waitCntrl;
                             }
                             break;
-                        case WrkStates.moduleReady:
-                            //Тут надо проверить таймоут ожидания начала движения трубы
-                            if ((sw.Elapsed - waitReadyStarted).Seconds > 30)
+                        //При появлении сигнала КОНТРОЛЬ начать анализировать сигнал СТРОБ3. 
+                        //Если сигнал КОНТРОЛЬ не появился за определенное время (10 секунд) – 
+                        //аварийное завершение режима с выводом со-ответствующего сообщения.
+                        case WrkStates.waitCntrl:
+                            if ((sw.Elapsed - waitControlStarted).Seconds > 10)
                             {
-                                errStr = "Не дождались начала движения трубы";
+                                errStr = "Не дождались трубы на входе в модуль";
                                 curState = WrkStates.error;
                                 break;
                             }
-                            //Снялcя сигнал "ГОТОВНОСТЬ3" - труба начала движение
-                            if (sl.iREADY.Val == false)
+                            if (sl.iCNTR.Val == true)
                             {
                                 //Включить сбор данных с модуля контроля. Ожидать появления сигнала КОНТРОЛЬ. 
                                 {
@@ -145,25 +158,6 @@ namespace CM
                                     readDataThread = new ReadDataThread(Program.lCard, tube);
                                     readDataThread.Start();
                                 }
-                                waitControlStarted = sw.Elapsed;
-                                curState = WrkStates.waitCntrl;
-                            }
-                            break;
-                        //При появлении сигнала КОНТРОЛЬ начать анализировать сигнал СТРОБ3. 
-                        //Если сигнал КОНТРОЛЬ не появился за определенное время (10 секунд) – 
-                        //аварийное завершение режима с выводом со-ответствующего сообщения.
-                        case WrkStates.waitCntrl:
-                            if ((sw.Elapsed - waitControlStarted).Seconds > 30)
-                            {
-                                errStr = "Не дождались трубы на входе в модуль";
-                                curState = WrkStates.error;
-                                break;
-                            }
-                            if(sl.iCNTR.Val==true)
-                            {
-                                //Запускаем поток чтения данных
-                                //frm.readDataThread.start();
-                                //frm.strobeThread.start();
                                 curState = WrkStates.work;
                             }
                             break;
@@ -190,8 +184,6 @@ namespace CM
                             curState = WrkStates.startWorkCycle;
                             //По идее надо наверное выходить из цикла работы для следующей трубы уже запускать новый цикл
                             isRunning = false;
-                            //frm.startStop();
-                            //frm.setSb("Info", "Для запуска нажмите F5");
                             break;
                         default:
                             break;
@@ -201,20 +193,15 @@ namespace CM
                 }
                 string _s = GetType().Name + ": " + System.Reflection.MethodBase.GetCurrentMethod().Name + ": Вышли";
                 Log.add(_s, LogRecord.LogReason.info);
-                //Если не установлено прерывание на просмотр и нет ошибки запускаем рабочий цикл по новой
-                frm.setSb("Info", _s);
                 //Останавливаем поток обработки стробов
-                //frm.strobeThread.stop();
+                strobeThread.stop();
                 //Останавливаем поток чтения данных если он запущен
                 readDataThread.Stop();
-                //readDataThread = null;
-                //if (!frm.bStopForView && curState!= WrkStates.error)
-                //    frm.startStop();
             }
             catch (Exception e)
             {
                 curState = WrkStates.error;
-                string s = GetType().Name + ": " + System.Reflection.MethodBase.GetCurrentMethod().Name + ": "+e.Message;
+                string s = GetType().Name + ": " + System.Reflection.MethodBase.GetCurrentMethod().Name + ": " + e.Message;
                 Log.add(s, LogRecord.LogReason.error);
                 Debug.WriteLine(s);
                 frm.setSb("Info", s + ". Аварийное завершение.");
@@ -226,9 +213,6 @@ namespace CM
                 //Снимем все выходные сигналы
                 sl.ClearAllSignals();
                 isRunning = false;
-                //if (!frm.bStopForView && curState != WrkStates.error)
-                //    frm.startStop();
-                //frm.startStop();
             }
         }
         public void start()
@@ -256,7 +240,7 @@ namespace CM
         {
             #region Логирование 
             {
-                string msg = string.Format("{0}", @"stop" );
+                string msg = string.Format("{0}", @"stop");
                 string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                 Log.add(logstr, LogRecord.LogReason.info);
                 Debug.WriteLine(logstr, "Message");
@@ -269,7 +253,7 @@ namespace CM
                 thread = null;
             }
         }
-        
+
         void IDisposable.Dispose()
         {
             stop();

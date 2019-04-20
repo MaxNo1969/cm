@@ -14,7 +14,7 @@ namespace CM
     {
         readonly FRMain frMain;
         readonly Tube tube;
-        WorkThread workThread = null;
+        WorkThread1 workThread1 = null;
         public MainWorkCycle(Tube _tube, FRMain _frMain):base()
         {
             #region Логирование 
@@ -45,23 +45,18 @@ namespace CM
             #endregion
             while(true)
             {
-                //В цикле сперва ждем готовность и соленоид
-
-                //А при появлении ждем контроль
-                //Выставляем сигнал "Перекладка" - установка готова к следующему рабочему циклу
-                Program.signals.oGLOBRES.Val = true;
                 if (CancellationPending)
                 {
                     e.Cancel = true;
                     break;
                 }
-                workThread = new WorkThread(tube, frMain);
-                workThread.start();
-                while (workThread.isRunning) Thread.Sleep(100);
-                ReportProgress(10);
-                break;
+                workThread1 = new WorkThread1(tube, frMain);
+                workThread1.start();
+                while (workThread1.isRunning) Thread.Sleep(100);
+                //ReportProgress(10);
+                if (frMain.breakToView) break;
             }
-            workThread.stop();
+            workThread1.stop();
             #region Логирование 
             {
                 string logstr = string.Format("{0}: {1} - Exit", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -80,6 +75,7 @@ namespace CM
                 Debug.WriteLine(logstr, "Message");
             }
             #endregion
+            frMain.startstopToolStripMenuItem.Text = "&Старт";
         }
 
         private void MainWorkCycle_ProgressChanged(object sender, ProgressChangedEventArgs e)

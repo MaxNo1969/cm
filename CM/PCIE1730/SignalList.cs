@@ -61,7 +61,7 @@ namespace CM
         /// <summary>
         /// Плата цифрового ввода/вывода (PCIE-1730)
         /// </summary>
-        protected PCIE_1730 a1730;
+        public PCIE_1730 a1730;
 
         private List<Signal> M = new List<Signal>();
         private List<Latch> L = new List<Latch>();

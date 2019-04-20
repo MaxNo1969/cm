@@ -132,6 +132,7 @@ namespace CM
                 oGLOBRES_ = Find("ОБЩРЕЗ", false); oGLOBRES = new SignalOut(oGLOBRES_); MOut.Add(oGLOBRES);
                 oSTRB_ = Find("СТРОБВ", false); oSTRB = new SignalOut(oSTRB_); MOut.Add(oSTRB);
                 oZONRES_ = Find("ЗОНРЕЗ", false); oZONRES = new SignalOut(oZONRES_); MOut.Add(oZONRES);
+
                 Start();
             }
             catch (KeyNotFoundException)
@@ -156,10 +157,10 @@ namespace CM
             {
                 throw new Exception("Пропал сигнал цепи управления");
             }
-            else if (iCYC.Val == false)
-            {
-                throw new Exception("Пропал сигнал \"ЦИКЛ3\"");
-            }
+            //else if (iCYC.Val == false)
+            //{
+            //    throw new Exception("Пропал сигнал \"ЦИКЛ3\"");
+            //}
             else
                 return true;
         }

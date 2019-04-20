@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -29,19 +30,24 @@ namespace CM
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            label8.Text = string.Format("Время:{0}",Program.rectifier.getCurrentProcessSeconds());
-            label9.Text = string.Format("Ток:{0}",Program.rectifier.getAmperage());
-            label10.Text = string.Format("Напряжение:{0}",Program.rectifier.getVoltage());
+            //label8.Text = string.Format("Время:{0}",Program.rectifier.getCurrentProcessSeconds());
+            //label9.Text = string.Format("Ток:{0}",Program.rectifier.getAmperage());
+            //label10.Text = string.Format("Напряжение:{0}",Program.rectifier.getVoltage());
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Program.rectifier.Start();
+            //Program.rectifier.Start();
+            Program.rectifier.modbus.setSingleRegister(1, 61, 1);
+            Thread.Sleep(200);
+            Program.rectifier.modbus.ReadInputRegisterE(1, 1, out ushort res);
+            label8.Text = string.Format("{0}", res);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Program.rectifier.Stop();
+            //Program.rectifier.Stop();
+            Program.rectifier.modbus.setSingleRegister(1, 61, 0);
         }
     }
 }

@@ -207,6 +207,7 @@
     <Compile Include="THREADS\ReadDataThread.cs" />
     <Compile Include="THREADS\StrobeThread.cs" />
     <Compile Include="THREADS\WorkThread.cs" />
+    <Compile Include="THREADS\WorkThread1.cs" />
     <Compile Include="UTIL\ChartExtras.cs" />
     <Compile Include="UTIL\CmdLineHelper.cs" />
     <Compile Include="UTIL\ColorHelper.cs" />

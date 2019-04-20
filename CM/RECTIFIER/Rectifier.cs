@@ -85,7 +85,7 @@ namespace CM
     /// </summary>
     public class Rectifier : IDisposable
     {
-        readonly ModBus modbus;
+        public readonly ModBus modbus;
         readonly RectifierSettings settings;
         readonly int abonent;
         /// <summary>
@@ -244,9 +244,9 @@ namespace CM
             while (res != _val)
             {
                 modbus.setSingleRegister(abonent, _pos, (ushort)_val);
+                Thread.Sleep(100);
                 modbus.ReadInputRegisterE(abonent, _pos, out res);
                 //Задержка
-                Thread.Sleep(100);
                 if (sw.ElapsedMilliseconds > 1000) break;
             }
         }

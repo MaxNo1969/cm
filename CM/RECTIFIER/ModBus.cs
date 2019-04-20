@@ -43,13 +43,22 @@ namespace CM
             }
             else
             {
-                ser = new SerialPort(settings.Port)
+                ser = new SerialPort(settings.PortName)
                 {
+                    BaudRate = settings.BaudRate,
                     DataBits = settings.DataBits,
                     Parity = settings.Parity,
                     StopBits = settings.StopBits,
                     ReadTimeout = settings.ReadIntervalTimeout,
                 };
+                //ser = new SerialPort("COM8")
+                //{
+                //    BaudRate = 9600,
+                //    DataBits = 8,
+                //    Parity = Parity.None,
+                //    StopBits = StopBits.One,
+                //    ReadTimeout = 100,
+                //};
                 answer = new AutoResetEvent(false);
                 ser.DataReceived += new SerialDataReceivedEventHandler(ser_DataReceived);
                 try
@@ -141,11 +150,13 @@ namespace CM
             {
                 try
                 {
+                    Log.add(string.Format("SEND:{0}", print(query)));
                     ser.Write(query, 0, query.Length);
                     if (answer.WaitOne(settings.ReadIntervalTimeout))
                     {
                         byte[] packet = new byte[7];
                         int count = ser.Read(packet, 0, packet.Length);
+                        Log.add(string.Format("RECV:{0}", print(packet)));
                         if (count != 7)
                         {
                             err = "Не смогли прочитать";
@@ -196,6 +207,14 @@ namespace CM
             }
         }
 
+        public static string print(byte[] _data)
+        {
+            string ret = string.Empty;
+            foreach (byte b in _data)
+                ret = ret + b.ToString() + " ";
+            return ret;
+        }
+
         /// <summary>
         /// Установка регистра
         /// </summary>
@@ -220,11 +239,13 @@ namespace CM
             {
                 try
                 {
+                    Log.add(string.Format("SEND:{0}",print(query)));
                     ser.Write(query, 0, query.Length);
                     if (answer.WaitOne(settings.ReadIntervalTimeout))
                     {
                         byte[] packet = new byte[5];
                         int count = ser.Read(packet, 0, packet.Length);
+                        Log.add(string.Format("RECV:{0}", print(packet)));
                         if (count != 5)
                         {
                             err = "Не смогли прочитать";

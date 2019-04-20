@@ -20,7 +20,7 @@ namespace CM
             settings = _pars;
             #region Логирование 
             {
-                string msg = string.Format("Конструктор: {0}", settings.Port);
+                string msg = string.Format("Конструктор: {0}", settings.PortName);
                 string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                 Log.add(logstr, LogRecord.LogReason.info);
                 Debug.WriteLine(logstr, "Message");
@@ -34,7 +34,7 @@ namespace CM
             }
             else
             {
-                ser = new SerialPort(settings.Port)
+                ser = new SerialPort(settings.PortName)
                 {
                     BaudRate = settings.BaudRate,
                     Parity = settings.Parity,
@@ -42,6 +42,14 @@ namespace CM
                     StopBits = settings.StopBits,
                     ReadTimeout = settings.ReadIntervalTimeout,
                 };
+                //ser = new SerialPort("COM7")
+                //{
+                //    BaudRate = 19200,
+                //    Parity = Parity.None,
+                //    DataBits = 8,
+                //    StopBits = StopBits.One,
+                //    ReadTimeout = 500,
+                //};
                 answer = new AutoResetEvent(false);
                 ser.DataReceived += new SerialDataReceivedEventHandler(ser_DataReceived);
                 try
@@ -249,7 +257,7 @@ namespace CM
 
         public override string ToString()
         {
-            return string.Format("MTADC: Port={0}",settings.Port);
+            return string.Format("MTADC: Port={0}",settings.PortName);
         }
     }
 } 

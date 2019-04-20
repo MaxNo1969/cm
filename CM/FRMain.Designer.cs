@@ -55,6 +55,7 @@
             this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.testADCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.модульТактированияToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rectifierTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.windowsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.protocolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewSignalsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,7 +70,6 @@
             this.lblTypeSize = new System.Windows.Forms.ToolStripLabel();
             this.cbTypeSize = new System.Windows.Forms.ToolStripComboBox();
             this.lblTubesCounter = new System.Windows.Forms.ToolStripLabel();
-            this.rectifierTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.ssMain.SuspendLayout();
             this.ts.SuspendLayout();
@@ -291,6 +291,13 @@
             this.модульТактированияToolStripMenuItem.Text = "Модуль тактирования";
             this.модульТактированияToolStripMenuItem.Click += new System.EventHandler(this.модульТактированияToolStripMenuItem_Click);
             // 
+            // rectifierTestToolStripMenuItem
+            // 
+            this.rectifierTestToolStripMenuItem.Name = "rectifierTestToolStripMenuItem";
+            this.rectifierTestToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.rectifierTestToolStripMenuItem.Text = "Блок питания";
+            this.rectifierTestToolStripMenuItem.Click += new System.EventHandler(this.rectifierTestToolStripMenuItem_Click);
+            // 
             // windowsToolStripMenuItem
             // 
             this.windowsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -404,13 +411,6 @@
             this.lblTubesCounter.Name = "lblTubesCounter";
             this.lblTubesCounter.Size = new System.Drawing.Size(0, 22);
             // 
-            // rectifierTestToolStripMenuItem
-            // 
-            this.rectifierTestToolStripMenuItem.Name = "rectifierTestToolStripMenuItem";
-            this.rectifierTestToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
-            this.rectifierTestToolStripMenuItem.Text = "Блок питания";
-            this.rectifierTestToolStripMenuItem.Click += new System.EventHandler(this.rectifierTestToolStripMenuItem_Click);
-            // 
             // FRMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -470,7 +470,6 @@
         private System.Windows.Forms.ToolStripMenuItem viewAllSensorsToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem rectifierToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem startstopToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem breakToViewToolStripMenuItem;
         private System.Windows.Forms.ToolStrip ts;
@@ -479,6 +478,7 @@
         private System.Windows.Forms.ToolStripLabel lblTubesCounter;
         private System.Windows.Forms.ToolStripMenuItem модульТактированияToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rectifierTestToolStripMenuItem;
+        public System.Windows.Forms.ToolStripMenuItem startstopToolStripMenuItem;
     }
 }
 
