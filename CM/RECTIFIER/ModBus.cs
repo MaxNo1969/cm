@@ -154,6 +154,13 @@ namespace CM
                     ser.Write(query, 0, query.Length);
                     if (answer.WaitOne(settings.ReadIntervalTimeout))
                     {
+                        // 0 - абонент
+                        // 1 - ошибки
+                        // 2 - длина / код ошибки
+                        // 3 - данные
+                        // 4 - данные
+                        // 5 - crc
+                        // 6 - crc
                         byte[] packet = new byte[7];
                         int count = ser.Read(packet, 0, packet.Length);
                         Log.add(string.Format("RECV:{0}", print(packet)));
@@ -224,11 +231,6 @@ namespace CM
         /// <returns>true - запись удалась</returns>
         public bool setSingleRegister(int _abonent, int _pos, ushort _data)
         {
-            // 0 - абонент
-            // 1 - ошибки
-            // 2 - код ошиибки
-            // 3 - crc
-            // 4 - crc
             byte[] query = new byte[] { Convert.ToByte(_abonent), 6, 0, Convert.ToByte(_pos), Convert.ToByte((_data >> 8) & 0xff), Convert.ToByte(_data & 0xff), 0, 0 };
             Crc16.Add(query);
             if (Program.cmdLineArgs.ContainsKey("NOCOM"))
@@ -243,7 +245,15 @@ namespace CM
                     ser.Write(query, 0, query.Length);
                     if (answer.WaitOne(settings.ReadIntervalTimeout))
                     {
-                        byte[] packet = new byte[5];
+                        // 0 - абонент
+                        // 1 - ошибки
+                        // 2 - код ошиибки/регистр
+                        // 3 - регистр
+                        // 4 - 255
+                        // 5 - 255
+                        // 6 - crc
+                        // 7 - crc
+                        byte[] packet = new byte[8];
                         int count = ser.Read(packet, 0, packet.Length);
                         Log.add(string.Format("RECV:{0}", print(packet)));
                         if (count != 5)

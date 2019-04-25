@@ -21,7 +21,7 @@ namespace CM
         FRMain frm;
         readonly Tube tube;
         ReadDataThread readDataThread = null;
-        StrobeThread strobeThread = null;
+        //StrobeThread strobeThread = null;
 
         /// <summary>
         /// Конструктор
@@ -139,8 +139,8 @@ namespace CM
                                 //Включить сбор данных с модуля контроля. Ожидать появления сигнала КОНТРОЛЬ. 
                                 {
                                     //Запускаем поток чтения стробов
-                                    strobeThread = new StrobeThread(tube);
-                                    strobeThread.start();
+                                    //strobeThread = new StrobeThread(tube);
+                                    //strobeThread.start();
                                     //Запускаем поток чтения данных
                                     readDataThread = new ReadDataThread(Program.lCard, tube);
                                     readDataThread.Start();
@@ -172,7 +172,7 @@ namespace CM
                             if (sl.iCNTR.Val == false)
                             {
                                 //Останавливаем поток обработки стробов
-                                strobeThread.stop();
+                                //strobeThread.stop();
                                 //strobeThread = null;
                                 //Останавливаем поток чтения данных
                                 readDataThread.Stop();
@@ -219,7 +219,7 @@ namespace CM
                 Debug.WriteLine(s);
                 frm.setSb("Info", s + ". Аварийное завершение.");
                 //Останавливаем поток обработки стробов
-                if(strobeThread!=null)strobeThread.stop();
+                //if(strobeThread!=null)strobeThread.stop();
                 //Останавливаем поток чтения данных если он запущен
                 if(readDataThread!=null)readDataThread.Stop();
                 //readDataThread = null;
@@ -238,7 +238,7 @@ namespace CM
             Debug.WriteLine(s);
             if (!isRunning)
             {
-                frm.setSb("Info", "Готов к работе");
+                //frm.setSb("Info", "Готов к работе");
                 isRunning = true;
                 thread = new Thread(threadFunc)
                 {

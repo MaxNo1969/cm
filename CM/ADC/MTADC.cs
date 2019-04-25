@@ -109,7 +109,7 @@ namespace CM
             }
 
         }
-        public static bool started = false;
+        public bool started = false;
         void ser_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             if (e.EventType == SerialData.Chars)
@@ -141,6 +141,9 @@ namespace CM
                     case 5:
                         started = false;
                         return "OK5";
+                    case 6:
+                        started = false;
+                        return "224";
                     default:
                         return "???";
                 }

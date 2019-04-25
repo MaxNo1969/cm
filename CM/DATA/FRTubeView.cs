@@ -57,7 +57,7 @@ namespace CM
         /// Возможность редактировать трубу
         /// </summary>
         public bool editable { get { return ucTube.editable; } set { ucTube.editable = value; } }
-
+        public UCTube.DrawType drawType { get { return ucTube.drawType; } set { ucTube.drawType = value; } }
         /// <summary>
         /// Конструктор
         /// </summary>
@@ -69,6 +69,7 @@ namespace CM
             MdiParent = frm;
             InitializeComponent();
             ucTube.Init(tube, this);
+            //ucTube.drawType = UCTube.DrawType.Pure;
         }
         /// <summary>
         /// Бработка изменения размеров
@@ -82,7 +83,6 @@ namespace CM
 
         private void FRTubeModel_Load(object sender, System.EventArgs e)
         {
-            //восстановление размеров главного окна        
             tube.onDataChanged += tube_onDataChanged;
         }
 

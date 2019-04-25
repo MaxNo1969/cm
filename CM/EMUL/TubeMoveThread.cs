@@ -10,7 +10,7 @@ namespace CM
     public class TubeMoveThread
     {
         PhysTube ptube = null;
-        SignalListDef sl = Program.signals;
+        readonly SignalListDef sl = Program.signals;
         Thread moveTubeThread = null;
         bool isMoving = false;
         /// <summary>
@@ -94,16 +94,16 @@ namespace CM
             }
             #endregion
             tubeStart?.Invoke(ptube);
-            sl.set(sl.iSTRB,true);
+            //sl.set(sl.iSTRB,true);
             while (isMoving)
             {
                 if (ptube.startReadX < ptube.Width)
                 {
                     //Генерируем строб
-                    if (ptube.l2px(ptube.startReadX) % Program.settings.ZoneSize == 0)
-                    {
-                        sl.set(sl.iSTRB, true);
-                    }
+                    //if (ptube.l2px(ptube.startReadX) % Program.settings.ZoneSize == 0)
+                    //{
+                    //    sl.set(sl.iSTRB, true);
+                    //}
                     //Сдвигаем трубу
                     lock (block)
                     {

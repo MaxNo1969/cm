@@ -12,7 +12,7 @@ namespace CM
     public abstract class LCard: IDataReader<double>
     {
 
-        public MTADC mtdadc;
+        //public MTADC mtdadc;
         /// <summary>
         /// Размер буфера для приема данных по умолчанию
         /// Речь шла о 1500 датчиках по умолчанию
@@ -85,7 +85,6 @@ namespace CM
             raw = new double[raw_size];
             RECV_TOUT = (uint)settings.RECV_TOUT;
             IsStarted = false;
-            mtdadc = new MTADC(Program.settings.mtadcSettings.port);
             #region Логирование
             {
                 string msg = string.Format("Размер буфера: {0}, Таймаут ожидания пакета: {1}", raw_size, RECV_TOUT);

@@ -24,10 +24,6 @@ namespace CM
         /// Сырые данные
         /// </summary>
         public List<double> data;
-        /// <summary>
-        /// Стробы
-        /// </summary>
-        public List<Strobe> strobes;
 
         public readonly int len;
 
@@ -43,7 +39,6 @@ namespace CM
             ts = _ts;
             len = _len;
             data = new List<double>();
-            strobes = new List<Strobe>();
         }
         
         ///<summary>
@@ -219,7 +214,6 @@ namespace CM
         public void reset()
         {
             data.Clear();
-            strobes.Clear();
         }
     }
 }

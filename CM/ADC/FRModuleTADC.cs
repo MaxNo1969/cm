@@ -18,7 +18,7 @@ namespace CM
         public FRModuleTADC()
         {
             InitializeComponent();
-            mtadc = Program.lCard.mtdadc;
+            mtadc = Program.mtdadc;
         }
 
 

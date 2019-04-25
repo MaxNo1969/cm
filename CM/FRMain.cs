@@ -135,12 +135,17 @@ namespace CM
                 cbTypeSize.Items.Add(ts);
                 if (ts.Name == Program.settings.Current.Name) cbTypeSize.SelectedItem = ts;
             }
-            
+
 
             if (Program.cmdLineArgs.ContainsKey("NOA1730"))
+            {
                 emulToolStripMenuItem.Visible = true;
+                Program.signals.set(Program.signals.iCC, true);
+            }
             else
+            {
                 emulToolStripMenuItem.Visible = false;
+            }
 
             //Запускаем таймер обновления
             timerUpdateUI.Start();
@@ -258,11 +263,12 @@ namespace CM
         {
             if (loadTube(ref Program.tube))
             {
-                if (Program.tube.rtube.ts.Name != Program.settings.TypeSizes.Current.Name)
+                if (Program.tube.rtube.ts.Name != Program.settings.Current.Name)
                 {
                     MessageBox.Show(string.Format("Изменился типоразмер {0} => {1}",
-                        Program.settings.TypeSizes.Current.Name, Program.tube.rtube.ts.Name));
+                        Program.settings.Current.Name, Program.tube.rtube.ts.Name));
                     Program.settings.TypeSizes.Current = Program.tube.rtube.ts;
+                    Program.settings.Current = Program.tube.rtube.ts;
                 }
                 viewTubeToolStripMenuItem_Click(this, null);
             }
@@ -354,7 +360,7 @@ namespace CM
 
         private void emulToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FREmul frm = new FREmul(Program.lCard, new Tube(Program.settings.Current, Program.settings.TubeLen))
+            FREmul frm = new FREmul(Program.lCard, new Tube(Program.settings.Current, Program.settings.TubeLen),this)
             {
                 parentMenu = emulToolStripMenuItem,
                 MdiParent = this,

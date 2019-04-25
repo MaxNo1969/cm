@@ -36,12 +36,14 @@ namespace CM
         BackgroundWorker worker;
 
         DateTime tubeStartTime;
+
+        FRMain fRMain;
         /// <summary>
         /// Конструктор
         /// </summary>
         /// <param name="_lcard">Карта АЦП(для эмулятора виртуальная)</param>
         /// <param name="_tube">Модель трубы</param>
-        public FREmul(LCard _lcard,Tube _tube)
+        public FREmul(LCard _lcard,Tube _tube, FRMain _frMain):base(_frMain)
         {
             tm = _tube ?? throw new ArgumentException("Не задан параметр", "_tube");
             if (_lcard == null)
@@ -54,6 +56,7 @@ namespace CM
             }
             lc = _lcard;
             (lc as LCardVirtual).srcTube = tm;
+            fRMain = _frMain;
             InitializeComponent();
             // Настройка ProgressBar-а
             pbTube.Minimum = 0;
@@ -251,6 +254,12 @@ namespace CM
                 worker.ReportProgress(101, "Снимаем сигнал \"СОЛЕНОИД\"...");
                 sl.set(sl.iSOL, false);
                 tMover.stop();
+                Thread.Sleep(signalWaitCycleTime);
+                if(fRMain.breakToView)
+                {
+                    e.Cancel = true;
+                    return;
+                }
             }
         }
 
@@ -317,14 +326,44 @@ namespace CM
         private void btnTubeModel_Click(object sender, EventArgs e)
         {
             btnTubeModel.Enabled = false;
-            FRTubeView frm = new FRTubeView(tm,(FRMain)MdiParent)
+            //FRTubeView frm = new FRTubeView(tm,(FRMain)MdiParent)
+            //{
+            //    Text = "Труба(модель)",
+            //    editable = true,
+            //};
+            //frm.FormClosed += new FormClosedEventHandler((object ob, FormClosedEventArgs ea) => { btnTubeModel.Enabled = true; });
+            //frm.MdiParent = this.MdiParent;
+            //frm.Show();
+            OpenFileDialog ofd = new OpenFileDialog
             {
-                Text = "Труба(модель)",
-                editable = true,
+                DefaultExt = "dbl",
+                AddExtension = true,
+                Filter = "Файлы дампа (*.dbl)|*.dbl|Все файлы (*.*)|*.*",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             };
-            frm.FormClosed += new FormClosedEventHandler((object ob, FormClosedEventArgs ea) => { btnTubeModel.Enabled = true; });
-            frm.MdiParent = this.MdiParent;
-            frm.Show();
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    DumpReader reader = new DumpReader(ofd.FileName);
+                    IDataWriter<double> writer = tm;
+                    writer.Write(reader.Read());
+                    //Program.tube.raw2phys(0, Program.tube.sections, 0, Program.tube.ptube.Width / Program.tube.ptube.logZoneSize);
+                }
+                catch (Exception ex)
+                {
+                    #region Логирование 
+                    {
+                        string msg = string.Format("{0}", ex.Message);
+                        string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                        Log.add(logstr, LogRecord.LogReason.error);
+                        Debug.WriteLine(logstr, "Error");
+                        MessageBox.Show(msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    }
+                    #endregion
+                }
+            }
+
         }
     }
 }

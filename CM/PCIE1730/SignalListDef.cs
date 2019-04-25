@@ -198,5 +198,28 @@ namespace CM
             set(iCNTR, false);
             set(iSTRB, false);
         }
+
+        //Сообщаем результат контроля по зоне
+        public void ZoneControlResult(Tube.TubeRes _res)
+        {
+            switch(_res)
+            {
+                case Tube.TubeRes.Good:
+                    oSTRB.Val = true;
+                    oZONRES.Val = true;
+                    oGLOBRES.Val = true;
+                    break;
+                case Tube.TubeRes.Class2:
+                    oSTRB.Val = false;
+                    oZONRES.Val = true;
+                    oGLOBRES.Val = true;
+                    break;
+                case Tube.TubeRes.Bad:
+                    oSTRB.Val = true;
+                    oZONRES.Val = false;
+                    oGLOBRES.Val = true;
+                    break;
+            }
+        }
     }
 }

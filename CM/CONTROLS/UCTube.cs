@@ -74,11 +74,45 @@ namespace CM
         [DisplayName("normalizedClass2Value"), Description("Значение Класс2 для редактора"), Category("Труба"), DefaultValue(0.7)]
         public double normalizedClass2Value { get; set; }
 
+        public enum DrawType { Gradient, Pure }
+        /// <summary>
+        /// Значение Класс2 для редактора (нормализованное)
+        /// </summary>
+        [DisplayName("DrawType"), Description("Типп отрисовки"), Category("Труба"), DefaultValue(DrawType.Gradient)]
+        public DrawType drawType
+        {
+            get
+            {
+                if (getColor == ColorHelper.getColor) return DrawType.Gradient;
+                else return DrawType.Pure;
+            }
+            set
+            {
+                if(value==DrawType.Gradient)
+                {
+                    getColor = ColorHelper.getColor;
+                    getBrush = ColorHelper.getBrush;
+                }
+                else
+                {
+                    getColor = ColorHelper.getPureColor;
+                    getBrush = ColorHelper.getPureBrush;
+                }
+            }
+        }
+
+        Brush b;
+        delegate Color GetColor(double _val);
+        GetColor getColor;
+        delegate Brush GetBrush(double _val);
+        GetBrush getBrush;
+
         /// <summary>
         /// Конструктор
         /// </summary>
         public UCTube()
         {
+            drawType = DrawType.Gradient;
             InitializeComponent();
             editable = false;
 
@@ -131,7 +165,12 @@ namespace CM
                     {
                         for (int y = 0; y < yCells; y++)
                         {
-                            Brush b = (y < tube.ptube.Height && winStart + x < tube.ptube.Width) ? ColorHelper.getBrush(tube[winStart + x, y]) : Brushes.White;
+                            if (y < tube.ptube.Height && winStart + x < tube.ptube.Width)
+                            {
+                                b = getBrush(tube[winStart + x, y]);
+                            }
+                            else
+                                b = Brushes.White;
                             g.FillRectangle(b, x * cellXSize, y * cellYSize, cellXSize, cellYSize);
                             g.DrawRectangle(Pens.Black, x * cellXSize, y * cellYSize, cellXSize, cellYSize);
                         }
@@ -164,7 +203,7 @@ namespace CM
                 for (int x = 0; x < tube.ptube.Width; x++)
                     for (int y = 0; y < tube.ptube.Height; y++)
                     {
-                        (backBuffer as Bitmap).SetPixel(x, y, ColorHelper.getColor(tube[x, y]));
+                        (backBuffer as Bitmap).SetPixel(x, y, getColor(tube[x, y]));
                     }
 
                 using (Graphics g = Graphics.FromImage(backBuffer))

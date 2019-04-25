@@ -16,14 +16,13 @@ namespace CM
         /// </summary>
         public event DataChanged onDataChanged = null;
 
-        //public List<double> raw { get; private set; }
-        //public TypeSize typeSize;
+        public RawTube rtube;
+        public PhysTube ptube;
+
         ///// <summary>
         ///// Список стробов для зонирования
         ///// </summary>
-        //public List<Strobe> rtube.strobes;
-        public RawTube rtube;
-        public PhysTube ptube;
+        public List<Strobe> strobes;
 
         public int rawDataSize { get { return rtube.rawDataSize; } }
         public int sectionSize { get { return rtube.ts.sensors.sectionSize; } }
@@ -73,6 +72,7 @@ namespace CM
             rtube = new RawTube(_ts,_len);
             ptube = new PhysTube(_ts,_len);
             loadAvgAndDeviations();
+            strobes = new List<Strobe>();
             //onDataChanged?.Invoke(null);
         }
 
@@ -293,8 +293,9 @@ namespace CM
             {
                 return null;
             }
-            double[] ret = new double[sections];
-            for (int i = 0; i < sections; i++)
+            int dim = sections;
+            double[] ret = new double[dim];
+            for (int i = 0; i < dim; i++)
             {
                 ret[i] = this[_mc, _mr, _c, _r, i];
             }
@@ -435,49 +436,49 @@ namespace CM
         /// Обработка получения нового строба
         /// </summary>
         /// <returns>Номер среза окончания записанной зоны</returns>
-        internal int addStrobe()
-        {
-            int zoneBound = 0;
-            int zoneStart = 0;
-            lock (rtube.strobes)
-            {
-                if (rtube.strobes.Count > 0)
-                {
-                    zoneBound = rawDataSize / sectionSize;
-                    zoneStart = rtube.strobes.Last().bound;
-                }
-                else
-                {
-                    Strobe strobe = new Strobe(zoneBound);
-                    rtube.strobes.Add(strobe);
-                    #region Логирование 
-                    {
-                        string msg = string.Format(@"Время: {0:hh\:mm\:ss\.ff} {1}-{2} {3}", strobe.dt, zoneStart, zoneBound, zoneBound - zoneStart); string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                        Log.add(logstr, LogRecord.LogReason.info);
-                        Debug.WriteLine(logstr, "Message");
-                    }
-                    #endregion
-                }
-            }
-            if (zoneBound - zoneStart > 0)
-            {
-                if (raw2phys(zoneStart, zoneBound - zoneStart, rtube.strobes.Count - 1, 1))
-                {
-                    onDataChanged?.Invoke(null);
-                    Strobe strobe = new Strobe(zoneBound);
-                    rtube.strobes.Add(strobe);
-                    #region Логирование 
-                    {
-                        string msg = string.Format(@"Время: {0:hh\:mm\:ss\.ff} {1}-{2} {3}", strobe.dt, zoneStart, zoneBound, zoneBound - zoneStart); string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                        Log.add(logstr, LogRecord.LogReason.info);
-                        Debug.WriteLine(logstr, "Message");
-                    }
-                    #endregion
-                    return strobe.bound * sectionSize;
-                }
-            }
-            return 0;
-        }
+        //internal int addStrobe()
+        //{
+        //    int zoneBound = 0;
+        //    int zoneStart = 0;
+        //    lock (rtube.strobes)
+        //    {
+        //        if (rtube.strobes.Count > 0)
+        //        {
+        //            zoneBound = rawDataSize / sectionSize;
+        //            zoneStart = rtube.strobes.Last().bound;
+        //        }
+        //        else
+        //        {
+        //            Strobe strobe = new Strobe(zoneBound);
+        //            rtube.strobes.Add(strobe);
+        //            #region Логирование 
+        //            {
+        //                string msg = string.Format(@"Время: {0:hh\:mm\:ss\.ff} {1}-{2} {3}", strobe.dt, zoneStart, zoneBound, zoneBound - zoneStart); string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+        //                Log.add(logstr, LogRecord.LogReason.info);
+        //                Debug.WriteLine(logstr, "Message");
+        //            }
+        //            #endregion
+        //        }
+        //    }
+        //    if (zoneBound - zoneStart > 0)
+        //    {
+        //        if (raw2phys(zoneStart, zoneBound - zoneStart, rtube.strobes.Count - 1, 1))
+        //        {
+        //            onDataChanged?.Invoke(null);
+        //            Strobe strobe = new Strobe(zoneBound);
+        //            rtube.strobes.Add(strobe);
+        //            #region Логирование 
+        //            {
+        //                string msg = string.Format(@"Время: {0:hh\:mm\:ss\.ff} {1}-{2} {3}", strobe.dt, zoneStart, zoneBound, zoneBound - zoneStart); string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+        //                Log.add(logstr, LogRecord.LogReason.info);
+        //                Debug.WriteLine(logstr, "Message");
+        //            }
+        //            #endregion
+        //            return strobe.bound * sectionSize;
+        //        }
+        //    }
+        //    return 0;
+        //}
 
         /// <summary>
         /// Запись данных в физическую модель
@@ -563,7 +564,84 @@ namespace CM
             return true;
         }
 
+        public bool raw2phys1(int _start, int _sz, int _znStart, int _znCnt)
+        {
+            if ((_znStart + _znCnt) * ptube.logZoneSize > ptube.Width - ptube.logZoneSize)
+            {
+                #region Логирование 
+                {
+                    string msg = string.Format("Попытка записи за границу массива:_znStart={0}, _znCnt={1}, logZoneSize={2}, logDataSize={3}",
+                        _znStart, _znCnt, ptube.logZoneSize, ptube.logDataSize);
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.info);
+                    Debug.WriteLine(logstr, "Message");
+                }
+                #endregion
+                ptube.expand(1);
+                //return false;
+            }
+            int measPerCell = (int)Math.Round((double)_sz / ptube.logZoneSize / _znCnt);
+            double[] accum = new double[mrows * rows];
+            //double avg;
+            for (int zn = _znStart; zn < _znStart + _znCnt; zn++)
+            {
+                for (int i = 0; i < ptube.logZoneSize; i++)
+                {
+                    for (int mrow = 0; mrow < mrows; mrow++)
+                    {
+                        for (int row = 0; row < rows; row++)
+                        {
+                            int cnt = 0;
+                            accum[mrow * rows + row] = 0;
+                            for (int mcol = 0; mcol < mcols; mcol++)
+                            {
+                                for (int col = 0; col < cols; col++)
+                                {
+                                    //Здесь у нас проход по всем датчикам и по всей зоне
+                                    //Можно посчитать результат по зоне
+                                    for (int j = 0; j < measPerCell && (zn - _znStart) * ptube.logZoneSize * measPerCell + i * measPerCell + j < _sz; j++)
+                                    {
+                                        accum[mrow * rows + row] += Math.Abs(this[mcol, mrow, col, row,_start+(zn - _znStart) * ptube.logZoneSize * measPerCell + i * measPerCell + j]-sensorsAvgValues[mcol,mrow,col,row]);
+                                        //accum[mrow * rows + row] += Math.Abs(this[mcol, mrow, col, row, _start + (zn - _znStart) * ptube.logZoneSize * measPerCell + i * measPerCell + j] - avg);
+                                        cnt++;
+                                    }
+                                }
+                            }
+                            if (cnt > 1) accum[mrow * rows + row] /= cnt;
+                            ptube[zn * ptube.logZoneSize + i, mrow * rows + row] = accum[mrow * rows + row];
+                        }
+                    }
+                }
+            }
+            ptube.endWritedX = (_znStart + _znCnt) * ptube.logZoneSize;
+            onDataChanged?.Invoke(null);
+            return true;
+        }
 
+        public enum TubeRes { Good, Bad, Class2, Unknown }
+
+        public TubeRes getZoneResult(int _zone,out double _maxVal)
+        {
+            TubeRes ret = TubeRes.Unknown;
+            double maxVal=0;
+            for(int x = 0;x<ptube.logZoneSize;x++)
+            {
+                for(int y=0;y<ptube.Height;y++)
+                {
+                    double val = Math.Abs(ptube[_zone * ptube.logZoneSize + x, y]);
+                    if (val > maxVal) maxVal = val;
+                }
+            }
+            _maxVal = maxVal;
+            //if (maxVal > ptube.ts.Border1) return TubeRes.Bad;
+            //else if (maxVal > ptube.ts.Border2) return TubeRes.Class2;
+            //else if (maxVal > 0) return TubeRes.Good;
+            TypeSize ts = Program.settings.Current;
+            if (maxVal > ts.Border1) return TubeRes.Bad;
+            else if (maxVal > ts.Border2) return TubeRes.Class2;
+            else if (maxVal > 0) return TubeRes.Good;
+            return ret;
+        }
 
         private double[,,,][] createNormalizedSensorsArray(int _start, int _sz)
         {
@@ -626,11 +704,21 @@ namespace CM
         int zones = 0;
         public int Write(IEnumerable<double> _data)
         {
-            int measesPerZone = (int)((double)Program.settings.ZoneSize * Program.settings.lCardSettings.FrequencyCollect / DefaultValues.Speed/1000);
+            //int measesPerZone = (int)((double)Program.settings.ZoneSize * Program.settings.lCardSettings.FrequencyCollect / DefaultValues.Speed/1000);
+            int measesPerZone = (int)((double)Program.settings.ZoneSize * Program.mtdadcFreq / (ptube.speed*1000));
             rtube.Write(_data);
             if (rawDataSize / measesPerZone > zones)
             {
+                #region Логирование 
+                {
+                    string msg = string.Format("Достигнута граница зоны {0} - {1}({2})", zones, sections, sections-startWriteZoneSection );
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.info);
+                    Debug.WriteLine(logstr, "Message");
+                }
+                #endregion
                 raw2phys(startWriteZoneSection, sections-startWriteZoneSection, zones, 1);
+                //Здесь надо проанализировать зону и выдать сигналы для результата
                 startWriteZoneSection = sections;
                 zones++;
             }
@@ -640,6 +728,7 @@ namespace CM
 
         public bool Start()
         {
+            reset();
             return true;
         }
 
@@ -652,6 +741,7 @@ namespace CM
         {
             rtube.reset();
             ptube.reset();
+            strobes.Clear();
         }
     }
 }

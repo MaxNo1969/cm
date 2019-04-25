@@ -109,8 +109,17 @@ namespace CM
         {
             if (!isRunning)
             {
+                #region Логирование 
+                {
+                    string msg = string.Format("{0}", "Запускаем поток сбора данных" );
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.info);
+                    Debug.WriteLine(logstr, "Message");
+                }
+                #endregion
                 isRunning = true;
-                if (reader.Start() && writer.Start())
+                writer.Start();
+                //if (reader.Start() && writer.Start())
                 {
                     thread = new Thread(threadFunc)
                     {
@@ -120,11 +129,6 @@ namespace CM
                     thread.Start();
                     stateChanged?.Invoke(thread.ThreadState);
                     return true;
-                }
-                else
-                {
-                    isRunning = false;
-                    return false;
                 }
             }
             else
@@ -139,12 +143,28 @@ namespace CM
         {
             if (isRunning)
             {
+                #region Логирование 
+                {
+                    string msg = string.Format("{0}", "Останавливаем поток сбора данных");
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.info);
+                    Debug.WriteLine(logstr, "Message");
+                }
+                #endregion Логирование 
                 isRunning = false;
                 thread.Join();
                 writer.Stop();
                 reader.Stop();
                 stateChanged?.Invoke(thread.ThreadState);
                 thread = null;
+                #region Логирование 
+                {
+                    string msg = string.Format("{0}", "Останавлен поток сбора данных");
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.info);
+                    Debug.WriteLine(logstr, "Message");
+                }
+                #endregion Логирование 
             }
             else
             {

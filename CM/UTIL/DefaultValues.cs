@@ -13,7 +13,7 @@ namespace CM
         public const double Speed = 0.4;
         public const int TubeLen = 6000;
 
-        public const int freq = 88888;
+        public const int freq = 2000000;
 
         public const int hallSensorWidth = 5;
         public const int hallSensorHeight = 8;

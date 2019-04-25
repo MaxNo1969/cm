@@ -66,6 +66,7 @@ namespace CM
                 #endregion
                 return null;
             }
+            if (!Program.mtdadc.started) return null;
             double[] data = new double[raw_size];
             lock (srcTube)
             {
@@ -74,15 +75,13 @@ namespace CM
                 onDataRead?.Invoke(data);
                 index += (int)raw_size;
             }
-            Thread.Sleep((int)(raw_size * 1000.0 / settings.FrequencyCollect));
+            Thread.Sleep((int)(raw_size * 50/ Program.mtdadcFreq));
             return data;
         }
 
         public override bool Start()
         {
             if (IsStarted) return IsStarted;
-            Program.rectifier.Start();
-            mtdadc.start();
             #region Логирование 
             {
                 string msg = string.Format("{0}", "");
@@ -111,8 +110,6 @@ namespace CM
         public override bool Stop()
         {
             if (!IsStarted) return true;
-            Program.rectifier.Stop();
-            mtdadc.stop();
             #region Логирование 
             {
                 string msg = string.Format("{0}", "");

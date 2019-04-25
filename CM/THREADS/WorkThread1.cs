@@ -21,8 +21,7 @@ namespace CM
         FRMain frm;
         readonly Tube tube;
         ReadDataThread readDataThread = null;
-        StrobeThread strobeThread = null;
-
+        ZoneWriterThread zoneWriter = null;
         /// <summary>
         /// Конструктор
         /// </summary>
@@ -68,6 +67,12 @@ namespace CM
         public WrkStates curState;
         private WrkStates prevState = WrkStates.none;
         private TimeSpan waitControlStarted;
+        //Текущее время для расчета положения трубы
+        private TimeSpan startTime;
+
+        //ToDo - Надо-ли
+        readonly int threadSleepTime = 100;
+
         private void threadFunc(object _params)
         {
             try
@@ -97,7 +102,7 @@ namespace CM
                             Debug.WriteLine(logstr);
                         }
                         #endregion 
-                        //frm.setSb("Info",msg);
+                        frm.setSb("Info",msg);
                         prevState = curState;
                     }
                     switch (curState)
@@ -130,6 +135,12 @@ namespace CM
                                     //Включить намагничивание модуля. Проверить сопротивление соленоидов. 
                                     //Если перегрев – выход из режима с соответствующим сообщением. 
                                     //Далее в цикле контроля трубы выводить на экран ток и напряжение соленоидов (пока намагничивание включено).
+                                    readDataThread = new ReadDataThread(Program.lCard, tube.rtube);
+                                    zoneWriter = new ZoneWriterThread(tube);
+                                    //Запускаем АЦП
+                                    Program.lCard.Start();
+                                    //Включаем питание 
+                                    Program.rectifier.Start();
                                 }
                                 //Выставляем сигнал "РАБОТА3"
                                 sl.oWRK.Val = true;
@@ -141,7 +152,7 @@ namespace CM
                         //Если сигнал КОНТРОЛЬ не появился за определенное время (10 секунд) – 
                         //аварийное завершение режима с выводом со-ответствующего сообщения.
                         case WrkStates.waitCntrl:
-                            if ((sw.Elapsed - waitControlStarted).Seconds > 10)
+                            if ((sw.Elapsed - waitControlStarted).Seconds > 30)
                             {
                                 errStr = "Не дождались трубы на входе в модуль";
                                 curState = WrkStates.error;
@@ -152,37 +163,49 @@ namespace CM
                                 //Включить сбор данных с модуля контроля. Ожидать появления сигнала КОНТРОЛЬ. 
                                 {
                                     //Запускаем поток чтения стробов
-                                    strobeThread = new StrobeThread(tube);
-                                    strobeThread.start();
+                                    //strobeThread = new StrobeThread(tube);
+                                    //strobeThread.start();
                                     //Запускаем поток чтения данных
-                                    readDataThread = new ReadDataThread(Program.lCard, tube);
                                     readDataThread.Start();
+                                    //Запускаем обсчет трубы
+                                    zoneWriter.start();
+                                    //Запускаем П217
+                                    if(!Program.mtdadc.start())
+                                    {
+                                        curState = WrkStates.error;
+                                        errStr = "Не удалось запустить П217";
+                                        break;
+                                    }
                                 }
                                 curState = WrkStates.work;
+                                //Начинаем отсчет времени
+                                startTime = sw.Elapsed;
                             }
                             break;
                         case WrkStates.work:
                             //Пропал сигнал контроль
                             if (sl.iCNTR.Val == false)
                             {
-                                //Останавливаем поток обработки стробов
-                                strobeThread.stop();
-                                //strobeThread = null;
                                 //Останавливаем поток чтения данных
                                 readDataThread.Stop();
-                                //readDataThread = null;
-                                sl.oWRK.Val = false;
+                                //Останавливаем обсчет трубы
+                                zoneWriter.stop();
                                 curState = WrkStates.endWork;
                                 break;
                             }
-
+                            else
+                                Thread.Sleep(threadSleepTime);
                             break;
                         case WrkStates.endWork:
                             //По окончании сбора, обработки и передачи результата снять сигнал КОНТРОЛЬ. 
                             //Выключить намагничивание соленоидов при снятии соответствующих сигналов КОНТРОЛЬ. 
                             //Выключить генерацию синхросигнала платой УС.
-                            curState = WrkStates.startWorkCycle;
-                            //По идее надо наверное выходить из цикла работы для следующей трубы уже запускать новый цикл
+                            //Выключаем питание
+                            Program.rectifier.Stop();
+                            //Останавливаем П217
+                            Program.mtdadc.stop();
+                            sl.oWRK.Val = false;
+                            //curState = WrkStates.startWorkCycle;
                             isRunning = false;
                             break;
                         default:
@@ -193,10 +216,12 @@ namespace CM
                 }
                 string _s = GetType().Name + ": " + System.Reflection.MethodBase.GetCurrentMethod().Name + ": Вышли";
                 Log.add(_s, LogRecord.LogReason.info);
-                //Останавливаем поток обработки стробов
-                strobeThread.stop();
                 //Останавливаем поток чтения данных если он запущен
-                readDataThread.Stop();
+                if (readDataThread != null) readDataThread.Stop();
+                readDataThread = null;
+                //Останавливаем поток обсчета если он запущен
+                if (zoneWriter != null) zoneWriter.stop();
+                zoneWriter = null;
             }
             catch (Exception e)
             {
@@ -205,11 +230,12 @@ namespace CM
                 Log.add(s, LogRecord.LogReason.error);
                 Debug.WriteLine(s);
                 frm.setSb("Info", s + ". Аварийное завершение.");
-                //Останавливаем поток обработки стробов
-                if(strobeThread!=null)strobeThread.stop();
                 //Останавливаем поток чтения данных если он запущен
                 if(readDataThread!=null)readDataThread.Stop();
-                //readDataThread = null;
+                readDataThread = null;
+                //Останавливаем поток обсчета если он запущен
+                if (zoneWriter != null) zoneWriter.stop();
+                zoneWriter = null;
                 //Снимем все выходные сигналы
                 sl.ClearAllSignals();
                 isRunning = false;
@@ -222,7 +248,8 @@ namespace CM
             Debug.WriteLine(s);
             if (!isRunning)
             {
-                frm.setSb("Info", "Готов к работе");
+                //frm.setSb("Info", "Готов к работе");
+                tube.reset();
                 isRunning = true;
                 thread = new Thread(threadFunc)
                 {

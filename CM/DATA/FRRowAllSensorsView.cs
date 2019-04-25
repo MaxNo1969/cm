@@ -44,11 +44,13 @@ namespace CM
                 c.Tag = i;
                 double[] data = _tube.getSensorData(i / _tube.cols, _mrow, i % _tube.cols, _row);
                 double avg = data.Average();
-                double max = data.Max();
-                double min = data.Min();
-                double maxAbs = Math.Max(Math.Abs(max), Math.Abs(min));
-                for (int x = 0; x < data.Length; x++) data[x] = Math.Abs(data[x] - avg) / maxAbs;
+                //double max = data.Max();
+                //double min = data.Min();
+                //double maxAbs = Math.Max(Math.Abs(max), Math.Abs(min));
+                for (int x = 0; x < data.Length; x++) data[x] = Math.Abs(data[x] - avg)/* / maxAbs*/;
                 c.addGraph(string.Format("sensor{0}", i), Color.Green, data);
+                c.ChartAreas["Area"].AxisY.Minimum = 0;
+                c.ChartAreas["Area"].AxisY.Maximum = 2;
                 c.ChartAreas["Area"].AxisX.LabelAutoFitMaxFontSize = 5;
                 c.ChartAreas["Area"].AxisY.LabelAutoFitMaxFontSize = 5;
             }

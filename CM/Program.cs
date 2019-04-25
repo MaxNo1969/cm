@@ -14,7 +14,10 @@ namespace CM
         public static Dictionary<string, string> cmdLineArgs;
         public static AppSettings settings = null;
         public static Tube tube;
+        public static int tubeCount;
         public static LCard lCard;
+        public static MTADC mtdadc;
+        public static int mtdadcFreq;
         public static SignalListDef signals;
         public static Rectifier rectifier;
         /// <summary>
@@ -48,9 +51,17 @@ namespace CM
                     lCard = new LCardVirtual(settings.lCardSettings);
                 else
                     lCard = new LCardReal(settings.lCardSettings);
+                mtdadc = new MTADC(Program.settings.mtadcSettings.port);
+                {
+                    int cmd6res = Convert.ToInt32(mtdadc.cmd(6));
+                    double T = 1 / Program.settings.lCardSettings.FrequencyCollect;
+                    double t = T * (cmd6res + 1);
+                    mtdadcFreq = (int)(1 / t);
+                }
                 signals = new SignalListDef();
                 //Включаем питание датчиков
                 signals.oPOWER.Val = true;
+                tubeCount = 0;
                 Application.Run(new FRMain());
             }
             catch (Exception ex)

@@ -70,6 +70,7 @@
             this.lblTypeSize = new System.Windows.Forms.ToolStripLabel();
             this.cbTypeSize = new System.Windows.Forms.ToolStripComboBox();
             this.lblTubesCounter = new System.Windows.Forms.ToolStripLabel();
+            this.tubeCount = new System.Windows.Forms.ToolStripLabel();
             this.mainMenu.SuspendLayout();
             this.ssMain.SuspendLayout();
             this.ts.SuspendLayout();
@@ -386,7 +387,8 @@
             this.ts.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.lblTypeSize,
             this.cbTypeSize,
-            this.lblTubesCounter});
+            this.lblTubesCounter,
+            this.tubeCount});
             this.ts.Location = new System.Drawing.Point(0, 24);
             this.ts.Name = "ts";
             this.ts.Size = new System.Drawing.Size(800, 25);
@@ -410,6 +412,13 @@
             this.lblTubesCounter.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.lblTubesCounter.Name = "lblTubesCounter";
             this.lblTubesCounter.Size = new System.Drawing.Size(0, 22);
+            // 
+            // tubeCount
+            // 
+            this.tubeCount.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.tubeCount.Name = "tubeCount";
+            this.tubeCount.Size = new System.Drawing.Size(13, 22);
+            this.tubeCount.Text = "0";
             // 
             // FRMain
             // 
@@ -479,6 +488,7 @@
         private System.Windows.Forms.ToolStripMenuItem модульТактированияToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rectifierTestToolStripMenuItem;
         public System.Windows.Forms.ToolStripMenuItem startstopToolStripMenuItem;
+        public System.Windows.Forms.ToolStripLabel tubeCount;
     }
 }
 

@@ -136,7 +136,6 @@ namespace CM
                 Debug.WriteLine(s);
                 return IsStarted;
             }
-            mtdadc.start();
             IsStarted = true;
             return IsStarted;
         }
@@ -144,7 +143,6 @@ namespace CM
         {
             //Если карта не работает, то ничего не делаем 
             if (!IsStarted) return true;
-            mtdadc.stop();
             if (hnd.StreamsStop() != lpcieapi.lpcie.Errs.OK)
             {
                 string s = GetType().Name + ": " + System.Reflection.MethodBase.GetCurrentMethod().Name + ": " + "не смогли остановить потоки";

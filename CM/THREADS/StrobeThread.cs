@@ -9,7 +9,7 @@ namespace CM
     /// </summary>
     public class StrobeThread
     {
-        Tube tube = null;
+        readonly Tube tube = null;
         SignalListDef sl = Program.signals;
         Thread strobeTh = null;
         bool isRunning = false;
@@ -58,7 +58,7 @@ namespace CM
                 Debug.WriteLine(logstr);
             }
             #endregion
-            tube.rtube.strobes.Clear();
+            //tube.rtube.strobes.Clear();
             strobeTh = new Thread(strobeThreadFunc)
             {
                 Name = "StrobeThread",
@@ -97,8 +97,8 @@ namespace CM
                 if (s == "Ok")
                 {
                     sl.set(sl.iSTRB, false);
-                    int ind = tube.addStrobe();
-                    strobeRise?.Invoke(ind);
+                    //int ind = tube.addStrobe();
+                    strobeRise?.Invoke(0);
                 }
                 Thread.Sleep(10);
             }

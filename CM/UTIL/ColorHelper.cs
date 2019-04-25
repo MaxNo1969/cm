@@ -9,6 +9,19 @@ namespace CM
 {
     public static class ColorHelper
     {
+        public static Color getPureColor(double _val)
+        {
+            if (double.IsNaN(_val) || double.IsNegativeInfinity(_val) || double.IsPositiveInfinity(_val)) return Color.Gray;
+            if (_val > Program.settings.Current.Border1) return Color.Red;
+            else if (_val > Program.settings.Current.Border2) return Color.Yellow;
+            else return Color.Green;
+        }
+
+        public static Brush getPureBrush(double _val)
+        {
+            return new SolidBrush(getPureColor(_val));
+        }
+
         /// <summary>
         /// Получаем цвет по значению
         /// </summary>
@@ -16,6 +29,7 @@ namespace CM
         /// <returns>Цвет для заданного значения</returns>
         public static Color getColor(double _val)
         {
+            if(double.IsNaN(_val) || double.IsNegativeInfinity(_val) || double.IsPositiveInfinity(_val)) return Color.Gray;
             if (_val > 1 || _val < 0) return Color.Gray;
             _val -= 0.5;
             int r;

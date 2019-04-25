@@ -204,6 +204,7 @@
     <Compile Include="THREADS\MainWorkCycle.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="THREADS\PhysTubeZoneWriterThread.cs" />
     <Compile Include="THREADS\ReadDataThread.cs" />
     <Compile Include="THREADS\StrobeThread.cs" />
     <Compile Include="THREADS\WorkThread.cs" />

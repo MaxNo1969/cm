@@ -47,7 +47,7 @@ namespace CM
         {
             tube = _tube;
             tube.onDataChanged += new DataChanged(x => Invalidate());
-            bitmapWidth = (int)((double)tube.len / DefaultValues.Speed * DefaultValues.freq / tube.sectionSize / 1000);
+            bitmapWidth = (int)((double)tube.len / tube.ptube.speed * Program.mtdadcFreq / tube.sectionSize / 1000);
             if (bitmapWidth < tube.sections) bitmapWidth = tube.sections;
             if (tube.sections > 0)
             {

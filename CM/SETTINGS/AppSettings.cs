@@ -43,9 +43,12 @@ namespace CM
         [DisplayName("Длина трубы"), Description("Длина трубы"), Category("1.Труба")]
         public int TubeLen { get; set; }
 
+        [Browsable(true)]
+        [DisplayName("Скорость трубы"), Description("Скорость трубы (м/с)"), Category("1.Труба")]
+        public double TubeSpeed { get; set; }
 
         [Browsable(true)]
-        [DisplayName("Типоразмеры"), Description("Список допустимых тпоразмеров"), Category("1.Труба")]
+        [DisplayName("Типоразмеры"), Description("Список допустимых типоразмеров"), Category("1.Труба")]
         public L_TypeSize TypeSizes { get; set; }
 
         [Browsable(true)]
@@ -67,6 +70,10 @@ namespace CM
         [Browsable(true)]
         [DisplayName("PCIE-1730"), Description("Настройки платы ввода/вывода (Advantech PCIE-1730)"), Category("3.Оборудование")]
         public PCIE1730Settings pCIE1730Settings { get; set; }
+
+        [Browsable(true)]
+        [DisplayName("Расстояние"), Description("Расстояние между датчиками (мм)"), Category("3.Оборудование")]
+        public int sensorsDistance  { get; set; }
 
         public AppSettings():base()
         {

@@ -34,6 +34,9 @@ namespace CM
             DoWork += MainWorkCycle_DoWork;
         }
 
+        //ToDo - В параметры?
+        private readonly int workSleepTimeout = 100;
+
         private void MainWorkCycle_DoWork(object sender, DoWorkEventArgs e)
         {
             #region Логирование 
@@ -50,10 +53,20 @@ namespace CM
                     e.Cancel = true;
                     break;
                 }
+                frMain.setSb("Info", "Работа");
                 workThread1 = new WorkThread1(tube, frMain);
                 workThread1.start();
-                while (workThread1.isRunning) Thread.Sleep(100);
-                //ReportProgress(10);
+                while (workThread1.isRunning)
+                {
+
+                    if (CancellationPending)
+                    {
+                        e.Cancel = true;
+                        break;
+                    }
+                    Thread.Sleep(workSleepTimeout);
+                }
+                ReportProgress(0,workThread1);
                 if (frMain.breakToView) break;
             }
             workThread1.stop();
@@ -87,6 +100,24 @@ namespace CM
                 Debug.WriteLine(logstr, "Message");
             }
             #endregion
+            WorkThread1 wt1 = (WorkThread1)e.UserState;
+            if(wt1!=null)
+            {
+                #region Логирование 
+                {
+                    string msg = string.Format("workThread1.state = {0}", wt1.curState.ToString() );
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.info);
+                    Debug.WriteLine(logstr, "Message");
+                }
+                #endregion
+                //Труба успешно прошла контроль
+                if(wt1.curState==WorkThread1.WrkStates.endWork)
+                {
+                    Program.tubeCount++;
+                    frMain.tubeCount.Text = Program.tubeCount.ToString();
+                }
+            }
         }
     }
 }

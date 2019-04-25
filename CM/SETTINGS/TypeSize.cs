@@ -78,13 +78,13 @@ namespace CM
         /// <summary>
         /// Порог класса 1
         /// </summary>
-        [DisplayName("Порог 1 класса, %"), Browsable(true)]
+        [DisplayName("Порог 1 класса"), Browsable(true)]
         public double Border1 { get; set; }
         
         /// <summary>
         /// Порог класса 2
         /// </summary>
-        [DisplayName("Порог 2 класса, %"), Browsable(true)]
+        [DisplayName("Порог 2 класса"), Browsable(true)]
         public double Border2 { get; set; }
         
         /// <summary>

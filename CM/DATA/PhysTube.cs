@@ -47,7 +47,13 @@ namespace CM
         /// <summary>
         /// Скорость движения трубы
         /// </summary>
-        public double speed = DefaultValues.Speed;
+        public double speed
+        {
+            get
+            { return (Program.settings.TubeSpeed > 0) ? Program.settings.TubeSpeed : DefaultValues.Speed; }
+            set
+            { Program.settings.TubeSpeed = value; }
+        }
 
         /// <summary>
         /// Время прохождения одной ячейки
@@ -68,7 +74,6 @@ namespace CM
         /// Физическое отображение трубы
         /// </summary>
         private double[,] data = null;
-
         /// <summary>
         /// Указатель на текущее положение для чтения данных
         /// </summary>
@@ -110,6 +115,10 @@ namespace CM
                 Debug.WriteLine(logstr, "Message");
             }
             #endregion
+            //if (Program.settings.TubeSpeed != 0)
+            //    speed = Program.settings.TubeSpeed;
+            //else
+            //    speed = DefaultValues.Speed;
             ts = _ts;
             len = _len;
             diameter = ts.diameter;
@@ -122,8 +131,8 @@ namespace CM
             try
             {
                 data = new double[Width, Height];
-                if (Program.settings.ZoneSize == 0) Program.settings.ZoneSize = 200;
-                int zones = (int)len / Program.settings.ZoneSize;
+                //if (Program.settings.ZoneSize == 0) Program.settings.ZoneSize = DefaultValues.ZoneSize;
+                //int zones = (int)len / Program.settings.ZoneSize;
                 reset();
             }
             catch (InsufficientMemoryException ex)
@@ -191,7 +200,7 @@ namespace CM
             get
             {
                 if (ts.sensors.hallSensors.elementWidth == 0) return DefaultValues.hallSensorWidth;
-                return ts.sensors.hallSensors.elementWidth;
+                return ts.sensors.hallSensors.elementWidth+ts.sensors.hallSensors.xGap;
             }
         }
 
