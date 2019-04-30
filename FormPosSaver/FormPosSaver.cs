@@ -148,6 +148,13 @@ namespace FormsExtras
             if (fa != null && fa.visible == true) return true;
             return false;
         }
+
+        public static void setInvisible(Form _frm)
+        {
+            FormAttrs fa = fl.Find(x => x.name == _frm.Name);
+            if (fa != null) fa.visible=false;
+        }
+
         const string fileName = "Wins.xml";
         /// <summary>
         /// Сохранение списка координат форм в файл

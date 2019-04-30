@@ -243,6 +243,7 @@ namespace CM
                             Debug.WriteLine(logstr, "Info");
                         }
                         #endregion
+
                         break;
                     }
                     Thread.Sleep(signalWaitCycleTime);
@@ -326,43 +327,43 @@ namespace CM
         private void btnTubeModel_Click(object sender, EventArgs e)
         {
             btnTubeModel.Enabled = false;
-            //FRTubeView frm = new FRTubeView(tm,(FRMain)MdiParent)
-            //{
-            //    Text = "Труба(модель)",
-            //    editable = true,
-            //};
-            //frm.FormClosed += new FormClosedEventHandler((object ob, FormClosedEventArgs ea) => { btnTubeModel.Enabled = true; });
-            //frm.MdiParent = this.MdiParent;
-            //frm.Show();
-            OpenFileDialog ofd = new OpenFileDialog
+            FRTubeView frm = new FRTubeView(tm,(FRMain)MdiParent)
             {
-                DefaultExt = "dbl",
-                AddExtension = true,
-                Filter = "Файлы дампа (*.dbl)|*.dbl|Все файлы (*.*)|*.*",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                Text = "Труба(модель)",
+                editable = true,
             };
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    DumpReader reader = new DumpReader(ofd.FileName);
-                    IDataWriter<double> writer = tm;
-                    writer.Write(reader.Read());
-                    //Program.tube.raw2phys(0, Program.tube.sections, 0, Program.tube.ptube.Width / Program.tube.ptube.logZoneSize);
-                }
-                catch (Exception ex)
-                {
-                    #region Логирование 
-                    {
-                        string msg = string.Format("{0}", ex.Message);
-                        string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                        Log.add(logstr, LogRecord.LogReason.error);
-                        Debug.WriteLine(logstr, "Error");
-                        MessageBox.Show(msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    }
-                    #endregion
-                }
-            }
+            frm.FormClosed += new FormClosedEventHandler((object ob, FormClosedEventArgs ea) => { btnTubeModel.Enabled = true; });
+            frm.MdiParent = this.MdiParent;
+            frm.Show();
+            //OpenFileDialog ofd = new OpenFileDialog
+            //{
+            //    DefaultExt = "dbl",
+            //    AddExtension = true,
+            //    Filter = "Файлы дампа (*.dbl)|*.dbl|Все файлы (*.*)|*.*",
+            //    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            //};
+            //if (ofd.ShowDialog() == DialogResult.OK)
+            //{
+            //    try
+            //    {
+            //        DumpReader reader = new DumpReader(ofd.FileName);
+            //        IDataWriter<double> writer = tm;
+            //        writer.Write(reader.Read());
+            //        //Program.tube.raw2phys(0, Program.tube.sections, 0, Program.tube.ptube.Width / Program.tube.ptube.logZoneSize);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        #region Логирование 
+            //        {
+            //            string msg = string.Format("{0}", ex.Message);
+            //            string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+            //            Log.add(logstr, LogRecord.LogReason.error);
+            //            Debug.WriteLine(logstr, "Error");
+            //            MessageBox.Show(msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            //        }
+            //        #endregion
+            //    }
+            //}
 
         }
     }

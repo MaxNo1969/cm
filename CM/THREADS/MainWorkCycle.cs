@@ -66,7 +66,9 @@ namespace CM
                     }
                     Thread.Sleep(workSleepTimeout);
                 }
-                ReportProgress(0,workThread1);
+                ReportProgress(0, workThread1);
+                if (workThread1.curState == WorkThread1.WrkStates.error)
+                    break;
                 if (frMain.breakToView) break;
             }
             workThread1.stop();

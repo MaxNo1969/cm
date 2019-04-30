@@ -73,7 +73,7 @@ namespace CM
         /// <summary>
         /// Физическое отображение трубы
         /// </summary>
-        private double[,] data = null;
+        public double[,] data = null;
         /// <summary>
         /// Указатель на текущее положение для чтения данных
         /// </summary>
@@ -197,10 +197,14 @@ namespace CM
         /// </summary>
         public double cellXSize
         {
+            //get
+            //{
+            //    if (ts.sensors.hallSensors.elementWidth == 0) return DefaultValues.hallSensorWidth;
+            //    return ts.sensors.hallSensors.elementWidth+ts.sensors.hallSensors.xGap;
+            //}
             get
             {
-                if (ts.sensors.hallSensors.elementWidth == 0) return DefaultValues.hallSensorWidth;
-                return ts.sensors.hallSensors.elementWidth+ts.sensors.hallSensors.xGap;
+                return Program.settings.ZoneSize / Tube.GetsectionsPerZone();
             }
         }
 
@@ -286,7 +290,7 @@ namespace CM
         {
             get
             {
-                return zoneSize / (int)cellXSize;
+                return Tube.GetsectionsPerZone();
             }
         }
 

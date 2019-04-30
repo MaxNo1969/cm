@@ -150,8 +150,17 @@ namespace CM
             {
                 try
                 {
-                    Log.add(string.Format("SEND:{0}", print(query)));
+                    #region Логирование 
+                    {
+                        string msg = string.Format("{0}", string.Format("SEND:{0}", print(query)));
+                        string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                        Log.add(logstr, LogRecord.LogReason.info);
+                        Debug.WriteLine(logstr, "Message");
+                    }
+                    #endregion
                     ser.Write(query, 0, query.Length);
+                    //Thread.Sleep(1000);
+                    WaitHelper.Wait(1);
                     if (answer.WaitOne(settings.ReadIntervalTimeout))
                     {
                         // 0 - абонент
@@ -161,32 +170,80 @@ namespace CM
                         // 4 - данные
                         // 5 - crc
                         // 6 - crc
+                        int bytesToRead = ser.BytesToRead;
                         byte[] packet = new byte[7];
                         int count = ser.Read(packet, 0, packet.Length);
-                        Log.add(string.Format("RECV:{0}", print(packet)));
+                        #region Логирование 
+                        {
+                            string msg = string.Format(string.Format("RECV:{0}(count={1}, BytesToRead={2}", print(packet),count,bytesToRead));
+                            string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                            Log.add(logstr, LogRecord.LogReason.info);
+                            Debug.WriteLine(logstr, "Message");
+                        }
+                        #endregion
                         if (count != 7)
                         {
                             err = "Не смогли прочитать";
+                            #region Логирование 
+                            {
+                                string msg = string.Format("{0},{1}", err, count );
+                                string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                                Log.add(logstr, LogRecord.LogReason.info);
+                                Debug.WriteLine(logstr, "Message");
+                            }
+                            #endregion
                             return false;
                         }
                         if (packet[0] != _abonent)
                         {
                             err = "Не тот абонент";
+                            #region Логирование 
+                            {
+                                string msg = string.Format("{0}", err);
+                                string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                                Log.add(logstr, LogRecord.LogReason.info);
+                                Debug.WriteLine(logstr, "Message");
+                            }
+                            #endregion
                             return false;
                         }
                         if ((packet[1] & 0x80) != 0)
                         {
                             err = "Ошибка в ответе: " + packet[2].ToString();
+                            #region Логирование 
+                            {
+                                string msg = string.Format("{0}", err);
+                                string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                                Log.add(logstr, LogRecord.LogReason.info);
+                                Debug.WriteLine(logstr, "Message");
+                            }
+                            #endregion
                             return false;
                         }
                         if (packet[2] != 7)
                         {
                             err = "Не верная длина в ответе";
+                            #region Логирование 
+                            {
+                                string msg = string.Format("{0}", err);
+                                string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                                Log.add(logstr, LogRecord.LogReason.info);
+                                Debug.WriteLine(logstr, "Message");
+                            }
+                            #endregion
                             return false;
                         }
                         if (Crc16.Check(packet))
                         {
                             err = "Не верная контрольная сумма";
+                            #region Логирование 
+                            {
+                                string msg = string.Format("{0}", err);
+                                string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                                Log.add(logstr, LogRecord.LogReason.info);
+                                Debug.WriteLine(logstr, "Message");
+                            }
+                            #endregion
                             return false;
                         }
                         _result = BitConverter.ToUInt16(new byte[2] { packet[6], packet[5] }, 0);
@@ -195,6 +252,14 @@ namespace CM
                     else
                     {
                         err = "Таймут чтения";
+                        #region Логирование 
+                        {
+                            string msg = string.Format("{0}", err);
+                            string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                            Log.add(logstr, LogRecord.LogReason.info);
+                            Debug.WriteLine(logstr, "Message");
+                        }
+                        #endregion
                         return false;
                     }
                 }
@@ -241,8 +306,17 @@ namespace CM
             {
                 try
                 {
-                    Log.add(string.Format("SEND:{0}",print(query)));
+                    #region Логирование 
+                    {
+                        string msg = string.Format("SEND:{0}", print(query));
+                        string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                        Log.add(logstr, LogRecord.LogReason.info);
+                        Debug.WriteLine(logstr, "Message");
+                    }
+                    #endregion
                     ser.Write(query, 0, query.Length);
+                    //Thread.Sleep(1000);
+                    WaitHelper.Wait(1);
                     if (answer.WaitOne(settings.ReadIntervalTimeout))
                     {
                         // 0 - абонент
@@ -254,33 +328,81 @@ namespace CM
                         // 6 - crc
                         // 7 - crc
                         byte[] packet = new byte[8];
+                        int bytesToRead = ser.BytesToRead;
                         int count = ser.Read(packet, 0, packet.Length);
-                        Log.add(string.Format("RECV:{0}", print(packet)));
-                        if (count != 5)
+                        #region Логирование 
+                        {
+                            string msg = string.Format(string.Format("RECV:{0}(count={1}, BytesToRead={2}", print(packet), count, bytesToRead));
+                            string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                            Log.add(logstr, LogRecord.LogReason.info);
+                            Debug.WriteLine(logstr, "Message");
+                        }
+                        #endregion
+                        if (count != 8)
                         {
                             err = "Не смогли прочитать";
+                            #region Логирование 
+                            {
+                                string msg = string.Format("{0}", err);
+                                string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                                Log.add(logstr, LogRecord.LogReason.info);
+                                Debug.WriteLine(logstr, "Message");
+                            }
+                            #endregion
                             return false;
                         }
                         if (packet[0] != _abonent)
                         {
                             err = "Не тот абонент";
+                            #region Логирование 
+                            {
+                                string msg = string.Format("{0}", err);
+                                string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                                Log.add(logstr, LogRecord.LogReason.info);
+                                Debug.WriteLine(logstr, "Message");
+                            }
+                            #endregion
                             return false;
                         }
                         if ((packet[1] & 0x80) != 0)
                         {
                             err = "Ошибка в ответе: " + packet[2].ToString();
+                            #region Логирование 
+                            {
+                                string msg = string.Format("{0}", err);
+                                string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                                Log.add(logstr, LogRecord.LogReason.info);
+                                Debug.WriteLine(logstr, "Message");
+                            }
+                            #endregion
                             return false;
                         }
-                        if (Crc16.Check(packet))
-                        {
-                            err = "Не верная контрольная сумма";
-                            return false;
-                        }
+                        //if (Crc16.Check(packet))
+                        //{
+                        //    err = "Не верная контрольная сумма";
+                        //    #region Логирование 
+                        //    {
+                        //        string msg = string.Format("{0}", err);
+                        //        string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                        //        Log.add(logstr, LogRecord.LogReason.info);
+                        //        Debug.WriteLine(logstr, "Message");
+                        //    }
+                        //    #endregion
+                        //    return false;
+                        //}
                         return true;
                     }
                     else
                     {
                         err = "Таймут чтения";
+                        #region Логирование 
+                        {
+                            string msg = string.Format("{0}", err);
+                            string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                            Log.add(logstr, LogRecord.LogReason.info);
+                            Debug.WriteLine(logstr, "Message");
+                        }
+                        #endregion
                         return false;
                     }
                 }

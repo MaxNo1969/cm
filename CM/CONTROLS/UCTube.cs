@@ -46,11 +46,6 @@ namespace CM
         private Image backBuffer = null;
 
         /// <summary>
-        /// Перо для рисования всяких границ
-        /// </summary>
-        private readonly Pen white2pix;
-
-        /// <summary>
         /// Количество зон отображаемых в верхнем окне
         /// </summary>
         [DisplayName("numZones"), Description("Количество отображаемых за раз зон"), Category("Труба"), DefaultValue(5)]
@@ -106,7 +101,10 @@ namespace CM
         GetColor getColor;
         delegate Brush GetBrush(double _val);
         GetBrush getBrush;
-
+        readonly Pen zoneBorderPen;
+        readonly Pen sensorBorderPen;
+        readonly Pen cellBorderPen;
+        readonly Pen bottomSensorBorderPen;
         /// <summary>
         /// Конструктор
         /// </summary>
@@ -117,14 +115,17 @@ namespace CM
             editable = false;
 
             numZones = 5;
-            upWinPercent = 50;
+            upWinPercent = 80;
             normalizedClass2Value = 0.7;
-
-            white2pix = new Pen(Color.White, 2);
 
             winStart = 0;
             curCellX = 0;
             curCellY = 0;
+            //zoneBorderPen = new Pen(Color.White, 2f);
+            zoneBorderPen = new Pen(Color.Black, 2f);
+            cellBorderPen = new Pen(Color.Black, 2f);
+            sensorBorderPen = new Pen(Color.Black, 2f);
+            bottomSensorBorderPen = new Pen(Color.Black, 4f);
         }
         /// <summary>
         /// Инициализация. Указываем форму и трубу
@@ -158,7 +159,6 @@ namespace CM
                 cellYSize = (float)height / (float)yCells;
                 //Рисуем верхнюю чатсь в буфер для избежания мерцания. 
                 backBuffer = new Bitmap(Width, height);
-                Pen zoneBorderPen = new Pen(Color.White, 2f);
                 using (Graphics g = Graphics.FromImage(backBuffer))
                 {
                     for (int x = 0; x < xCells; x++)
@@ -167,12 +167,12 @@ namespace CM
                         {
                             if (y < tube.ptube.Height && winStart + x < tube.ptube.Width)
                             {
-                                b = getBrush(tube[winStart + x, y]);
+                                b =ColorHelper.getBrush1(tube[winStart + x, y]);
                             }
                             else
                                 b = Brushes.White;
                             g.FillRectangle(b, x * cellXSize, y * cellYSize, cellXSize, cellYSize);
-                            g.DrawRectangle(Pens.Black, x * cellXSize, y * cellYSize, cellXSize, cellYSize);
+                            //g.DrawRectangle(Pens.Black, x * cellXSize, y * cellYSize, cellXSize, cellYSize);
                         }
                     }
                     //рисуем границы зон
@@ -181,13 +181,18 @@ namespace CM
                         g.DrawLine(zoneBorderPen, x * cellXSize, 0, x * cellXSize, Height);
                     }
                     //Рисуем границы матриц
-                    for (int i = 1; i < tube.ptube.mrows; i++)
+                    //for (int i = 1; i < Tube.mrows; i++)
+                    //{
+                    //    g.DrawLine(sensorBorderPen, 0, i * cellYSize * Tube.mrows*Tube.rows, Width, 
+                    //        i * cellYSize * Tube.mrows * Tube.rows);
+                    //}
+                    //Рисуем границы матриц
+                    for (int i = 1; i < Tube.mrows; i++)
                     {
-                        g.DrawLine(zoneBorderPen, 0, i * cellYSize * tube.ptube.mrows*tube.ptube.rows, Width, 
-                            i * cellYSize * tube.ptube.mrows * tube.ptube.rows);
+                        g.DrawLine(sensorBorderPen, 0, i * height / Tube.mrows, Width, i * height / Tube.mrows);
                     }
                     //Рисуем курсор текущей ячейки
-                    g.DrawRectangle(zoneBorderPen, curCellX * cellXSize, curCellY * cellYSize, cellXSize, cellYSize);
+                    g.DrawRectangle(cellBorderPen, curCellX * cellXSize, curCellY * cellYSize, cellXSize, cellYSize);
                 }
                 e.Graphics.DrawImage(backBuffer, 0, 0);
                 backBuffer.Dispose();
@@ -203,17 +208,23 @@ namespace CM
                 for (int x = 0; x < tube.ptube.Width; x++)
                     for (int y = 0; y < tube.ptube.Height; y++)
                     {
-                        (backBuffer as Bitmap).SetPixel(x, y, getColor(tube[x, y]));
+                        (backBuffer as Bitmap).SetPixel(x, y, ColorHelper.getColor1(tube[x, y]));
                     }
 
                 using (Graphics g = Graphics.FromImage(backBuffer))
                 {
+                    //if (winStart + 1 < tube.ptube.Width)
+                    //    g.DrawLine(white2pix, winStart, 0, winStart, backBuffer.Height);
+                    //if (winStart + winWidth + 1 < tube.ptube.Width)
+                    //    g.DrawLine(white2pix, winStart + winWidth, 0, winStart + winWidth, backBuffer.Height);
                     if (winStart + 1 < tube.ptube.Width)
-                        g.DrawLine(white2pix, winStart, 0, winStart, backBuffer.Height);
+                        g.DrawLine(Pens.Black, winStart, 0, winStart, backBuffer.Height);
                     if (winStart + winWidth + 1 < tube.ptube.Width)
-                        g.DrawLine(white2pix, winStart + winWidth, 0, winStart + winWidth, backBuffer.Height);
+                        g.DrawLine(Pens.Black, winStart + winWidth, 0, winStart + winWidth, backBuffer.Height);
+                    //for (int i = 1; i < tube.ptube.mrows; i++)
+                    //    g.DrawLine(Pens.White, 0, i * tube.ptube.rows, backBuffer.Width, i * tube.ptube.rows);
                     for (int i = 1; i < tube.ptube.mrows; i++)
-                        g.DrawLine(Pens.White, 0, i * tube.ptube.rows, backBuffer.Width, i * tube.ptube.rows);
+                        g.DrawLine(bottomSensorBorderPen, 0, i * tube.ptube.rows, backBuffer.Width, i * tube.ptube.rows);
                 }
                 //if (winStart + 1 < tube.ptube.Width)
                 //{
@@ -423,7 +434,9 @@ namespace CM
                     {
 
                         case Keys.Enter:
-
+                            FRRowAllSensorsView frm = new FRRowAllSensorsView(frTubeView.MdiParent, tube, curCellY / Tube.rows, curCellY % Tube.rows);
+                            //FRHallSensorView frm = new FRHallSensorView(tube, curCellY / Tube.rows, curCellY % Tube.rows, 0, 0, tube.sections);
+                            frm.Show();
                             break;
                         default:
                             break;
@@ -453,7 +466,8 @@ namespace CM
                 int row =(int)(e.Y / cellYSize);
                 int mrow = row / tube.ptube.rows;
                 row = row % tube.ptube.rows;
-                FRRowAllSensorsView frm = new FRRowAllSensorsView(frTubeView.MdiParent, tube, mrow, row);
+                //FRRowAllSensorsView frm = new FRRowAllSensorsView(frTubeView.MdiParent, tube, mrow, row);
+                FRHallSensorView frm = new FRHallSensorView(tube, mrow, row, 0, 0, tube.sections);
                 frm.Show();
             }
         }

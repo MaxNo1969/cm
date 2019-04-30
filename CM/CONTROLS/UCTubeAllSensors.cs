@@ -47,13 +47,13 @@ namespace CM
         {
             tube = _tube;
             tube.onDataChanged += new DataChanged(x => Invalidate());
-            bitmapWidth = (int)((double)tube.len / tube.ptube.speed * Program.mtdadcFreq / tube.sectionSize / 1000);
+            bitmapWidth = (int)((double)tube.len / tube.ptube.speed * Program.mtdadcFreq / Tube.sectionSize / 1000);
             if (bitmapWidth < tube.sections) bitmapWidth = tube.sections;
             if (tube.sections > 0)
             {
-                backBuffer = new Bitmap(tube.sections, tube.sectionSize);
+                backBuffer = new Bitmap(tube.sections, Tube.sectionSize);
                 g = Graphics.FromImage(backBuffer);
-                bitmap = new byte[tube.sections * tube.sectionSize * 4];
+                bitmap = new byte[tube.sections * Tube.sectionSize * 4];
                 r = new Rectangle(tube.sections, 0, bitmapWidth - tube.sections, backBuffer.Height);
             }
             else
@@ -71,16 +71,16 @@ namespace CM
             if (bitmap == null) return;
             for (int sect = 0; sect < tube.sections; sect++)
             {
-                for (int mcol = 0; mcol < tube.mcols; mcol++)
+                for (int mcol = 0; mcol < Tube.mcols; mcol++)
                 {
-                    for (int mrow = 0; mrow < tube.mrows; mrow++)
+                    for (int mrow = 0; mrow < Tube.mrows; mrow++)
                     {
-                        for (int col = 0; col < tube.cols; col++)
+                        for (int col = 0; col < Tube.cols; col++)
                         {
-                            for (int row = 0; row < tube.rows; row++)
+                            for (int row = 0; row < Tube.rows; row++)
                             {
-                                int y = mcol * tube.rows * tube.cols * tube.rows +
-                                    mrow * tube.cols * tube.rows + row * tube.cols + col;
+                                int y = mcol * Tube.rows * Tube.cols * Tube.rows +
+                                    mrow * Tube.cols * Tube.rows + row * Tube.cols + col;
                                 double val = tube.getNorm(mcol, mrow, col, row, sect);
                                 Color c = ColorHelper.getColor(val);
                                 int ind = tube.sections * 4 * y + sect * 4;
@@ -102,16 +102,16 @@ namespace CM
             {
                 Parallel.For(0, tube.sections, sect =>
                 {
-                    Parallel.For(0, tube.mcols, mcol =>
+                    Parallel.For(0, Tube.mcols, mcol =>
                     {
-                        Parallel.For(0, tube.mrows, mrow =>
+                        Parallel.For(0, Tube.mrows, mrow =>
                         {
-                            Parallel.For(0, tube.cols, col =>
+                            Parallel.For(0, Tube.cols, col =>
                             {
-                                Parallel.For(0, tube.rows, row =>
+                                Parallel.For(0, Tube.rows, row =>
                                 {
-                                    int y = mcol * tube.rows * tube.cols * tube.rows +
-                                        mrow * tube.cols * tube.rows + row * tube.cols + col;
+                                    int y = mcol * Tube.rows * Tube.cols * Tube.rows +
+                                        mrow * Tube.cols * Tube.rows + row * Tube.cols + col;
                                     double val = tube.getNorm(mcol, mrow, col, row, sect);
                                     Color c = ColorHelper.getColor(val);
                                     int ind = tube.sections * 4 * y + sect * 4;
@@ -145,16 +145,16 @@ namespace CM
             if (backBuffer == null) return;
             for (int sect = 0; sect < tube.sections; sect++)
             {
-                for (int mcol = 0; mcol < tube.mcols; mcol++)
+                for (int mcol = 0; mcol < Tube.mcols; mcol++)
                 {
-                    for (int mrow = 0; mrow < tube.mrows; mrow++)
+                    for (int mrow = 0; mrow < Tube.mrows; mrow++)
                     {
-                        for (int col = 0; col < tube.cols; col++)
+                        for (int col = 0; col < Tube.cols; col++)
                         {
-                            for (int row = 0; row < tube.rows; row++)
+                            for (int row = 0; row < Tube.rows; row++)
                             {
-                                int y = mcol * tube.rows * tube.cols * tube.rows +
-                                    mrow * tube.cols * tube.rows + row * tube.cols + col;
+                                int y = mcol * Tube.rows * Tube.cols * Tube.rows +
+                                    mrow * Tube.cols * Tube.rows + row * Tube.cols + col;
                                 double val = tube.getNorm(mcol, mrow, col, row, sect);
                                 backBuffer.SetPixel(sect, y, ColorHelper.getColor(val));
                             }
@@ -171,10 +171,10 @@ namespace CM
         {
             if (backBuffer == null) return;
             //Рисуем границы матриц
-            int sensorSize = tube.cols * tube.rows;
+            int sensorSize = Tube.cols * Tube.rows;
             Pen p = new Pen(Color.White, 2);
             Graphics g = Graphics.FromImage(backBuffer);
-            for (int y = 1; y < tube.mcols * tube.mrows; y++)
+            for (int y = 1; y < Tube.mcols * Tube.mrows; y++)
             {                
                 g.DrawLine(p,0,y*sensorSize,backBuffer.Width,y*sensorSize);
             }
@@ -186,7 +186,7 @@ namespace CM
         {
             if (backBuffer == null) return;
             //Рисуем границы матриц
-            int sensorSize = tube.cols * tube.rows;
+            int sensorSize = Tube.cols * Tube.rows;
             Pen p = new Pen(Color.White, 2);
             Graphics g = Graphics.FromImage(backBuffer);
             int zones = (int)tube.ptube.len / tube.ptube.zoneSize;
@@ -222,7 +222,7 @@ namespace CM
                     //Рисуем границы матриц
                     sensorBounds2bitmap();
                     //Рисуем зоны
-                    zoneBounds2bitmap();
+                    //zoneBounds2bitmap();
                     if (backBuffer != null)
                     {
                         Bitmap resized = ImgHelper.ResizeImage(backBuffer, Width, Height);

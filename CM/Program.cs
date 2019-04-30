@@ -11,6 +11,7 @@ namespace CM
 {
     static class Program
     {
+        public const string className = "Program";
         public static Dictionary<string, string> cmdLineArgs;
         public static AppSettings settings = null;
         public static Tube tube;
@@ -34,33 +35,44 @@ namespace CM
                 cmdLineArgs = CmdLineHelper.getCmdLineParameters(args);
                 #region Логирование 
                 {
-                    string msg = string.Format("{0}", @"Program: Начало выполнения программы.");
-                    string logstr = string.Format("{0}: {1}: {2}", @"Program", System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    string msg = @"Начало выполнения программы.";
+                    string logstr = string.Format("{0}: {1}: {2}", className, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                     Log.add(logstr, LogRecord.LogReason.info);
                     Debug.WriteLine(logstr, "Message");
                 }
                 #endregion
                 settings = AppSettingsSerialization.load(DefaultValues.defaultAppSettingsFileName);
-                //cmdLineArgs.Add("NOCOM", "true");
                 rectifier = new Rectifier(new ModBus(Program.settings.rectifierSettings.Port));
-                if (settings.Current.Name != "Новый")
-                    tube = new Tube(settings.Current, settings.TubeLen);
-                else
-                    tube = new Tube(settings.TypeSizes[0], settings.TubeLen);
                 if(cmdLineArgs.ContainsKey("NOLCARD"))
                     lCard = new LCardVirtual(settings.lCardSettings);
                 else
                     lCard = new LCardReal(settings.lCardSettings);
-                mtdadc = new MTADC(Program.settings.mtadcSettings.port);
-                {
-                    int cmd6res = Convert.ToInt32(mtdadc.cmd(6));
-                    double T = 1 / Program.settings.lCardSettings.FrequencyCollect;
-                    double t = T * (cmd6res + 1);
-                    mtdadcFreq = (int)(1 / t);
-                }
+                //Инициализация PCIE1730 и списка обрабатываемых сигналов
                 signals = new SignalListDef();
                 //Включаем питание датчиков
                 signals.oPOWER.Val = true;
+                WaitHelper.Wait(1000);
+                //Инициализируем П-217
+                mtdadc = new MTADC(Program.settings.mtadcSettings.port);
+                //Получаем частоту внешней синхронизации
+                int cmd6res = Convert.ToInt32(mtdadc.cmd(6));
+                if (Program.settings.mtadcSettings.Freq == 0) Program.settings.mtadcSettings.Freq = 20000000;
+                double T = 1 / (double)Program.settings.mtadcSettings.Freq;
+                double t = T * (cmd6res + 1);
+                mtdadcFreq = (int)(1 / t);
+                //mtdadcFreq = 44440;
+                #region Логирование 
+                {
+                    string msg = string.Format("mtdadcFreq = {0}", mtdadcFreq );
+                    string logstr = string.Format("{0}: {1}: {2}", className, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.info);
+                    Debug.WriteLine(logstr, "Message");
+                }
+                #endregion
+                if (settings.Current.Name != "Новый")
+                    tube = new Tube(settings.Current, settings.TubeLen);
+                else
+                    tube = new Tube(settings.TypeSizes[0], settings.TubeLen);
                 tubeCount = 0;
                 Application.Run(new FRMain());
             }

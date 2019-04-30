@@ -58,7 +58,7 @@ namespace CM
                 Debug.WriteLine(logstr);
             }
             #endregion
-            //tube.rtube.strobes.Clear();
+            //tube.rtube.Zones.Clear();
             strobeTh = new Thread(strobeThreadFunc)
             {
                 Name = "StrobeThread",

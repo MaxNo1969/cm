@@ -202,6 +202,7 @@ namespace CM
 
         public bool Start()
         {
+            reset();
             return true;
         }
 

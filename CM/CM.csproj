@@ -77,6 +77,18 @@
       <DependentUpon>UCTubeAllSensors.cs</DependentUpon>
     </Compile>
     <Compile Include="DATA\DumpReader.cs" />
+    <Compile Include="DATA\FRHallSensorView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DATA\FRHallSensorView.designer.cs">
+      <DependentUpon>FRHallSensorView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DATA\FRTubeRawView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DATA\FRTubeRawView.designer.cs">
+      <DependentUpon>FRTubeRawView.cs</DependentUpon>
+    </Compile>
     <Compile Include="DATA\PhysTube.cs" />
     <Compile Include="DATA\RawTube.cs" />
     <Compile Include="DATA\Strobe.cs" />
@@ -204,7 +216,7 @@
     <Compile Include="THREADS\MainWorkCycle.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="THREADS\PhysTubeZoneWriterThread.cs" />
+    <Compile Include="THREADS\ZoneWriterThread.cs" />
     <Compile Include="THREADS\ReadDataThread.cs" />
     <Compile Include="THREADS\StrobeThread.cs" />
     <Compile Include="THREADS\WorkThread.cs" />
@@ -223,6 +235,7 @@
     <Compile Include="CONTROLS\UCGraph.designer.cs">
       <DependentUpon>UCGraph.cs</DependentUpon>
     </Compile>
+    <Compile Include="UTIL\WaitHelper.cs" />
     <EmbeddedResource Include="ADC\FRModuleTADC.resx">
       <DependentUpon>FRModuleTADC.cs</DependentUpon>
     </EmbeddedResource>
@@ -234,6 +247,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DATA\FRAllSensorsView.resx">
       <DependentUpon>FRAllSensorsView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DATA\FRHallSensorView.resx">
+      <DependentUpon>FRHallSensorView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DATA\FRTubeRawView.resx">
+      <DependentUpon>FRTubeRawView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EMUL\FREmul.resx">
       <DependentUpon>FREmul.cs</DependentUpon>

@@ -172,6 +172,17 @@ namespace CM
             fSignals.Visible = viewSignalsToolStripMenuItem.Checked;
         }
         /// <summary>
+        /// Блок питания
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void rectifierToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            rectifierToolStripMenuItem.Checked = !rectifierToolStripMenuItem.Checked;
+            fRectifier.Visible = rectifierToolStripMenuItem.Checked;
+        }
+        #endregion Показ/скрытие окон
+        /// <summary>
         /// АЦП
         /// </summary>
         /// <param name="sender"></param>
@@ -185,17 +196,6 @@ namespace CM
             };
             frADC.Show();
         }
-        /// <summary>
-        /// Блок питания
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void rectifierToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            rectifierToolStripMenuItem.Checked = !rectifierToolStripMenuItem.Checked;
-            fRectifier.Visible = rectifierToolStripMenuItem.Checked;
-        }
-        #endregion Показ/скрытие окон
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -280,6 +280,11 @@ namespace CM
 
         private void viewTubeToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            viewTube();
+        }
+
+        public void viewTube()
+        {
             if (Program.tube == null)
             {
                 MessageBox.Show("Не загружена труба...");
@@ -291,6 +296,7 @@ namespace CM
                 parentMenu = viewTubeToolStripMenuItem,
             };
             tubeView.Show();
+
         }
 
         private void importDumpToolStripMenuItem_Click(object sender, EventArgs e)
@@ -309,8 +315,9 @@ namespace CM
                     DumpReader reader = new DumpReader(ofd.FileName);
                     IDataWriter<double> writer = Program.tube;
                     writer.Write(reader.Read());
-                    Program.tube.raw2phys(0, Program.tube.sections, 0, Program.tube.ptube.Width / Program.tube.ptube.logZoneSize);
-                    viewTubeToolStripMenuItem_Click(this, null);
+                    Program.tube.raw2phys1(0, Program.tube.sections, 0, Program.tube.ptube.Width / Program.tube.ptube.logZoneSize);
+                    //viewTubeToolStripMenuItem_Click(this, null);
+                    viewAllSensorsToolStripMenuItem_Click(this, null);
                 }
                 catch (Exception ex)
                 {
@@ -408,12 +415,6 @@ namespace CM
             }
         }
 
-        private void newToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Program.tube = new Tube(Program.settings.Current, Program.settings.TubeLen);
-            viewTubeToolStripMenuItem_Click(newToolStripMenuItem, null);
-        }
-
         private void startstopToolStripMenuItem_Click(object sender, EventArgs e)
         {
             #region Логирование 
@@ -466,6 +467,17 @@ namespace CM
         private void rectifierTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FRRectifierTest frm = new FRRectifierTest(Program.settings.Current.rectifier);
+            frm.Show();
+        }
+
+        private void adcRawDataToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Program.tube == null)
+            {
+                MessageBox.Show("Не загружена труба...");
+                return;
+            }
+            FRTubeRawView frm = new FRTubeRawView(Program.tube,this, adcRawDataToolStripMenuItem);
             frm.Show();
         }
     }

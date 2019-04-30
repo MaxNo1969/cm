@@ -39,7 +39,6 @@
             this.viewTubeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewAllSensorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
-            this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -71,6 +70,7 @@
             this.cbTypeSize = new System.Windows.Forms.ToolStripComboBox();
             this.lblTubesCounter = new System.Windows.Forms.ToolStripLabel();
             this.tubeCount = new System.Windows.Forms.ToolStripLabel();
+            this.adcRawDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.ssMain.SuspendLayout();
             this.ts.SuspendLayout();
@@ -137,8 +137,8 @@
             this.tubeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.viewTubeToolStripMenuItem,
             this.viewAllSensorsToolStripMenuItem,
+            this.adcRawDataToolStripMenuItem,
             this.toolStripMenuItem2,
-            this.newToolStripMenuItem,
             this.openToolStripMenuItem,
             this.toolStripSeparator,
             this.saveToolStripMenuItem,
@@ -170,16 +170,6 @@
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
             this.toolStripMenuItem2.Size = new System.Drawing.Size(219, 6);
             // 
-            // newToolStripMenuItem
-            // 
-            this.newToolStripMenuItem.Image = global::CM.Properties.Resources.newButton_Image;
-            this.newToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
-            this.newToolStripMenuItem.Text = "&Новая";
-            this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
-            // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Image = global::CM.Properties.Resources.openButton_Image;
@@ -187,7 +177,7 @@
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
             this.openToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
-            this.openToolStripMenuItem.Text = "&Открыть";
+            this.openToolStripMenuItem.Text = "&Загрузить";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // toolStripSeparator
@@ -238,20 +228,20 @@
             this.importCSVToolStripMenuItem});
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
             this.importToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
-            this.importToolStripMenuItem.Text = "&Загрузить...";
+            this.importToolStripMenuItem.Text = "&Загрузить из...";
             // 
             // importDumpToolStripMenuItem
             // 
             this.importDumpToolStripMenuItem.Name = "importDumpToolStripMenuItem";
-            this.importDumpToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
-            this.importDumpToolStripMenuItem.Text = "Файл дампа";
+            this.importDumpToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.importDumpToolStripMenuItem.Text = "Файла дампа";
             this.importDumpToolStripMenuItem.Click += new System.EventHandler(this.importDumpToolStripMenuItem_Click);
             // 
             // importCSVToolStripMenuItem
             // 
             this.importCSVToolStripMenuItem.Name = "importCSVToolStripMenuItem";
-            this.importCSVToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
-            this.importCSVToolStripMenuItem.Text = "Файл CSV";
+            this.importCSVToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.importCSVToolStripMenuItem.Text = "Файла CSV";
             // 
             // toolsToolStripMenuItem
             // 
@@ -420,6 +410,13 @@
             this.tubeCount.Size = new System.Drawing.Size(13, 22);
             this.tubeCount.Text = "0";
             // 
+            // adcRawDataToolStripMenuItem
+            // 
+            this.adcRawDataToolStripMenuItem.Name = "adcRawDataToolStripMenuItem";
+            this.adcRawDataToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.adcRawDataToolStripMenuItem.Text = "Данные АЦП";
+            this.adcRawDataToolStripMenuItem.Click += new System.EventHandler(this.adcRawDataToolStripMenuItem_Click);
+            // 
             // FRMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -449,7 +446,6 @@
 
         private System.Windows.Forms.MenuStrip mainMenu;
         private System.Windows.Forms.ToolStripMenuItem tubeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
@@ -489,6 +485,7 @@
         private System.Windows.Forms.ToolStripMenuItem rectifierTestToolStripMenuItem;
         public System.Windows.Forms.ToolStripMenuItem startstopToolStripMenuItem;
         public System.Windows.Forms.ToolStripLabel tubeCount;
+        private System.Windows.Forms.ToolStripMenuItem adcRawDataToolStripMenuItem;
     }
 }
 

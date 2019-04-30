@@ -5,6 +5,7 @@ using System.Diagnostics;
 using FormsExtras;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 namespace CM
 {
@@ -105,6 +106,7 @@ namespace CM
         /// </summary>
         public void updateSb()
         {
+            setSb("Sensor", string.Format("Датчик ({0},{1})", ucTube.curCellY / Tube.rows, ucTube.curCellY % Tube.rows));
             setSb("Zone",string.Format("Зона: {0} ({1,5:f2}-{2,5:f2})", ucTube.GetZoneNum(),
                 tube.ptube.l2px(ucTube.GetZoneNum() * tube.ptube.logZoneSize) / 1000f,
                 tube.ptube.l2px((ucTube.GetZoneNum() + 1) * tube.ptube.logZoneSize) / 1000f));
@@ -127,19 +129,16 @@ namespace CM
 
         private void miSave_Click(object sender, EventArgs e)
         {
-            if(true)
+            SaveFileDialog sfd = new SaveFileDialog
             {
-                SaveFileDialog sfd = new SaveFileDialog
-                {
-                    DefaultExt = "bin",
-                    AddExtension = true,
-                    Filter = "Файлы bin (*.bin)|*.bin|Все файлы (*.*)|*.*",
-                    OverwritePrompt = true,
-                };
-                if (sfd.ShowDialog() == DialogResult.OK)
-                {
-                    Tube.save(tube, sfd.FileName);
-                }
+                DefaultExt = "bin",
+                AddExtension = true,
+                Filter = "Файлы bin (*.bin)|*.bin|Все файлы (*.*)|*.*",
+                OverwritePrompt = true,
+            };
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                Tube.save(tube, sfd.FileName);
             }
         }
 
@@ -166,12 +165,16 @@ namespace CM
         {
             if (MessageBox.Show("Очистить данные по трубе?", "Очистка", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
+                tube.reset();
+                ucTube.Invalidate();
             }
         }
         private void miFill_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Заполнить данные нулями?", "Очистка", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
+                tube.reset(0);
+                ucTube.Invalidate();
             }
         }
     }

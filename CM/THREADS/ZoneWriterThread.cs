@@ -36,7 +36,6 @@ namespace CM
         readonly int zoneTime;
         int lastWritedSection = 0;
         int zone = 0;
-        readonly int sectionsPerZone;
         /// <summary>
         /// Конструктор
         /// </summary>
@@ -46,7 +45,6 @@ namespace CM
             tube = _tube;
             isRunning = false;
             zoneTime = (int)(Program.settings.ZoneSize / Program.settings.TubeSpeed);
-            sectionsPerZone = (int)((double)Program.settings.ZoneSize * Program.mtdadcFreq / (Program.settings.TubeSpeed * 1000)/tube.sectionSize);
         }
 
         /// <summary>
@@ -91,7 +89,7 @@ namespace CM
             {
                 if (tube.ptube.endWritedX < tube.ptube.Width)
                 {
-                    if (tube.sections > sectionsPerZone * (zone + 1))
+                    if (tube.sections > Tube.GetsectionsPerZone() * (zone + 1))
                     {
                         #region Логирование 
                         {
@@ -103,9 +101,9 @@ namespace CM
                         }
                         #endregion
                         int currentSections = tube.sections;
-                        tube.strobes.Add(new Strobe(currentSections));
                         tube.raw2phys1(lastWritedSection, currentSections - lastWritedSection, zone, 1);
                         Tube.TubeRes zoneRes = tube.getZoneResult(zone, out double _maxVal);
+                        tube.Zones.Add(new Zone(currentSections,zoneRes));
                         #region Логирование 
                         {
                             string msg = string.Format(@"{0:hh\:mm\:ss\.ff} Результат по зоне {1} : {2} {3}",
@@ -115,7 +113,7 @@ namespace CM
                             Debug.WriteLine(logstr, "Message");
                         }
                         #endregion
-                        Program.signals.ZoneControlResult(zoneRes);
+                        Program.signals.ControlResult(zoneRes);
                         lastWritedSection = currentSections;
                         zone++;
                         onNextZone?.Invoke(tube);

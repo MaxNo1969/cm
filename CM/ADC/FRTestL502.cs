@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace CM
@@ -56,21 +57,25 @@ namespace CM
         //Dt corrSens = null;
         //сколько данных за раз показываем в окне
         int size = 2048;
+        ReadDataThread readDataThread;
+        ZoneWriterThread zoneWriter;
 
         /// <summary>
         /// Обработчик события записи очередной порции данных в трубу (вызывается в потоке readDataThread для класса Tube.LogTube.RawTube)
         /// </summary>
         /// <param name="_data">Данные для вывода в график</param>
-        public void tubeDataChanged(IEnumerable<double> _data)
+        public void lCardDataRead(IEnumerable<double> _data)
         {
             //lock (block)
             if(_data!=null)
             {
                 IEnumerator<double> enumerator = _data.GetEnumerator();
                 enumerator.Reset();
+                int cnt = 0;
                 for (int i = 0; i < size && enumerator.MoveNext(); i++)
                 {
                     y[i] = enumerator.Current;
+                    cnt++;
                 }
                 //Array.Copy(_data, y, size);
             }
@@ -88,7 +93,7 @@ namespace CM
             frMain = _frm;
             isReadThStarted = false;
             InitializeComponent();
-            tbSaveData.Enabled = !(Program.tube.rawDataSize > 0);
+            tbSaveData.Enabled = (Program.tube.rawDataSize > 0);
             ucGr.showGridX = true;
             ucGr.showGridY = true;
             ucGr.minX = 0;
@@ -108,7 +113,7 @@ namespace CM
         }
 
         bool isReadThStarted;
-        ReadDataThread readDataThread = null;
+        //ReadDataThread readDataThread = null;
         //MTADC mtadc = null;
         private void btnStartL502_Click(object sender, EventArgs e)
         {
@@ -118,67 +123,111 @@ namespace CM
                 tbSaveData.Enabled = false;
                 isReadThStarted = true;
                 btnStartL502.Text = "Стоп";
-                sw.Reset();
-                sw.Start();
                 Program.tube.reset();
-                readDataThread = new ReadDataThread(Program.lCard, Program.tube);
-                readDataThread.Start();
+                readDataThread = new ReadDataThread(Program.lCard, Program.tube.rtube);
+                zoneWriter = new ZoneWriterThread(Program.tube);
+                Start();
             }
             else
             {
+                Stop();
+                //Снимаем все выходные сигналы кроме питания
+                Program.signals.ClearAllSignals();
                 tbView.Enabled = (Program.tube.rawDataSize>0);
                 tbSaveData.Enabled = (Program.tube.rawDataSize > 0);
                 isReadThStarted = false;
                 btnStartL502.Text = "Старт";
-                readDataThread.Stop();
-                readDataThread = null;
-                sw.Stop();
                 sb.Items["Time"].Text = string.Empty;
                 frMain.setSb("Info",string.Empty);
             }
         }
 
+        private bool Start()
+        {
+            //Запускаем таймер
+            sw.Reset();
+            sw.Start();
+            //Включаем поле
+            Program.rectifier.Start();
+            //Поставим задержку на включение блока питания
+            WaitHelper.Wait(1);
+            Program.lCard.Start();
+            Program.mtdadc.start();
+            readDataThread.Start();
+            zoneWriter.start();
+            return true;
+        }
+
+        private bool Stop()
+        {
+            //Останавливаем обсчет зон
+            zoneWriter?.stop();
+            zoneWriter = null;
+            //Останавливаем чтение данных с АЦП
+            readDataThread?.Stop();
+            readDataThread = null;
+            //Останавливаем П217
+            Program.mtdadc.stop();
+            Program.lCard.Stop();
+            Program.rectifier.Stop();
+            sw.Stop();
+            return true;
+        }
+
         private void FRTestL502_Load(object sender, EventArgs e)
         {
             FormPosSaver.load(this);
-            Program.tube.onDataChanged += tubeDataChanged;
-            tbView.Enabled = !(Program.tube.rawDataSize > 0);
-            tbSaveData.Enabled = !(Program.tube.rawDataSize > 0);
+            Program.lCard.onDataRead += lCardDataRead;
+            tbView.Enabled = (Program.tube.rawDataSize > 0);
+            tbSaveData.Enabled = (Program.tube.rawDataSize > 0);
+            //В режиме эмуляции выставляем сигнал соленод (без него не запустится ReadDataThread)
+            if (Program.signals.a1730 is PCIE_1730_virtual)
+                Program.signals.set(Program.signals.iSOL, true);
         }
 
         private void FRTestL502_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Program.tube.onDataChanged -= tubeDataChanged;
+            Stop();
+            Program.lCard.onDataRead -= lCardDataRead;
         }
         
         private void tbView_Click(object sender, EventArgs e)
         {
-            //FRCutView frm = new FRCutView(frMain)
-            //{
-            //    MdiParent = frMain,
-            //};
-            //frm.Show();
+            frMain.viewTube();
         }
 
 
         private void tbSaveLcard_Click(object sender, EventArgs e)
         {
+            Tube tube = Program.tube;
             frMain.setSb("Info", "Запись данных в файл...");
             setSb("Info", "Запись данных в файл...");
-            SaveFileDialog sfd = new SaveFileDialog()
+            string[] srows = new string[tube.ptube.Height];
+            for (int y = 0; y < tube.ptube.Height; y++)
             {
-                AddExtension = true,
+                string srow = string.Empty;
+                for (int x = 0; x < tube.ptube.Width; x++)
+                {
+                    {
+                        srow += string.Format("{0};", tube[x, y]);
+                    }
+                    srows[y] = srow;
+                }
+            }
+            SaveFileDialog sfd = new SaveFileDialog
+            {
                 DefaultExt = "csv",
-                Filter = "Файлы CSV (*.csv)|*.csv|Все файлы (*.*)|*.*",
+                AddExtension = true,
+                Filter = "Файлы csv (*.csv)|*.csv|Все файлы (*.*)|*.*",
+                OverwritePrompt = true,
             };
-            if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (sfd.ShowDialog() == DialogResult.OK)
             {
                 using (StreamWriter writer = new StreamWriter(sfd.FileName, false))
                 {
-
-                    for (int i = 0; i < Program.tube.rawDataSize; i++)
+                    foreach (string srow in srows)
                     {
-                        writer.WriteLine(Program.tube.rtube.data[i].ToString());
+                        writer.WriteLine(srow);
                     }
                     writer.Close();
                 }

@@ -67,6 +67,19 @@ namespace CM
         {
             while (isRunning)
             {
+                if (Program.signals.iSOL.Val == false)
+                {
+                    #region Логирование 
+                    {
+                        string msg = string.Format("{0}", "Нет сигнала \"Соленоид\"");
+                        string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                        Log.add(logstr, LogRecord.LogReason.error);
+                        Debug.WriteLine(logstr, "Error");
+                    }
+                    #endregion
+                    isRunning = false;
+                    return;
+                }
                 //записываем если ещё есть место в буфере
                 lock (block)
                 {
@@ -97,6 +110,7 @@ namespace CM
                             Debug.WriteLine(logstr, "Warning");
                         }
                         #endregion
+                        Thread.Sleep(200);
                     }
                 }
             }
@@ -109,6 +123,18 @@ namespace CM
         {
             if (!isRunning)
             {
+                if(Program.signals.iSOL.Val==false)
+                {
+                    #region Логирование 
+                    {
+                        string msg = string.Format("{0}", "Нет сигнала \"Соленоид\"" );
+                        string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                        Log.add(logstr, LogRecord.LogReason.error);
+                        Debug.WriteLine(logstr, "Error");
+                    }
+                    #endregion
+                    return false;
+                }
                 #region Логирование 
                 {
                     string msg = string.Format("{0}", "Запускаем поток сбора данных" );

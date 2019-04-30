@@ -156,11 +156,13 @@ namespace CM
             if (iCC.Val == false)
             {
                 throw new Exception("Пропал сигнал цепи управления");
+                //return false;
             }
-            //else if (iCYC.Val == false)
-            //{
-            //    throw new Exception("Пропал сигнал \"ЦИКЛ3\"");
-            //}
+            else if (iCYC.Val == false)
+            {
+                //return false;
+                throw new Exception("Пропал сигнал \"ЦИКЛ3\"");
+            }
             else
                 return true;
         }
@@ -199,27 +201,41 @@ namespace CM
             set(iSTRB, false);
         }
 
-        //Сообщаем результат контроля по зоне
-        public void ZoneControlResult(Tube.TubeRes _res)
+        //Сообщаем результат контроля
+        public void ControlResult(Tube.TubeRes _res, bool isGlobRes = false)
         {
-            switch(_res)
+            switch (_res)
             {
                 case Tube.TubeRes.Good:
                     oSTRB.Val = true;
                     oZONRES.Val = true;
-                    oGLOBRES.Val = true;
+                    WaitHelper.Wait(200);
+                    oSTRB.Val = false;
+                    oZONRES.Val = false;
                     break;
                 case Tube.TubeRes.Class2:
                     oSTRB.Val = false;
                     oZONRES.Val = true;
-                    oGLOBRES.Val = true;
+                    WaitHelper.Wait(200);
+                    oZONRES.Val = false;
                     break;
                 case Tube.TubeRes.Bad:
                     oSTRB.Val = true;
                     oZONRES.Val = false;
-                    oGLOBRES.Val = true;
+                    WaitHelper.Wait(200);
+                    oSTRB.Val = false;
                     break;
             }
+            if (isGlobRes)
+                oGLOBRES.Val = true;
+            #region Логирование 
+            {
+                string msg = string.Format("Результат={0}", _res.ToString());
+                string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                Log.add(logstr, LogRecord.LogReason.info);
+                Debug.WriteLine(logstr, "Message");
+            }
+            #endregion
         }
     }
 }

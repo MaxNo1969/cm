@@ -14,6 +14,7 @@ namespace CM
     public partial class FRRectifierTest : Form
     {
         RectifierSettings settings;
+        bool isStarted = false;
         public FRRectifierTest(RectifierSettings _settings)
         {
             settings = _settings;
@@ -31,23 +32,22 @@ namespace CM
         private void timer_Tick(object sender, EventArgs e)
         {
             //label8.Text = string.Format("Время:{0}",Program.rectifier.getCurrentProcessSeconds());
+            //if(isStarted)
             //label9.Text = string.Format("Ток:{0}",Program.rectifier.getAmperage());
             //label10.Text = string.Format("Напряжение:{0}",Program.rectifier.getVoltage());
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //Program.rectifier.Start();
-            Program.rectifier.modbus.setSingleRegister(1, 61, 1);
-            Thread.Sleep(200);
-            Program.rectifier.modbus.ReadInputRegisterE(1, 1, out ushort res);
-            label8.Text = string.Format("{0}", res);
+            Program.rectifier.Start();
+            isStarted = true;
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            //Program.rectifier.Stop();
-            Program.rectifier.modbus.setSingleRegister(1, 61, 0);
+            isStarted = false;
+            Program.rectifier.Stop();
+
         }
     }
 }

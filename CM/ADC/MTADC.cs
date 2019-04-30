@@ -200,8 +200,16 @@ namespace CM
                 //Если тактирование не запущено - запускаем
                 if (s.Trim() == "OK0")
                 {
-                    //s = mtadc.cmd(5);
-                    //Thread.Sleep(1000);
+                    s = cmd(2);
+                    #region Логирование 
+                    {
+                        string msg = string.Format("MTADC:start: ->(!2) <-({0})", s);
+                        string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                        Log.add(logstr, LogRecord.LogReason.info);
+                        Debug.WriteLine(logstr, "Message");
+                    }
+                    #endregion
+                    Thread.Sleep(500);
                     s = cmd(3);
                     #region Логирование 
                     {

@@ -129,18 +129,19 @@ namespace CM
                             if (sl.iREADY.Val == true && sl.iSOL.Val==true)
                             {
                                 //Если 
-                                sl.oGLOBRES.Val = false;
+                                //sl.oGLOBRES.Val = false;
                                 //Здесь подготовка модуля к работе
                                 {
                                     //Включить намагничивание модуля. Проверить сопротивление соленоидов. 
+                                    //Включаем питание 
+                                    Program.rectifier.Start();
+                                    Thread.Sleep(2000);
                                     //Если перегрев – выход из режима с соответствующим сообщением. 
                                     //Далее в цикле контроля трубы выводить на экран ток и напряжение соленоидов (пока намагничивание включено).
                                     readDataThread = new ReadDataThread(Program.lCard, tube.rtube);
                                     zoneWriter = new ZoneWriterThread(tube);
                                     //Запускаем АЦП
                                     Program.lCard.Start();
-                                    //Включаем питание 
-                                    Program.rectifier.Start();
                                 }
                                 //Выставляем сигнал "РАБОТА3"
                                 sl.oWRK.Val = true;
@@ -198,12 +199,25 @@ namespace CM
                             break;
                         case WrkStates.endWork:
                             //По окончании сбора, обработки и передачи результата снять сигнал КОНТРОЛЬ. 
+                            //и при снятии цикла сбрасывай сигналы ОБЩ рез, строб и рез зоны
+                            //sl.oSTRB.Val = false;
+                            //sl.oZONRES.Val = false;
+                            //Передаём результат по трубе
+                            //FormAttrs fa = fl.Find(x => x.name == _frm.Name);
+                            if (tube.Zones.Exists(z => z.res == Tube.TubeRes.Bad))
+                                sl.ControlResult(Tube.TubeRes.Bad, true);
+                            else if (tube.Zones.Exists(z => z.res == Tube.TubeRes.Class2))
+                                sl.ControlResult(Tube.TubeRes.Class2, true);
+                            else 
+                                sl.ControlResult(Tube.TubeRes.Good, true);
                             //Выключить намагничивание соленоидов при снятии соответствующих сигналов КОНТРОЛЬ. 
-                            //Выключить генерацию синхросигнала платой УС.
                             //Выключаем питание
                             Program.rectifier.Stop();
+                            //Выключить генерацию синхросигнала платой УС.
                             //Останавливаем П217
                             Program.mtdadc.stop();
+                            //Задержка перед снятием сигнала "Работа"
+                            Thread.Sleep(3000);
                             sl.oWRK.Val = false;
                             //curState = WrkStates.startWorkCycle;
                             isRunning = false;

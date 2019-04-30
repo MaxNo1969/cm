@@ -10,6 +10,8 @@ namespace CM
     public class MTADCSettings:ParBase
     {
         public ComPortSettings port { get; set; }
+        [DisplayName("1.Частота"), Description("Частота")]
+        public int Freq { get; set; }
         public MTADCSettings()
         {
             #region Логирование 

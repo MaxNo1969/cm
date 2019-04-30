@@ -41,7 +41,8 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tbReset = new System.Windows.Forms.ToolStripButton();
             this.tbFill = new System.Windows.Forms.ToolStripButton();
-            this.ucTube = new UCTube();
+            this.ucTube = new CM.UCTube();
+            this.Sensor = new System.Windows.Forms.ToolStripStatusLabel();
             this.sb.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -50,6 +51,7 @@
             // 
             this.sb.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.Info,
+            this.Sensor,
             this.Zone,
             this.PositionX,
             this.PositionY,
@@ -65,7 +67,7 @@
             this.Info.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
             this.Info.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
             this.Info.Name = "Info";
-            this.Info.Size = new System.Drawing.Size(442, 19);
+            this.Info.Size = new System.Drawing.Size(348, 19);
             this.Info.Spring = true;
             this.Info.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -166,6 +168,14 @@
             this.ucTube.Size = new System.Drawing.Size(762, 414);
             this.ucTube.TabIndex = 6;
             // 
+            // Sensor
+            // 
+            this.Sensor.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
+            this.Sensor.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.Sensor.Name = "Sensor";
+            this.Sensor.Size = new System.Drawing.Size(76, 19);
+            this.Sensor.Text = "Датчик (0,0)";
+            // 
             // FRTubeView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -202,5 +212,6 @@
         private System.Windows.Forms.ToolStripButton tbReset;
         private System.Windows.Forms.ToolStripButton tbFill;
         private UCTube ucTube;
+        private System.Windows.Forms.ToolStripStatusLabel Sensor;
     }
 }

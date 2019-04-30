@@ -75,7 +75,7 @@ namespace CM
                 onDataRead?.Invoke(data);
                 index += (int)raw_size;
             }
-            Thread.Sleep((int)(raw_size * 50/ Program.mtdadcFreq));
+            Thread.Sleep((int)(raw_size * 1000/ Program.mtdadcFreq));
             return data;
         }
 

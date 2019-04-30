@@ -238,16 +238,17 @@ namespace CM
 
         private void setInt1(int _pos, int _val)
         {
-            modbus.ReadInputRegisterE(abonent, _pos, out ushort res);
+            modbus.ReadHoldingRegisterE(abonent, _pos, out ushort res);
             Stopwatch sw = new Stopwatch();
             sw.Start();
             while (res != _val)
             {
                 modbus.setSingleRegister(abonent, _pos, (ushort)_val);
-                Thread.Sleep(100);
-                modbus.ReadInputRegisterE(abonent, _pos, out res);
+                //Thread.Sleep(2000);
+                WaitHelper.Wait(2);
+                modbus.ReadHoldingRegisterE(abonent, _pos, out res);
                 //Задержка
-                if (sw.ElapsedMilliseconds > 1000) break;
+                if (sw.ElapsedMilliseconds > 5000) break;
             }
         }
 
@@ -369,10 +370,10 @@ namespace CM
             switch (settings.TpIU)
             {
                 case EIU.ByI:
-                    setInt1(61, 1);
+                    setInt(61, 1);
                     break;
                 case EIU.ByU:
-                    setInt1(60, 1);
+                    setInt(60, 1);
                     break;
                 default:
                     break;
@@ -392,10 +393,10 @@ namespace CM
             switch (settings.TpIU)
             {
                 case EIU.ByI:
-                    setInt1(61, 0);
+                    setInt(61, 0);
                     break;
                 case EIU.ByU:
-                    setInt1(60, 0);
+                    setInt(60, 0);
                     break;
                 default:
                     break;

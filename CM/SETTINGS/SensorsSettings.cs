@@ -62,12 +62,20 @@ namespace CM
         {
             dim = new Dim();
         }
-        public Block(int _cols,int _rows,string _order="1,2,3,4")
+        public Block(int _cols,int _rows,string _order="0,1,2,3")
         {
             dim = new Dim(_cols, _rows);
             sensorOrder = _order;
         }
         public int size { get { return dim.size; } }
+        public int[] getSensorOrder()
+        {
+            string[] order = sensorOrder.Split(new char[] { ',' });
+            int[] res = new int[order.Length];
+            for (int i = 0; i < res.Length; i++)
+                res[i] = Convert.ToInt32(order[i]);
+            return res;
+        }
     }
     /// <summary>
     /// Один датчик
