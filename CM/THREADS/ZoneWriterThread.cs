@@ -89,7 +89,8 @@ namespace CM
             {
                 if (tube.ptube.endWritedX < tube.ptube.Width)
                 {
-                    if (tube.sections > Tube.GetsectionsPerZone() * (zone + 1))
+                    int currentSections = tube.sections;
+                    if (currentSections > Tube.GetsectionsPerZone() * (zone + 1))
                     {
                         #region Логирование 
                         {
@@ -100,8 +101,8 @@ namespace CM
                             Debug.WriteLine(logstr, "Message");
                         }
                         #endregion
-                        int currentSections = tube.sections;
-                        tube.raw2phys1(lastWritedSection, currentSections - lastWritedSection, zone, 1);
+                        //int currentSections = tube.sections;
+                        tube.raw2phys(lastWritedSection, currentSections - lastWritedSection, zone, 1);
                         Tube.TubeRes zoneRes = tube.getZoneResult(zone, out double _maxVal);
                         tube.Zones.Add(new Zone(currentSections,zoneRes));
                         #region Логирование 

@@ -115,7 +115,7 @@ namespace CM
             editable = false;
 
             numZones = 5;
-            upWinPercent = 80;
+            upWinPercent = 50;
             normalizedClass2Value = 0.7;
 
             winStart = 0;

@@ -17,11 +17,11 @@ namespace CM
         /// Модель трубы  
         /// </summary>
         Tube tm;
-        LCard lc;
+        LCardVirtual lc;
         /// <summary>
         /// Поток для эмуляции движения трубы
         /// </summary>
-        TubeMoveThread tMover;
+        //TubeMoveThread tMover;
         ///// <summary>
         ///// Поток для записи данных из виртуальной трубы в буфер эмулятора АЦП
         ///// </summary>
@@ -34,7 +34,6 @@ namespace CM
         /// Worker - эмуляция движения трубы через установку
         /// </summary>
         BackgroundWorker worker;
-
         DateTime tubeStartTime;
 
         FRMain fRMain;
@@ -43,7 +42,7 @@ namespace CM
         /// </summary>
         /// <param name="_lcard">Карта АЦП(для эмулятора виртуальная)</param>
         /// <param name="_tube">Модель трубы</param>
-        public FREmul(LCard _lcard,Tube _tube, FRMain _frMain):base(_frMain)
+        public FREmul(LCardVirtual _lcard,Tube _tube, FRMain _frMain):base(_frMain)
         {
             tm = _tube ?? throw new ArgumentException("Не задан параметр", "_tube");
             if (_lcard == null)
@@ -54,37 +53,10 @@ namespace CM
             {
                 throw new ArgumentException("Эмулятор работает только с виртуальной L502", "_lcard");
             }
-            lc = _lcard;
-            (lc as LCardVirtual).srcTube = tm;
-            fRMain = _frMain;
             InitializeComponent();
-            // Настройка ProgressBar-а
-            pbTube.Minimum = 0;
-            pbTube.Maximum = 100;
-            tMover = new TubeMoveThread(tm.ptube);
+            lc = _lcard;
+            lc.srcTube = tm;
             sl = Program.signals;
-            btnStart.Enabled = true;
-            btnStop.Enabled = false;
-            for (int i = 0; i < sl.CountIn; i++)
-            {
-                SignalIn s = sl.GetSignalIn(i);
-                inputSignals.Items.Add(string.Format("{0} {1}", s.Position, s.Name), s.Val);
-            }
-            for (int i = 0; i < sl.CountOut; i++)
-            {
-                SignalOut s = sl.GetSignalOut(i);
-                outputSignals.Items.Add(string.Format("{0} {1}", s.Position, s.Name), s.Val);
-            }
-            timer.Start();
-            //Подготавливаем BackgroundWorker
-            worker = new BackgroundWorker()
-            {
-                WorkerReportsProgress = true,
-                WorkerSupportsCancellation = true,
-            };
-            worker.DoWork += new DoWorkEventHandler(worker_DoWork);
-            worker.ProgressChanged += new ProgressChangedEventHandler(worker_ProgressChanged);
-            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
         }
 
         void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -96,8 +68,7 @@ namespace CM
                 Log.add(logstr, LogRecord.LogReason.info);
                 Debug.WriteLine(logstr);
             }
-            #endregion 
-            tMover.stop();
+            #endregion
             //Снимаем все сигналы 
             sl.ClearAllInputSignals();
             pbTube.Value = 0;
@@ -115,6 +86,7 @@ namespace CM
             {
                 pbTube.Value=e.ProgressPercentage;
                 lblPos.Text=string.Format("{0,5:f2} м",tm.ptube.l2px(tm.ptube.startReadX)/1000.0);
+                lblTimer.Text = string.Format("{0:hh\\:mm\\:ss}", DateTime.Now - tubeStartTime);
                 //Проверяем открыта ли модель трубы
                 if (btnTubeModel.Enabled == false)
                 {
@@ -128,7 +100,6 @@ namespace CM
                 lblInfo.Text = e.UserState as string;
                 lb.Items.Add(e.UserState as string);
                 lb.SelectedIndex = lb.Items.Count - 1;
-                lb.SelectedIndex = -1;
             }
             //Просто обновляем метку
             else if (e.ProgressPercentage == 102)
@@ -137,12 +108,12 @@ namespace CM
             }
         }
 
-        static long startWait;
+        long startWait;
         /// <summary>
         /// Задержка в цикле ожидания сигнала
         /// </summary>
-        const int signalWaitCycleTime = 1000;
-        const int updateCountersPeriod = 1000;
+        const int signalWaitCycleTime = 200;
+        const int updateCountersPeriod = 200;
         void worker_DoWork(object sender, DoWorkEventArgs e)
         {
             #region Логирование
@@ -152,14 +123,9 @@ namespace CM
                 Log.add(logstr, LogRecord.LogReason.info);
                 Debug.WriteLine(logstr,"Message");
             }
-            #endregion 
+            #endregion
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            //Сигнал должен быть включен всегда
-            //worker.ReportProgress(101, "Включаем сигнал \"Цепи управления\"");
-            //sl.set(sl.iCC, true);
-            //worker.ReportProgress(101, "Включаем сигнал \"Цикл 3\"");
-            //sl.set(sl.iCYC, true);
             //Тут сделаем цикл по трубам
             while (true)
             {
@@ -168,55 +134,27 @@ namespace CM
                     e.Cancel = true;
                     return;
                 }
-                //Ждем выставления сигнала "Перекладка"
-                //worker.ReportProgress(102, "Ждем выставления сигнала \"ПЕРЕКЛАДКА\"...");
-                //while (sl.oGLOBRES.Val == false)
-                //{
-                //    //Проверяем кнопку СТОП
-                //    if (worker.CancellationPending)
-                //    {
-                //        e.Cancel = true;
-                //        return;
-                //    }
-                //    Thread.Sleep(signalWaitCycleTime);
-                //}
-                worker.ReportProgress(101, "Выставляем сигнал \"Готовность 3\"...");
+                worker.ReportProgress(101, "Выставляем сигнал \"ГОТОВНОСТЬ\"...");
                 sl.set(sl.iREADY, true);
-                if (worker.CancellationPending)
-                {
-                    e.Cancel = true;
-                    return;
-                }
-                worker.ReportProgress(101, "Выставляем сигнал \"Соленоид\"...");
+                worker.ReportProgress(101, "Выставляем сигнал \"СОЛЕНОИД\"...");
                 sl.set(sl.iSOL, true);
-                if (worker.CancellationPending)
+                //Ожидаем сигнал "РАБОТА"
+                startWait = sw.ElapsedMilliseconds;
+                while (!sl.get(sl.oWRK))
                 {
-                    e.Cancel = true;
-                    return;
+                    //Проверяем кнопку СТОП
+                    if (worker.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                    Thread.Sleep(signalWaitCycleTime);
                 }
-                //Ожидаем сигнал "Работа 3"
-                //worker.ReportProgress(101, "Начинаем движение трубы...");
-                ////Снимаем сигнал "Готовность 3" (начинается движение трубы)
-                //worker.ReportProgress(101, "Снимаем сигнал \"ГОТОВНОСТЬ3\"...");
-                //sl.set(sl.iREADY, false);
+                worker.ReportProgress(101, "Получен сигнал \"РАБОТА\"...");
                 tubeStartTime = DateTime.Now;
-                //Ждем пока труба доедет до входа в модуль (~30 сек.)
-                //startWait = sw.ElapsedMilliseconds;
-                //while (sw.ElapsedMilliseconds - startWait < 1000)
-                //{
-                //    //Проверяем кнопку СТОП
-                //    if (worker.CancellationPending)
-                //    {
-                //        e.Cancel = true;
-                //        return;
-                //    }
-                //    Thread.Sleep(signalWaitCycleTime);
-                //}
-                //Запускаем движение трубы
-                tMover.start();
                 //Труба на входе в модуль мнк3
                 worker.ReportProgress(101, "Труба на входе в модуль МНК3...");
-                worker.ReportProgress(101, "Выставляем сигнал \"КОНТРОЛЬ3\"(труба на входе МНК3)...");
+                worker.ReportProgress(101, "Выставляем сигнал \"КОНТРОЛЬ\"(труба на входе МНК3)...");
                 sl.set(sl.iCNTR, true);
                 //Ждем пока труба проедет до конца
                 startWait = sw.ElapsedMilliseconds;
@@ -233,17 +171,17 @@ namespace CM
                         worker.ReportProgress(tm.ptube.startReadX * 100 / tm.ptube.Width,0);
                         startWait = sw.ElapsedMilliseconds;
                     }
-                    if (tMover.bEndOfTube)
+                    //Закончились данные для эмуляции
+                    if(lc.index>tm.rawDataSize)
                     {
                         #region Логирование 
                         {
-                            string msg = string.Format("Окончание трубы: {0}", tm.ptube.startReadX);
+                            string msg = "Закончились данные для эмуляции";
                             string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                             Log.add(logstr, LogRecord.LogReason.info);
-                            Debug.WriteLine(logstr, "Info");
+                            Debug.WriteLine(logstr, "Message");
                         }
                         #endregion
-
                         break;
                     }
                     Thread.Sleep(signalWaitCycleTime);
@@ -254,7 +192,6 @@ namespace CM
                 sl.set(sl.iCNTR, false);
                 worker.ReportProgress(101, "Снимаем сигнал \"СОЛЕНОИД\"...");
                 sl.set(sl.iSOL, false);
-                tMover.stop();
                 Thread.Sleep(signalWaitCycleTime);
                 if(fRMain.breakToView)
                 {
@@ -266,8 +203,6 @@ namespace CM
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            if (Visible)
-            {
                 for (int i = 0; i < outputSignals.Items.Count; i++)
                 {
                     SignalOut s = sl.GetSignalOut(i);
@@ -278,8 +213,6 @@ namespace CM
                     SignalIn s = sl.GetSignalIn(i);
                     inputSignals.SetItemChecked(i, s.Val);
                 }
-            }
-            lblTimer.Text= string.Format(@"{0:hh\:mm\:ss}", DateTime.Now - tubeStartTime);
         }
 
         private void signals_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -313,11 +246,39 @@ namespace CM
 
         private void FREmul_Load(object sender, EventArgs e)
         {
+            // Настройка ProgressBar-а
+            pbTube.Minimum = 0;
+            pbTube.Maximum = 100;
+            btnStart.Enabled = true;
+            btnStop.Enabled = false;
+            for (int i = 0; i < sl.CountIn; i++)
+            {
+                SignalIn s = sl.GetSignalIn(i);
+                inputSignals.Items.Add(string.Format("{0} {1}", s.Position, s.Name), s.Val);
+            }
+            for (int i = 0; i < sl.CountOut; i++)
+            {
+                SignalOut s = sl.GetSignalOut(i);
+                outputSignals.Items.Add(string.Format("{0} {1}", s.Position, s.Name), s.Val);
+            }
+            //Подготавливаем BackgroundWorker
+            worker = new BackgroundWorker()
+            {
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = true,
+            };
+            worker.DoWork += new DoWorkEventHandler(worker_DoWork);
+            worker.ProgressChanged += new ProgressChangedEventHandler(worker_ProgressChanged);
+            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
+
+            worker.ReportProgress(101, "Выставляем сигнал \"ЦИКЛ\"...");
+            sl.set(sl.iCYC, true);
+            worker.ReportProgress(101, "Выставляем сигнал \"СОЛЕНОИД\"...");
+            sl.set(sl.iSOL, true);
         }
+
         private void FREmul_FormClosing(object sender, FormClosingEventArgs e)
         {
-
-            tMover.stop();
             if (worker.IsBusy)
             {
                 worker.CancelAsync();
@@ -326,44 +287,44 @@ namespace CM
         //FRTubeModel frtubemodel;
         private void btnTubeModel_Click(object sender, EventArgs e)
         {
-            btnTubeModel.Enabled = false;
-            FRTubeView frm = new FRTubeView(tm,(FRMain)MdiParent)
-            {
-                Text = "Труба(модель)",
-                editable = true,
-            };
-            frm.FormClosed += new FormClosedEventHandler((object ob, FormClosedEventArgs ea) => { btnTubeModel.Enabled = true; });
-            frm.MdiParent = this.MdiParent;
-            frm.Show();
-            //OpenFileDialog ofd = new OpenFileDialog
+            //btnTubeModel.Enabled = false;
+            //FRTubeView frm = new FRTubeView(tm,(FRMain)MdiParent)
             //{
-            //    DefaultExt = "dbl",
-            //    AddExtension = true,
-            //    Filter = "Файлы дампа (*.dbl)|*.dbl|Все файлы (*.*)|*.*",
-            //    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            //    Text = "Труба(модель)",
+            //    editable = true,
             //};
-            //if (ofd.ShowDialog() == DialogResult.OK)
-            //{
-            //    try
-            //    {
-            //        DumpReader reader = new DumpReader(ofd.FileName);
-            //        IDataWriter<double> writer = tm;
-            //        writer.Write(reader.Read());
-            //        //Program.tube.raw2phys(0, Program.tube.sections, 0, Program.tube.ptube.Width / Program.tube.ptube.logZoneSize);
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        #region Логирование 
-            //        {
-            //            string msg = string.Format("{0}", ex.Message);
-            //            string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-            //            Log.add(logstr, LogRecord.LogReason.error);
-            //            Debug.WriteLine(logstr, "Error");
-            //            MessageBox.Show(msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            //        }
-            //        #endregion
-            //    }
-            //}
+            //frm.FormClosed += new FormClosedEventHandler((object ob, FormClosedEventArgs ea) => { btnTubeModel.Enabled = true; });
+            //frm.MdiParent = this.MdiParent;
+            //frm.Show();
+            OpenFileDialog ofd = new OpenFileDialog
+            {
+                DefaultExt = "dbl",
+                AddExtension = true,
+                Filter = "Файлы дампа (*.dbl)|*.dbl|Все файлы (*.*)|*.*",
+                //InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            };
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    DumpReader reader = new DumpReader(ofd.FileName);
+                    IDataWriter<double> writer = tm;
+                    writer.Write(reader.Read());
+                    //Program.tube.raw2phys(0, Program.tube.sections, 0, Program.tube.ptube.Width / Program.tube.ptube.logZoneSize);
+                }
+                catch (Exception ex)
+                {
+                    #region Логирование 
+                    {
+                        string msg = string.Format("{0}", ex.Message);
+                        string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                        Log.add(logstr, LogRecord.LogReason.error);
+                        Debug.WriteLine(logstr, "Error");
+                        MessageBox.Show(msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    }
+                    #endregion
+                }
+            }
 
         }
     }

@@ -41,18 +41,15 @@ namespace CM
                 (Program.settings.TubeSpeed * 1000) / Program.settings.Current.sensors.sectionSize);
         }
         public double[,,,] sensorsAvgValues;
-        public double[,,,] sensorsMaxDeviationsValues;
 
         static readonly int deadSectionsStart = Program.settings.Current.DeadZoneStart * GetsectionsPerZone() / Program.settings.ZoneSize;
         static readonly int deadSectionsEnd = Program.settings.Current.DeadZoneFinish * GetsectionsPerZone() / Program.settings.ZoneSize;
 
-        private void loadAvgAndDeviations()
+        private void loadAvg()
         {
             string fName = string.Format("{0}.csv", rtube.ts.Name);
             string s;
-            string[] values;
             sensorsAvgValues = new double[mcols, mrows, cols, rows];
-            sensorsMaxDeviationsValues = new double[mcols, mrows, cols, rows];
             if (File.Exists(fName))
             {
                 using (StreamReader sr = new StreamReader(fName))
@@ -65,9 +62,7 @@ namespace CM
                                     s = sr.ReadLine();
                                     if(s!=null)
                                     {
-                                        values = s.Split(new char[] { ';' });
-                                        sensorsAvgValues[mcol, mrow, col, row] = Convert.ToDouble(values[0]);
-                                        sensorsMaxDeviationsValues[mcol, mrow, col, row] = Convert.ToDouble(values[1]);
+                                        sensorsAvgValues[mcol, mrow, col, row] = Convert.ToDouble(s);
                                     }
                                 }
                 }
@@ -82,7 +77,7 @@ namespace CM
             len = _len;
             rtube = new RawTube(_ts,_len);
             ptube = new PhysTube(_ts,_len);
-            //loadAvgAndDeviations();
+            //loadAvg();
             Zones = new List<Zone>();
             //onDataChanged?.Invoke(null);
             #region Логирование 
@@ -194,34 +189,25 @@ namespace CM
                 using (FileStream fs = new FileStream(_fileName, FileMode.Open))
                 {
                     _tube.rtube = (RawTube)formatter.Deserialize(fs);
-                    _tube.fillSensorAvgAndDeviationValues(deadSectionsStart-1, _tube.sections - deadSectionsStart);
-                    double maxDeviation = 0;
-                    for (int mcol = 0; mcol < mcols; mcol++)
-                        for (int mrow = 0; mrow < mrows; mrow++)
-                            for (int col = 0; col < cols; col++)
-                                for (int row = 0; row < rows; row++)
-                                {
-                                    if (maxDeviation < _tube.sensorsMaxDeviationsValues[mcol, mrow, col, row]) maxDeviation = _tube.sensorsMaxDeviationsValues[mcol, mrow, col, row];
-                                }
-                    #region Логирование 
-                    {
-                        string msg = string.Format("MaxDeviation = {0}", maxDeviation );
-                        string logstr = string.Format("{0}: {1}: {2}", "Tube", System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                        Log.add(logstr, LogRecord.LogReason.info);
-                        Debug.WriteLine(logstr, "Message");
-                    }
-                    #endregion
-                    _tube.ptube = new PhysTube(_tube.rtube.ts, _tube.rtube.len);
-                    _tube.raw2phys1(0, _tube.sections, 0, _tube.ptube.Width / _tube.ptube.logZoneSize);
-                    _tube.onDataChanged?.Invoke(null);
-                    return true;
                 }
+                //_tube.fillSensorAvgValues(deadSectionsStart - 1, _tube.sections - deadSectionsStart);
+                _tube.ptube = new PhysTube(_tube.rtube.ts, _tube.rtube.len);
+                //int zone = 0;
+                //for(int i=0; i<_tube.sections;i+=Tube.GetsectionsPerZone())
+                //{
+                //    _tube.raw2phys(i, Tube.GetsectionsPerZone(), zone++, 1);
+                //    _tube.onDataChanged?.Invoke(null);
+                //}
+                _tube.raw2phys(0, _tube.sections, 0, _tube.ptube.Width / _tube.ptube.logZoneSize);
+                _tube.onDataChanged?.Invoke(null);
+                return true;
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 #region Логирование 
                 {
-                    string msg = string.Format("{0}", ex.Message );
+                    string msg = string.Format("{0}", ex.Message);
                     string logstr = string.Format("{0}: {1}: {2}", "Tube", System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                     Log.add(logstr, LogRecord.LogReason.error);
                     Debug.WriteLine(logstr, "Error");
@@ -303,76 +289,6 @@ namespace CM
             return ret;
         }
 
-        /// <summary>
-        /// Получить нормализованные данные по датчику
-        /// </summary>
-        /// <param name="_mc">Колонка матрицы</param>
-        /// <param name="_mr">Строка матрицы</param>
-        /// <param name="_c">Колонка датчика</param>
-        /// <param name="_r">Строка датчика</param>
-        /// <param name="_start">Начальный срез</param>
-        /// <param name="_count">Количество срезов</param>
-        /// <returns>Массив с данными по датчику</returns>
-        public double[] getNormSensorData(int _mc, int _mr, int _c, int _r, int _start, int _count)
-        {
-            if (_start < 0 || _start > sections - 1 || _count < 0 || _start + _count > sections)
-            {
-                return null;
-            }
-            if (rtube.data.Count == 0)
-            {
-                return null;
-            }
-            double[] ret = new double[_count];
-            for (int i = 0; i < _count; i++)
-            {
-                ret[i] = getNorm(_mc, _mr, _c, _r, _start + i);
-            }
-            return ret;
-        }
-        /// <summary>
-        /// Получить данные по датчику
-        /// </summary>
-        /// <param name="_mc">Колонка матрицы</param>
-        /// <param name="_mr">Строка матрицы</param>
-        /// <param name="_c">Колонка датчика</param>
-        /// <param name="_r">Строка датчика</param>
-        /// <returns>Массив с данными по датчику</returns>
-        public double[] getNormSensorData(int _mc, int _mr, int _c, int _r)
-        {
-            if (rtube.data.Count == 0)
-            {
-                return null;
-            }
-            double[] ret = new double[sections];
-            for (int i = 0; i < sections; i++)
-            {
-                ret[i] = getNorm(_mc, _mr, _c, _r, i);
-            }
-            return ret;
-        }
-
-
-
-        /// <summary>
-        /// Получить нормализованное значение по датчику
-        /// </summary>
-        /// <param name="_mc">Столбец  датчиков</param>
-        /// <param name="_mr">Ряд датчиков</param>
-        /// <param name="_c">Строка матрицы датчиков</param>
-        /// <param name="_r">Ряд в матрице датчиков</param>
-        /// <returns>Значение</returns>
-        public double getNorm(int _mc, int _mr, int _c, int _r, int _i)
-        {
-            int ind = _mc * mrows * cols * rows + _mr * cols * rows + _r * cols + _c;
-            double val;
-            if (ind + _i * sectionSize < sections)
-                val = Math.Abs(rtube.data[ind + _i * sectionSize] - sensorsAvgValues[_mc, _mr, _c, _r]) / sensorsMaxDeviationsValues[_mc, _mr, _c, _r];
-            else
-                val = PhysTube.undefined;
-            return val;
-        }
-
         public double getSensorAvg(int _mc, int _mr, int _c, int _r)
         {
             return getSensorData(_mc, _mr, _c, _r).Average();
@@ -383,28 +299,7 @@ namespace CM
             return getSensorData(_mc, _mr, _c, _r,_start,_count).Average();
         }
 
-        private double getSensorMaxDeviation(int _mc, int _mr, int _c, int _r)
-        {
-            double avg = getSensorAvg(_mc, _mr, _c, _r);
-            double[] sensorData = getSensorData(_mc, _mr, _c, _r);
-            double[] deviations = new double[sensorData.Length];
-            for (int i = 0; i < sensorData.Length; i++) deviations[i] = Math.Abs(sensorData[i] - avg);
-            return deviations.Max();
-        }
-
-        private double getSensorMaxDeviation(int _mc, int _mr, int _c, int _r,int _start,int _count)
-        {
-            double avg = getSensorData(_mc, _mr, _c, _r,_start,_count).Average();
-            double[] sensorData = getSensorData(_mc, _mr, _c, _r, _start, _count);
-            double[] deviations = new double[sensorData.Length];
-            for (int i = 0; i < sensorData.Length; i++)
-            {
-                deviations[i] = Math.Abs(sensorData[i] - avg);
-            }            
-            return deviations.Max();
-        }
-
-        internal void fillSensorAvgAndDeviationValues()
+        internal void fillSensorAvgValues()
         {
             #region Логирование 
             {
@@ -414,7 +309,6 @@ namespace CM
             }
             #endregion
             sensorsAvgValues = new double[mcols, mrows, cols, rows];
-            sensorsMaxDeviationsValues = new double[mcols, mrows, cols, rows];
             //for (int mcol = 0; mcol < mcols; mcol++)
             //{
             //    for (int mrow = 0; mrow < mrows; mrow++)
@@ -424,7 +318,6 @@ namespace CM
             //            for (int row = 0; row < rows; row++)
             //            {
             //                sensorsAvgValues[mcol, mrow, col, row] = getSensorAvg(mcol, mrow, col, row);
-            //                sensorsMaxDeviationsValues[mcol, mrow, col, row] = getSensorMaxDeviation(mcol, mrow, col, row);
             //            }
             //        }
             //    }
@@ -438,7 +331,6 @@ namespace CM
                                  Parallel.For(0, rows, row =>
                                    {
                                        sensorsAvgValues[mcol, mrow, col, row] = getSensorAvg(mcol, mrow, col, row);
-                                       sensorsMaxDeviationsValues[mcol, mrow, col, row] = getSensorMaxDeviation(mcol, mrow, col, row);
                                    });
                              });
                        });
@@ -446,7 +338,7 @@ namespace CM
         }
 
 
-        internal void fillSensorAvgAndDeviationValues(int _start,int _count)
+        internal void fillSensorAvgValues(int _start,int _count)
         {
             #region Логирование 
             {
@@ -457,7 +349,6 @@ namespace CM
             }
             #endregion
             sensorsAvgValues = new double[mcols, mrows, cols, rows];
-            sensorsMaxDeviationsValues = new double[mcols, mrows, cols, rows];
             //for (int mcol = 0; mcol < mcols; mcol++)
             //{
             //    for (int mrow = 0; mrow < mrows; mrow++)
@@ -466,8 +357,8 @@ namespace CM
             //        {
             //            for (int row = 0; row < rows; row++)
             //            {
+            //                if (_start + _count > sections - deadSectionsEnd) _count = sections - deadSectionsEnd - _start;
             //                sensorsAvgValues[mcol, mrow, col, row] = getSensorAvg(mcol, mrow, col, row, _start, _count);
-            //                sensorsMaxDeviationsValues[mcol, mrow, col, row] = getSensorMaxDeviation(mcol, mrow, col, row, _start, _count);
             //            }
             //        }
             //    }
@@ -482,144 +373,10 @@ namespace CM
                         {
                             if (_start + _count > sections - deadSectionsEnd) _count = sections - deadSectionsEnd - _start;
                             sensorsAvgValues[mcol, mrow, col, row] = getSensorData(mcol, mrow, col, row, _start, _count).Average();
-                            sensorsMaxDeviationsValues[mcol, mrow, col, row] = getSensorMaxDeviation(mcol, mrow, col, row, _start, _count);
                         });
                     });
                 });
             });
-        }
-
-
-        /// <summary>
-        /// Обработка получения нового строба
-        /// </summary>
-        /// <returns>Номер среза окончания записанной зоны</returns>
-        //internal int addStrobe()
-        //{
-        //    int zoneBound = 0;
-        //    int zoneStart = 0;
-        //    lock (rtube.Zones)
-        //    {
-        //        if (rtube.Zones.Count > 0)
-        //        {
-        //            zoneBound = rawDataSize / sectionSize;
-        //            zoneStart = rtube.Zones.Last().bound;
-        //        }
-        //        else
-        //        {
-        //            Zone strobe = new Zone(zoneBound);
-        //            rtube.Zones.Add(strobe);
-        //            #region Логирование 
-        //            {
-        //                string msg = string.Format(@"Время: {0:hh\:mm\:ss\.ff} {1}-{2} {3}", strobe.dt, zoneStart, zoneBound, zoneBound - zoneStart); string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-        //                Log.add(logstr, LogRecord.LogReason.info);
-        //                Debug.WriteLine(logstr, "Message");
-        //            }
-        //            #endregion
-        //        }
-        //    }
-        //    if (zoneBound - zoneStart > 0)
-        //    {
-        //        if (raw2phys(zoneStart, zoneBound - zoneStart, rtube.Zones.Count - 1, 1))
-        //        {
-        //            onDataChanged?.Invoke(null);
-        //            Zone strobe = new Zone(zoneBound);
-        //            rtube.Zones.Add(strobe);
-        //            #region Логирование 
-        //            {
-        //                string msg = string.Format(@"Время: {0:hh\:mm\:ss\.ff} {1}-{2} {3}", strobe.dt, zoneStart, zoneBound, zoneBound - zoneStart); string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-        //                Log.add(logstr, LogRecord.LogReason.info);
-        //                Debug.WriteLine(logstr, "Message");
-        //            }
-        //            #endregion
-        //            return strobe.bound * sectionSize;
-        //        }
-        //    }
-        //    return 0;
-        //}
-
-        /// <summary>
-        /// Запись данных в физическую модель
-        /// </summary>
-        /// <param name="_start">Начало данных(номер среза) </param>
-        /// <param name="_sz">Размер записываемых данных (в срезах)</param>
-        /// <param name="_znStart">Первая зоня для записи</param>
-        /// <param name="_znCnt">Количество зон</param>
-        public bool raw2phys(int _start, int _sz, int _znStart, int _znCnt)
-        {
-            if ((_znStart + _znCnt) * ptube.logZoneSize > ptube.Width - ptube.logZoneSize)
-            {
-                #region Логирование 
-                {
-                    string msg = string.Format("Попытка записи за границу массива:_znStart={0}, _znCnt={1}, logZoneSize={2}, logDataSize={3}",
-                        _znStart, _znCnt, ptube.logZoneSize, ptube.logDataSize);
-                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                    Log.add(logstr, LogRecord.LogReason.info);
-                    Debug.WriteLine(logstr, "Message");
-                }
-                #endregion
-                ptube.expand(1);
-                //return false;
-            }
-            double[,,,][] tmpData = createNormalizedSensorsArray(_start, _sz);
-            int measPerCell = (int)Math.Round((double)_sz / ptube.logZoneSize / _znCnt);
-            double[] accum = new double[mrows * rows];
-            for (int zn = _znStart; zn < _znStart + _znCnt; zn++)
-            {
-                for (int i = 0; i < ptube.logZoneSize; i++)
-                {
-                    for (int mrow = 0; mrow < mrows; mrow++)
-                    {
-                        for (int row = 0; row < rows; row++)
-                        {
-                            int cnt = 0;
-                            accum[mrow * rows + row] = 0;
-                            for (int mcol = 0; mcol < mcols; mcol++)
-                            {
-                                for (int col = 0; col < cols; col++)
-                                {
-                                    for (int j = 0; j < measPerCell && (zn - _znStart) * ptube.logZoneSize * measPerCell + i * measPerCell + j < _sz; j++)
-                                    {
-                                        accum[mrow * rows + row] += Math.Abs(tmpData[mcol, mrow, col, row][(zn - _znStart) * ptube.logZoneSize * measPerCell + i * measPerCell + j]);
-                                        cnt++;
-                                    }
-                                }
-                            }
-                            if (cnt > 1) accum[mrow * rows + row] /= cnt;
-                            ptube[zn * ptube.logZoneSize + i, mrow * rows + row] = accum[mrow * rows + row];
-                        }
-                    }
-                }
-            }
-            //Parallel.For(_znStart, _znStart + _znCnt, zn =>
-            //{
-            //    Parallel.For(0, ptube.logZoneSize, i =>
-            //    {
-            //        Parallel.For(0, mrows, mrow =>
-            //          {
-            //              Parallel.For(0, rows, row =>
-            //                {
-            //                    int cnt = 0;
-            //                    accum[mrow * rows + row] = 0;
-            //                    for (int mcol = 0; mcol < mcols; mcol++)
-            //                    {
-            //                        for (int col = 0; col < cols; col++)
-            //                        {
-            //                            for (int j = 0; j < measPerCell && (zn - _znStart) * ptube.logZoneSize * measPerCell + i * measPerCell + j < _sz; j++)
-            //                            {
-            //                                accum[mrow * rows + row] += Math.Abs(tmpData[mcol, mrow, col, row][(zn - _znStart) * ptube.logZoneSize * measPerCell + i * measPerCell + j]);
-            //                                cnt++;
-            //                            }
-            //                        }
-            //                    }
-            //                    if (cnt > 1) accum[mrow * rows + row] /= cnt;
-            //                    ptube[zn * ptube.logZoneSize + i, mrow * rows + row] = accum[mrow * rows + row];
-            //                });
-            //          });
-            //    });
-            //});
-            ptube.endWritedX = (_znStart + _znCnt) * ptube.logZoneSize;
-            return true;
         }
 
         static string printAccum(double[] _accum)
@@ -630,7 +387,7 @@ namespace CM
             return ret;
         }
 
-        public bool raw2phys1(int _start, int _sz, int _znStart, int _znCnt)
+        public bool raw2phys(int _start, int _sz, int _znStart, int _znCnt)
         {
             if ((_znStart + _znCnt) * ptube.logZoneSize > ptube.Width)
             {
@@ -650,7 +407,7 @@ namespace CM
             int currentSections = rtube.sections;
             if (currentSections > (_znStart+1)*GetsectionsPerZone()+deadSectionsStart-1)
             {
-                fillSensorAvgAndDeviationValues(deadSectionsStart-1,currentSections-deadSectionsStart);
+                fillSensorAvgValues(deadSectionsStart-1,currentSections-deadSectionsStart);
                 int distLogSize = (int)(Program.settings.sensorsDistance / ptube.cellXSize);
                 for (int zn = _znStart; zn < _znStart + _znCnt; zn++)
                 {
@@ -705,6 +462,17 @@ namespace CM
                     }
                 }
             }
+            else
+            {
+                #region Логирование 
+                {
+                    string msg = string.Format("Мало данных: currentSections = {0}, Надо {1}",currentSections,(_znStart + 1) * GetsectionsPerZone() + deadSectionsStart - 1);
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.info);
+                    Debug.WriteLine(logstr, "Message");
+                }
+                #endregion
+            }
             ptube.endWritedX = (_znStart + _znCnt) * ptube.logZoneSize;
             onDataChanged?.Invoke(null);
             return true;
@@ -716,14 +484,14 @@ namespace CM
         {
             TubeRes ret = TubeRes.Unknown;
             double maxVal=0;
-            if(_zone>=ptube.Width/ptube.logZoneSize)
+            if(_zone* ptube.logZoneSize >= ptube.Width)
             {
                 _maxVal = PhysTube.undefined;
                 return ret;
             }
-            for(int x = 0;x<ptube.logZoneSize;x++)
+            for (int x = 0; x < ptube.logZoneSize && (_zone * ptube.logZoneSize + x < ptube.Width); x++)
             {
-                for(int y=0;y<ptube.Height;y++)
+                for (int y = 0; y < ptube.Height; y++)
                 {
                     double val = Math.Abs(ptube[_zone * ptube.logZoneSize + x, y]);
                     if (val > maxVal) maxVal = val;
@@ -738,38 +506,6 @@ namespace CM
             else if (maxVal > ts.Border2) return TubeRes.Class2;
             else if (maxVal > 0) return TubeRes.Good;
             return ret;
-        }
-
-        private double[,,,][] createNormalizedSensorsArray(int _start, int _sz)
-        {
-            double[,,,][] tmpData = new double[mcols, mrows, cols, rows][];
-            //for (int mcol = 0; mcol < mcols; mcol++)
-            //{
-            //    for (int mrow = 0; mrow < mrows; mrow++)
-            //    {
-            //        for (int row = 0; row < rows; row++)
-            //        {
-            //            for (int col = 0; col < cols; col++)
-            //            {
-            //                tmpData[mcol, mrow, col, row] = getNormSensorData(mcol, mrow, col, row, _start, _sz);
-            //            }
-            //        }
-            //    }
-            //}
-            Parallel.For(0, mcols, mcol =>
-            {
-                Parallel.For(0, mrows, mrow =>
-                {
-                    Parallel.For(0, cols, col =>
-                    {
-                        Parallel.For(0, rows, row =>
-                        {
-                            tmpData[mcol, mrow, col, row] = getNormSensorData(mcol, mrow, col, row, _start, _sz);
-                        });
-                    });
-                });
-            });
-            return tmpData;
         }
 
         /// <summary>
@@ -822,7 +558,7 @@ namespace CM
                     Debug.WriteLine(logstr, "Message");
                 }
                 #endregion
-                raw2phys1(startWriteZoneSection, sections-startWriteZoneSection, zones, 1);
+                raw2phys(startWriteZoneSection, sections-startWriteZoneSection, zones, 1);
                 //Здесь надо проанализировать зону и выдать сигналы для результата
                 startWriteZoneSection = sections;
                 zones++;

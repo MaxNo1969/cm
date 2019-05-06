@@ -33,13 +33,13 @@
             this.btnStop = new System.Windows.Forms.Button();
             this.inputSignals = new System.Windows.Forms.CheckedListBox();
             this.outputSignals = new System.Windows.Forms.CheckedListBox();
-            this.timer = new System.Windows.Forms.Timer(this.components);
             this.lb = new System.Windows.Forms.ListBox();
             this.pbTube = new System.Windows.Forms.ProgressBar();
             this.lblInfo = new System.Windows.Forms.Label();
             this.btnTubeModel = new System.Windows.Forms.Button();
             this.lblPos = new System.Windows.Forms.Label();
             this.lblTimer = new System.Windows.Forms.Label();
+            this.timer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // btnStart
@@ -82,10 +82,6 @@
             this.outputSignals.Size = new System.Drawing.Size(140, 244);
             this.outputSignals.TabIndex = 3;
             // 
-            // timer
-            // 
-            this.timer.Tick += new System.EventHandler(this.timer_Tick);
-            // 
             // lb
             // 
             this.lb.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -123,17 +119,22 @@
             // 
             // lblPos
             // 
-            this.lblPos.Location = new System.Drawing.Point(517, 286);
+            this.lblPos.Location = new System.Drawing.Point(429, 286);
             this.lblPos.Name = "lblPos";
             this.lblPos.Size = new System.Drawing.Size(72, 23);
             this.lblPos.TabIndex = 8;
             // 
             // lblTimer
             // 
-            this.lblTimer.Location = new System.Drawing.Point(434, 286);
+            this.lblTimer.Location = new System.Drawing.Point(517, 286);
             this.lblTimer.Name = "lblTimer";
             this.lblTimer.Size = new System.Drawing.Size(72, 23);
             this.lblTimer.TabIndex = 9;
+            // 
+            // timer
+            // 
+            this.timer.Enabled = true;
+            this.timer.Tick += new System.EventHandler(this.timer_Tick);
             // 
             // FREmul
             // 
@@ -168,12 +169,12 @@
         private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.CheckedListBox inputSignals;
         private System.Windows.Forms.CheckedListBox outputSignals;
-        private System.Windows.Forms.Timer timer;
         private System.Windows.Forms.ListBox lb;
         private System.Windows.Forms.ProgressBar pbTube;
         private System.Windows.Forms.Label lblInfo;
         private System.Windows.Forms.Button btnTubeModel;
         private System.Windows.Forms.Label lblPos;
         private System.Windows.Forms.Label lblTimer;
+        private System.Windows.Forms.Timer timer;
     }
 }

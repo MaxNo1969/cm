@@ -37,7 +37,7 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tubeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewTubeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewAllSensorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.adcRawDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
@@ -70,7 +70,7 @@
             this.cbTypeSize = new System.Windows.Forms.ToolStripComboBox();
             this.lblTubesCounter = new System.Windows.Forms.ToolStripLabel();
             this.tubeCount = new System.Windows.Forms.ToolStripLabel();
-            this.adcRawDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewAllSensorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.ssMain.SuspendLayout();
             this.ts.SuspendLayout();
@@ -157,13 +157,12 @@
             this.viewTubeToolStripMenuItem.Text = "&Просмотр";
             this.viewTubeToolStripMenuItem.Click += new System.EventHandler(this.viewTubeToolStripMenuItem_Click);
             // 
-            // viewAllSensorsToolStripMenuItem
+            // adcRawDataToolStripMenuItem
             // 
-            this.viewAllSensorsToolStripMenuItem.Name = "viewAllSensorsToolStripMenuItem";
-            this.viewAllSensorsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.viewAllSensorsToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
-            this.viewAllSensorsToolStripMenuItem.Text = "Просмотр по датчикам";
-            this.viewAllSensorsToolStripMenuItem.Click += new System.EventHandler(this.viewAllSensorsToolStripMenuItem_Click);
+            this.adcRawDataToolStripMenuItem.Name = "adcRawDataToolStripMenuItem";
+            this.adcRawDataToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.adcRawDataToolStripMenuItem.Text = "Данные АЦП";
+            this.adcRawDataToolStripMenuItem.Click += new System.EventHandler(this.adcRawDataToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
             // 
@@ -410,12 +409,13 @@
             this.tubeCount.Size = new System.Drawing.Size(13, 22);
             this.tubeCount.Text = "0";
             // 
-            // adcRawDataToolStripMenuItem
+            // viewAllSensorsToolStripMenuItem
             // 
-            this.adcRawDataToolStripMenuItem.Name = "adcRawDataToolStripMenuItem";
-            this.adcRawDataToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
-            this.adcRawDataToolStripMenuItem.Text = "Данные АЦП";
-            this.adcRawDataToolStripMenuItem.Click += new System.EventHandler(this.adcRawDataToolStripMenuItem_Click);
+            this.viewAllSensorsToolStripMenuItem.Name = "viewAllSensorsToolStripMenuItem";
+            this.viewAllSensorsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
+            this.viewAllSensorsToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.viewAllSensorsToolStripMenuItem.Text = "Просмотр по датчикам";
+            this.viewAllSensorsToolStripMenuItem.Click += new System.EventHandler(this.viewAllSensorsToolStripMenuItem_Click);
             // 
             // FRMain
             // 
@@ -472,7 +472,6 @@
         private System.Windows.Forms.ToolStripMenuItem viewSignalsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem emulToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewTubeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem viewAllSensorsToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem rectifierToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
@@ -486,6 +485,7 @@
         public System.Windows.Forms.ToolStripMenuItem startstopToolStripMenuItem;
         public System.Windows.Forms.ToolStripLabel tubeCount;
         private System.Windows.Forms.ToolStripMenuItem adcRawDataToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem viewAllSensorsToolStripMenuItem;
     }
 }
 

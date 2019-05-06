@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
+using Protocol;
 
 namespace CM
 {
@@ -81,8 +82,8 @@ namespace CM
                             {
                                 int y = mcol * Tube.rows * Tube.cols * Tube.rows +
                                     mrow * Tube.cols * Tube.rows + row * Tube.cols + col;
-                                double val = tube.getNorm(mcol, mrow, col, row, sect);
-                                Color c = ColorHelper.getColor(val);
+                                double val = Math.Abs(tube[mcol, mrow, col, row, sect]-tube.sensorsAvgValues[mcol,mrow,col,row]);
+                                Color c = ColorHelper.getColor1(val);
                                 int ind = tube.sections * 4 * y + sect * 4;
                                 bitmap[ind + 3] = c.A;
                                 bitmap[ind + 2] = c.R;
@@ -112,8 +113,8 @@ namespace CM
                                 {
                                     int y = mcol * Tube.rows * Tube.cols * Tube.rows +
                                         mrow * Tube.cols * Tube.rows + row * Tube.cols + col;
-                                    double val = tube.getNorm(mcol, mrow, col, row, sect);
-                                    Color c = ColorHelper.getColor(val);
+                                    double val = Math.Abs(tube[mcol, mrow, col, row, sect]-tube.sensorsAvgValues[mcol, mrow, col, row]);
+                                    Color c = ColorHelper.getColor1(val);
                                     int ind = tube.sections * 4 * y + sect * 4;
                                     bitmap[ind + 3] = c.A;
                                     bitmap[ind + 2] = c.R;
@@ -155,8 +156,8 @@ namespace CM
                             {
                                 int y = mcol * Tube.rows * Tube.cols * Tube.rows +
                                     mrow * Tube.cols * Tube.rows + row * Tube.cols + col;
-                                double val = tube.getNorm(mcol, mrow, col, row, sect);
-                                backBuffer.SetPixel(sect, y, ColorHelper.getColor(val));
+                                double val = Math.Abs(tube[mcol, mrow, col, row, sect]-tube.sensorsAvgValues[mcol, mrow, col, row]);
+                                backBuffer.SetPixel(sect, y, ColorHelper.getColor1(val));
                             }
                         }
                     }
@@ -216,14 +217,14 @@ namespace CM
                     //data2bitmap();
                     data2bmpbytesParallel();
                     //data2bmpbytes();
-                    if (g != null && tube.sections < bitmapWidth) g.FillRectangle(b, r);
                     if (backBuffer != null && bitmap != null && bitmap.Length > 0)
                         ImgHelper.setBitmapData(ref backBuffer, ref bitmap);
+                    if (g != null && tube.sections < bitmapWidth) g.FillRectangle(b, r);
                     //Рисуем границы матриц
                     sensorBounds2bitmap();
                     //Рисуем зоны
                     //zoneBounds2bitmap();
-                    if (backBuffer != null)
+                    if (backBuffer != null && Width > 0 && Height > 0)
                     {
                         Bitmap resized = ImgHelper.ResizeImage(backBuffer, Width, Height);
                         e.Graphics.DrawImage(resized, 0, 0);
@@ -237,9 +238,15 @@ namespace CM
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(string.Format(
-                        "{0}.{1}:{2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, ex.Message)
-                        );
+                    #region Логирование 
+                    {
+                        string msg = string.Format("{0}", ex.Message);
+                        string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                        Log.add(logstr, LogRecord.LogReason.error);
+                        Debug.WriteLine(logstr, "Error");
+
+                    }
+                    #endregion
                 }
             }
         }

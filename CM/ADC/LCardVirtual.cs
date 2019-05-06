@@ -6,8 +6,18 @@ using System.Threading;
 
 namespace CM
 {
-    class LCardVirtual : LCard
+    public class LCardVirtual : LCard
     {
+        /// <summary>
+        /// Модель трубы для эмуляции
+        /// </summary>
+        public Tube srcTube = null;
+
+        /// <summary>
+        /// Текущий индех для чтения в трубе
+        /// </summary>
+        public int index;
+
         /// <summary>
         /// Конструктор.
         /// </summary>
@@ -23,17 +33,8 @@ namespace CM
 
             }
             #endregion
+            index = 0;
         }
-
-        /// <summary>
-        /// Модель трубы для эмуляции
-        /// </summary>
-        public Tube srcTube = null;
-
-        /// <summary>
-        /// Текущий индех для чтения в трубе
-        /// </summary>
-        public int index = 0;
 
         public override double GetValue(int _ch)
         {
@@ -68,10 +69,9 @@ namespace CM
             }
             if (!Program.mtdadc.started) return null;
             double[] data = new double[raw_size];
-            lock (srcTube)
+            if (index + raw_size < srcTube.rawDataSize)
             {
-                if (index + raw_size < srcTube.rawDataSize)
-                    Array.Copy(srcTube.rtube.data.ToArray(), index, data, 0, raw_size);
+                Array.Copy(srcTube.rtube.data.ToArray(), index, data, 0, raw_size);
                 onDataRead?.Invoke(data);
                 index += (int)raw_size;
             }
