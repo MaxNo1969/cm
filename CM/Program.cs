@@ -52,13 +52,30 @@ namespace CM
                 //Включаем питание датчиков
                 signals.oPOWER.Val = true;
                 WaitHelper.Wait(1000);
-                //Инициализируем П-217
-                mtdadc = new MTADC(Program.settings.mtadcSettings.port);
                 //Получаем частоту внешней синхронизации
-                int cmd6res = Convert.ToInt32(mtdadc.cmd(6));
+                int cmdres = 224;
+                try
+                {
+                    //Инициализируем П-217
+                    mtdadc = new MTADC(Program.settings.mtadcSettings.port);
+                    mtdadc.start();
+                    mtdadc.stop();
+                    cmdres = Convert.ToInt32(mtdadc.cmd(6));
+                }
+                catch (Exception ex)
+                {
+                    #region Логирование 
+                    {
+                        string msg = string.Format("{0}", ex.Message);
+                        string logstr = string.Format("{0}: {1}: {2}", className, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                        Log.add(logstr, LogRecord.LogReason.error);
+                        Debug.WriteLine(logstr, "Error");
+                    }
+                    #endregion
+                }
                 if (Program.settings.mtadcSettings.Freq == 0) Program.settings.mtadcSettings.Freq = 20000000;
                 double T = 1 / (double)Program.settings.mtadcSettings.Freq;
-                double t = T * (cmd6res + 1);
+                double t = T * (cmdres + 1);
                 mtdadcFreq = (int)(1 / t);
                 //mtdadcFreq = 44440;
                 #region Логирование 
