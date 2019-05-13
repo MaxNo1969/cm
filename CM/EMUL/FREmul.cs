@@ -53,6 +53,7 @@ namespace CM
             {
                 throw new ArgumentException("Эмулятор работает только с виртуальной L502", "_lcard");
             }
+            fRMain = _frMain;
             InitializeComponent();
             lc = _lcard;
             lc.srcTube = tm;
@@ -70,7 +71,10 @@ namespace CM
             }
             #endregion
             //Снимаем все сигналы 
-            sl.ClearAllInputSignals();
+            //sl.ClearAllInputSignals();
+            sl.set(sl.iREADY, false);
+            sl.set(sl.iCNTR, false);
+            sl.set(sl.iSTRB, false);
             pbTube.Value = 0;
             btnStart.Enabled = true;
             btnStop.Enabled = false;
@@ -108,7 +112,7 @@ namespace CM
             }
         }
 
-        long startWait;
+        DateTime startWait;
         /// <summary>
         /// Задержка в цикле ожидания сигнала
         /// </summary>
@@ -124,8 +128,6 @@ namespace CM
                 Debug.WriteLine(logstr,"Message");
             }
             #endregion
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
             //Тут сделаем цикл по трубам
             while (true)
             {
@@ -138,8 +140,10 @@ namespace CM
                 sl.set(sl.iREADY, true);
                 worker.ReportProgress(101, "Выставляем сигнал \"СОЛЕНОИД\"...");
                 sl.set(sl.iSOL, true);
+                worker.ReportProgress(101, "Выставляем сигнал \"ЦИКЛ\"...");
+                sl.set(sl.iCYC, true);
                 //Ожидаем сигнал "РАБОТА"
-                startWait = sw.ElapsedMilliseconds;
+                //startWait = DateTime.Now;
                 while (!sl.get(sl.oWRK))
                 {
                     //Проверяем кнопку СТОП
@@ -157,7 +161,7 @@ namespace CM
                 worker.ReportProgress(101, "Выставляем сигнал \"КОНТРОЛЬ\"(труба на входе МНК3)...");
                 sl.set(sl.iCNTR, true);
                 //Ждем пока труба проедет до конца
-                startWait = sw.ElapsedMilliseconds;
+                startWait = DateTime.Now;
                 while (true)
                 {
                     //Проверяем кнопку СТОП
@@ -166,17 +170,29 @@ namespace CM
                         e.Cancel = true;
                         return;
                     }
-                    if(sw.ElapsedMilliseconds-startWait>updateCountersPeriod)
+                    if((DateTime.Now-startWait).TotalMilliseconds>updateCountersPeriod)
                     {
                         worker.ReportProgress(tm.ptube.startReadX * 100 / tm.ptube.Width,0);
-                        startWait = sw.ElapsedMilliseconds;
+                        startWait = DateTime.Now;
                     }
-                    //Закончились данные для эмуляции
-                    if(lc.index>tm.rawDataSize)
+                    ////Закончились данные для эмуляции
+                    //if(lc.index>tm.rawDataSize)
+                    //{
+                    //    #region Логирование 
+                    //    {
+                    //        string msg = "Закончились данные для эмуляции";
+                    //        string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    //        Log.add(logstr, LogRecord.LogReason.info);
+                    //        Debug.WriteLine(logstr, "Message");
+                    //    }
+                    //    #endregion
+                    //    break;
+                    //}
+                    if (!lc.IsRunning)
                     {
                         #region Логирование 
                         {
-                            string msg = "Закончились данные для эмуляции";
+                            string msg = string.Format("Закончились данные в модели. Считано {0}",lc.srcTube.rawDataSize  );
                             string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                             Log.add(logstr, LogRecord.LogReason.info);
                             Debug.WriteLine(logstr, "Message");

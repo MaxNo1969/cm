@@ -18,6 +18,7 @@ namespace CM
         /// </summary>
         public int index;
 
+        public bool IsRunning { get { return IsStarted; } }
         /// <summary>
         /// Конструктор.
         /// </summary>
@@ -75,6 +76,8 @@ namespace CM
                 onDataRead?.Invoke(data);
                 index += (int)raw_size;
             }
+            else
+                Stop();
             Thread.Sleep((int)(raw_size * 1000/ Program.mtdadcFreq));
             return data;
         }

@@ -58,7 +58,7 @@ namespace CM
         //сколько данных за раз показываем в окне
         int size = 2048;
         ReadDataThread readDataThread;
-        ZoneWriterThread zoneWriter;
+        //ZoneWriterThread zoneWriter;
 
         /// <summary>
         /// Обработчик события записи очередной порции данных в трубу (вызывается в потоке readDataThread для класса Tube.LogTube.RawTube)
@@ -82,6 +82,7 @@ namespace CM
             ucGr.Invalidate();
             setSb("DataSize", string.Format("{0}", Program.tube.rawDataSize));
             setSb("Time",string.Format(@"{0:mm\:ss\.ff}", sw.Elapsed));
+            if (sw.ElapsedMilliseconds > 20000) Stop();
         }
         /// <summary>
         /// Конструктор
@@ -98,6 +99,9 @@ namespace CM
             ucGr.showGridY = true;
             ucGr.minX = 0;
             ucGr.maxX = size;
+            //ucGr.stepGridY = 0.01f;
+            //ucGr.minY = -0.1f;
+            //ucGr.maxY = 0.1f;
             ucGr.minY = -6;
             ucGr.maxY = 6;
 
@@ -125,7 +129,7 @@ namespace CM
                 btnStartL502.Text = "Стоп";
                 Program.tube.reset();
                 readDataThread = new ReadDataThread(Program.lCard, Program.tube.rtube);
-                zoneWriter = new ZoneWriterThread(Program.tube);
+                //zoneWriter = new ZoneWriterThread(Program.tube);
                 Start();
             }
             else
@@ -150,19 +154,19 @@ namespace CM
             //Включаем поле
             Program.rectifier.Start();
             //Поставим задержку на включение блока питания
-            WaitHelper.Wait(1);
+            //WaitHelper.Wait(1);
             Program.lCard.Start();
             Program.mtdadc.start();
             readDataThread.Start();
-            zoneWriter.start();
+            //zoneWriter.start();
             return true;
         }
 
         private bool Stop()
         {
             //Останавливаем обсчет зон
-            zoneWriter?.stop();
-            zoneWriter = null;
+            //zoneWriter?.stop();
+            //zoneWriter = null;
             //Останавливаем чтение данных с АЦП
             readDataThread?.Stop();
             readDataThread = null;
@@ -202,18 +206,6 @@ namespace CM
             Tube tube = Program.tube;
             frMain.setSb("Info", "Запись данных в файл...");
             setSb("Info", "Запись данных в файл...");
-            string[] srows = new string[tube.ptube.Height];
-            for (int y = 0; y < tube.ptube.Height; y++)
-            {
-                string srow = string.Empty;
-                for (int x = 0; x < tube.ptube.Width; x++)
-                {
-                    {
-                        srow += string.Format("{0};", tube[x, y]);
-                    }
-                    srows[y] = srow;
-                }
-            }
             SaveFileDialog sfd = new SaveFileDialog
             {
                 DefaultExt = "csv",
@@ -225,9 +217,9 @@ namespace CM
             {
                 using (StreamWriter writer = new StreamWriter(sfd.FileName, false))
                 {
-                    foreach (string srow in srows)
+                    for (int i = 0; i < tube.rawDataSize; i++)
                     {
-                        writer.WriteLine(srow);
+                        writer.WriteLine(string.Format("{0}",tube.rtube.data[i]));
                     }
                     writer.Close();
                 }
