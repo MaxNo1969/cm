@@ -17,6 +17,8 @@ namespace FormsExtras
         /// Имя формы для поиска (Поле Text)
         /// </summary>
         public string name;
+        public FormWindowState state { get; set; }
+
         /// <summary>
         /// Признак видимости формы
         /// </summary>
@@ -83,6 +85,7 @@ namespace FormsExtras
                 fa = new FormAttrs()
                 {
                     name = _frm.Name,
+                    state=_frm.WindowState,
                     visible = _frm.Visible,
                     left = _frm.Left,
                     top = _frm.Top,
@@ -95,6 +98,7 @@ namespace FormsExtras
             else
             {
                 fa.visible = _frm.Visible;
+                fa.state = _frm.WindowState;
                 fa.left = _frm.Left;
                 fa.top = _frm.Top;
                 fa.width = _frm.Width;
@@ -114,6 +118,7 @@ namespace FormsExtras
             if (fa != null)
             {
                 _frm.Visible = fa.visible;
+                _frm.WindowState = fa.state;
                 _frm.Left = fa.left;
                 _frm.Top = fa.top;
                 _frm.Width = fa.width;
@@ -131,6 +136,7 @@ namespace FormsExtras
             if (fa != null)
             {
                 _frm.Visible = fa.visible;
+                _frm.WindowState = fa.state;
                 _frm.Left = fa.left;
                 _frm.Top = fa.top;
                 _frm.Width = fa.width;
