@@ -37,6 +37,7 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tubeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewTubeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewAllSensorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.adcRawDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -70,7 +71,6 @@
             this.cbTypeSize = new System.Windows.Forms.ToolStripComboBox();
             this.lblTubesCounter = new System.Windows.Forms.ToolStripLabel();
             this.tubeCount = new System.Windows.Forms.ToolStripLabel();
-            this.viewAllSensorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.ssMain.SuspendLayout();
             this.ts.SuspendLayout();
@@ -156,6 +156,14 @@
             this.viewTubeToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
             this.viewTubeToolStripMenuItem.Text = "&Просмотр";
             this.viewTubeToolStripMenuItem.Click += new System.EventHandler(this.viewTubeToolStripMenuItem_Click);
+            // 
+            // viewAllSensorsToolStripMenuItem
+            // 
+            this.viewAllSensorsToolStripMenuItem.Name = "viewAllSensorsToolStripMenuItem";
+            this.viewAllSensorsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
+            this.viewAllSensorsToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.viewAllSensorsToolStripMenuItem.Text = "Просмотр по датчикам";
+            this.viewAllSensorsToolStripMenuItem.Click += new System.EventHandler(this.viewAllSensorsToolStripMenuItem_Click);
             // 
             // adcRawDataToolStripMenuItem
             // 
@@ -408,14 +416,6 @@
             this.tubeCount.Name = "tubeCount";
             this.tubeCount.Size = new System.Drawing.Size(13, 22);
             this.tubeCount.Text = "0";
-            // 
-            // viewAllSensorsToolStripMenuItem
-            // 
-            this.viewAllSensorsToolStripMenuItem.Name = "viewAllSensorsToolStripMenuItem";
-            this.viewAllSensorsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.viewAllSensorsToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
-            this.viewAllSensorsToolStripMenuItem.Text = "Просмотр по датчикам";
-            this.viewAllSensorsToolStripMenuItem.Click += new System.EventHandler(this.viewAllSensorsToolStripMenuItem_Click);
             // 
             // FRMain
             // 

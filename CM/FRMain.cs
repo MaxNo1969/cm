@@ -127,8 +127,8 @@ namespace CM
                 MdiParent = this,
             };
             fRectifier.onHide += new FRRectifier.OnHideForm(() => { rectifierToolStripMenuItem.Checked = false; });
-            fRectifier.Visible = FormPosSaver.visible(fRectifier);
-            rectifierToolStripMenuItem.Checked = fRectifier.Visible;
+            fRectifier.Visible = false;
+            rectifierToolStripMenuItem.Checked = false;
 
             foreach (TypeSize ts in Program.settings.TypeSizes)
             {
@@ -137,7 +137,7 @@ namespace CM
             }
 
 
-            if (Program.cmdLineArgs.ContainsKey("NOA1730"))
+            if (Program.cmdLineArgs.ContainsKey("NOA1730")&& Program.cmdLineArgs.ContainsKey("NOLCARD"))
             {
                 emulToolStripMenuItem.Visible = true;
                 Program.signals.set(Program.signals.iCC, true);
@@ -306,7 +306,7 @@ namespace CM
                 DefaultExt = "dbl",
                 AddExtension = true,
                 Filter = "Файлы дампа (*.dbl)|*.dbl|Все файлы (*.*)|*.*",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                //InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             };
             if (ofd.ShowDialog() == DialogResult.OK)
             {
@@ -382,7 +382,7 @@ namespace CM
                 DefaultExt = "bin",
                 AddExtension = true,
                 Filter = "Трубы (*.bin)|*.bin|Все файлы (*.*)|*.*",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                //InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             };
             if (sfd.ShowDialog() == DialogResult.OK)
             {
@@ -466,7 +466,10 @@ namespace CM
 
         private void rectifierTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FRRectifierTest frm = new FRRectifierTest(Program.settings.Current.rectifier);
+            FRRectifierTest frm = new FRRectifierTest(Program.settings.Current.rectifier)
+            {
+                MdiParent = this,
+            };
             frm.Show();
         }
 
