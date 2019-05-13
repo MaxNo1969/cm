@@ -119,10 +119,22 @@ namespace CM
         {
             if (modbus.ReadInputRegisterE(abonent, _pos, out ushort res))
             {
-                return (double)res * 0.1;
+                return res * 0.1;
             }
             else
-                throw new Exception(modbus.err);
+            {
+                //throw new Exception(modbus.err);
+                #region Логирование 
+                {
+                    string msg = string.Format("{0}", modbus.err );
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.error);
+                    Debug.WriteLine(logstr, "Error");
+
+                }
+                #endregion
+                return 0;
+            }
         }
 
         private int getInt(int _pos)
@@ -132,7 +144,19 @@ namespace CM
                 return res;
             }
             else
-                throw new Exception(modbus.err);
+            {
+                //throw new Exception(modbus.err);
+                #region Логирование 
+                {
+                    string msg = string.Format("{0}", modbus.err);
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.error);
+                    Debug.WriteLine(logstr, "Error");
+
+                }
+                #endregion
+                return 0;
+            }
         }
 
         private bool getBool(int _pos)
@@ -142,7 +166,19 @@ namespace CM
                 return res == 0;
             }
             else
-                throw new Exception(modbus.err);
+            {
+                //throw new Exception(modbus.err);
+                #region Логирование 
+                {
+                    string msg = string.Format("{0}", modbus.err);
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.error);
+                    Debug.WriteLine(logstr, "Error");
+
+                }
+                #endregion
+                return false;
+            }
         }
         /// <summary>
         /// Выходное напряжение ( дискретность 0.1В), только чтение(функция 4)
@@ -244,19 +280,17 @@ namespace CM
             while (res != _val)
             {
                 modbus.setSingleRegister(abonent, _pos, (ushort)_val);
-                //Thread.Sleep(2000);
-                WaitHelper.Wait(2);
                 modbus.ReadHoldingRegisterE(abonent, _pos, out res);
                 //Задержка
                 if (sw.ElapsedMilliseconds > 5000) break;
             }
         }
 
-            /// <summary>
-            /// Установка рабочей силы тока
-            /// </summary>
+        /// <summary>
+        /// Установка рабочей силы тока
+        /// </summary>
             public void setWorkAmperage()
-        {
+        { 
             if (settings.TpIU == EIU.ByI)
                 setDouble(50, settings.NominalI);
             else
@@ -367,16 +401,30 @@ namespace CM
                 Debug.WriteLine(logstr, "Message");
             }
             #endregion
-            switch (settings.TpIU)
+            try
             {
-                case EIU.ByI:
-                    setInt(61, 1);
-                    break;
-                case EIU.ByU:
-                    setInt(60, 1);
-                    break;
-                default:
-                    break;
+                switch (settings.TpIU)
+                {
+                    case EIU.ByI:
+                        setInt(61, 1);
+                        break;
+                    case EIU.ByU:
+                        setInt(60, 1);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch(Exception ex)
+            {
+                #region Логирование 
+                {
+                    string msg = string.Format("{0}", ex.Message );
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.error);
+                    Debug.WriteLine(logstr, "Error");
+                }
+                #endregion
             }
         }
         public void Stop()
@@ -390,17 +438,38 @@ namespace CM
                 Debug.WriteLine(logstr, "Message");
             }
             #endregion
-            switch (settings.TpIU)
+            try
             {
-                case EIU.ByI:
-                    setInt(61, 0);
-                    break;
-                case EIU.ByU:
-                    setInt(60, 0);
-                    break;
-                default:
-                    break;
+                switch (settings.TpIU)
+                {
+                    case EIU.ByI:
+                        setInt(61, 0);
+                        break;
+                    case EIU.ByU:
+                        setInt(60, 0);
+                        break;
+                    default:
+                        break;
+                }
             }
+            catch (Exception ex)
+            {
+                #region Логирование 
+                {
+                    string msg = string.Format("{0}", ex.Message);
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.error);
+                    Debug.WriteLine(logstr, "Error");
+                }
+                #endregion
+            }
+
+        }
+        public bool IsWork()
+        {
+            int register = (settings.TpIU == EIU.ByI) ? 61 : 60;
+            modbus.ReadHoldingRegisterE(abonent, register, out ushort _res);
+            return _res == 1;
         }
     }
 }
