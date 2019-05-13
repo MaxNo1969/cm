@@ -173,7 +173,8 @@ namespace CM
             if (backBuffer == null) return;
             //Рисуем границы матриц
             int sensorSize = Tube.cols * Tube.rows;
-            Pen p = new Pen(Color.White, 2);
+            //Pen p = new Pen(Color.White, 2);
+            Pen p = new Pen(Color.Black, 2);
             Graphics g = Graphics.FromImage(backBuffer);
             for (int y = 1; y < Tube.mcols * Tube.mrows; y++)
             {                
@@ -188,7 +189,8 @@ namespace CM
             if (backBuffer == null) return;
             //Рисуем границы матриц
             int sensorSize = Tube.cols * Tube.rows;
-            Pen p = new Pen(Color.White, 2);
+            //Pen p = new Pen(Color.White, 2);
+            Pen p = new Pen(Color.Black, 2);
             Graphics g = Graphics.FromImage(backBuffer);
             int zones = (int)tube.ptube.len / tube.ptube.zoneSize;
             int zoneSize = backBuffer.Width / zones;
