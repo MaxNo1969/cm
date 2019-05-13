@@ -90,7 +90,7 @@ namespace CM
                 if (tube.ptube.endWritedX < tube.ptube.Width)
                 {
                     int currentSections = tube.sections;
-                    if (currentSections > Tube.GetsectionsPerZone() * (zone + 1))
+                    if (currentSections > Tube.GetsectionsPerZone() * (zone + 1)+ Program.settings.Current.DeadZoneStart - 1)
                     {
                         #region Логирование 
                         {
@@ -102,7 +102,8 @@ namespace CM
                         }
                         #endregion
                         //int currentSections = tube.sections;
-                        tube.raw2phys(lastWritedSection, currentSections - lastWritedSection, zone, 1);
+                        //tube.raw2phys(lastWritedSection, currentSections - lastWritedSection, zone, 1);
+                        tube.raw2phys(lastWritedSection, Tube.GetsectionsPerZone(), zone, 1);
                         Tube.TubeRes zoneRes = tube.getZoneResult(zone, out double _maxVal);
                         tube.Zones.Add(new Zone(currentSections,zoneRes));
                         #region Логирование 
@@ -115,11 +116,12 @@ namespace CM
                         }
                         #endregion
                         Program.signals.ControlResult(zoneRes);
-                        lastWritedSection = currentSections;
+                        //lastWritedSection = currentSections;
+                        lastWritedSection += Tube.GetsectionsPerZone();
                         zone++;
                         onNextZone?.Invoke(tube);
                     }
-                    Thread.Sleep(zoneTime);
+                    //Thread.Sleep(zoneTime);
                 }
                 else
                 {
