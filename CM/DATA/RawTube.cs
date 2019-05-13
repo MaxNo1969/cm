@@ -66,15 +66,10 @@ namespace CM
             get
             {
                 int ind = _mc * mrows * cols * rows + _mr * cols * rows + _r * cols + _c;
-                double val;
-                try
+                double val = 0;
+                if (ind + _i * sectionSize < data.Count)
                 {
                     val = data[ind + _i * sectionSize];
-                }
-                catch
-                {
-                    val = double.NaN;
-                    //throw (new IndexOutOfRangeException());
                 }
                 return val;
             }

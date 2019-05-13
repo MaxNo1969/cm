@@ -226,7 +226,7 @@ namespace CM
         {
             get
             {
-                return (int)(len / cellXSize);
+                return (int)Math.Ceiling(len / cellXSize);
             }
         }
         /// <summary>

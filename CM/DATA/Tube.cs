@@ -192,13 +192,13 @@ namespace CM
                 }
                 //_tube.fillSensorAvgValues(deadSectionsStart - 1, _tube.sections - deadSectionsStart);
                 _tube.ptube = new PhysTube(_tube.rtube.ts, _tube.rtube.len);
-                //int zone = 0;
-                //for(int i=0; i<_tube.sections;i+=Tube.GetsectionsPerZone())
-                //{
-                //    _tube.raw2phys(i, Tube.GetsectionsPerZone(), zone++, 1);
-                //    _tube.onDataChanged?.Invoke(null);
-                //}
-                _tube.raw2phys(0, _tube.sections, 0, _tube.ptube.Width / _tube.ptube.logZoneSize);
+                int zone = 0;
+                for (int i = 0; i < _tube.sections; i += Tube.GetsectionsPerZone())
+                {
+                    _tube.raw2phys(i, Tube.GetsectionsPerZone(), zone++, 1);
+                    _tube.onDataChanged?.Invoke(null);
+                }
+                //_tube.raw2phys(0, _tube.sections, 0, _tube.ptube.Width / _tube.ptube.logZoneSize);
                 _tube.onDataChanged?.Invoke(null);
                 return true;
 
@@ -255,7 +255,7 @@ namespace CM
         /// <returns>Массив с данными по датчику</returns>
         public double[] getSensorData(int _mc, int _mr, int _c, int _r, int _start, int _count)
         {
-            if (_start < 0 || _start > sections - 1 || _count < 0 || _start + _count > sections-1)
+            if (_start < 0 || _start > sections - 1 || _count < 0 || _start + _count > sections)
             {
                 return null;
             }
@@ -404,10 +404,12 @@ namespace CM
                 return false;
             }
             int[] sensorOrder = Program.settings.Current.sensors.sensors.getSensorOrder();
+            int[] reversedSensors = Program.settings.Current.sensors.sensors.getReverseSensors();
             int currentSections = rtube.sections;
-            if (currentSections > (_znStart+1)*GetsectionsPerZone()+deadSectionsStart-1)
+            //if (currentSections > (_znStart+1)*GetsectionsPerZone()+deadSectionsStart-1)
+            if (currentSections > (_znStart + _znCnt) * GetsectionsPerZone() + deadSectionsStart)
             {
-                fillSensorAvgValues(deadSectionsStart-1,currentSections-deadSectionsStart);
+                fillSensorAvgValues(deadSectionsStart, currentSections - deadSectionsStart);
                 int distLogSize = (int)(Program.settings.sensorsDistance / ptube.cellXSize);
                 for (int zn = _znStart; zn < _znStart + _znCnt; zn++)
                 {
@@ -418,6 +420,12 @@ namespace CM
                             int xPos = (sensorOrder[mrow] < 2) ? 0 : distLogSize;
                             for (int row = 0; row < rows; row++)
                             {
+                                //int orderedRow = (reversedSensors.Contains(mrow)) ? rows - row - 1 : row;
+                                int orderedRow;
+                                if (reversedSensors.Contains(sensorOrder[mrow]))
+                                    orderedRow = rows - row - 1;
+                                else
+                                    orderedRow = row;
                                 for (int mcol = 0; mcol < mcols; mcol++)
                                 {
                                     for (int col = 0; col < cols; col++)
@@ -427,18 +435,18 @@ namespace CM
                                             if (zn * ptube.logZoneSize + i < currentSections && xPos + zn * ptube.logZoneSize + i < ptube.Width)
                                             {
                                                 if (_start + (zn - _znStart) * GetsectionsPerZone() + i < deadSectionsStart ||
-                                                    _start + (zn - _znStart) * GetsectionsPerZone() + i > currentSections-deadSectionsEnd)
+                                                    _start + (zn - _znStart) * GetsectionsPerZone() + i > currentSections - deadSectionsEnd)
                                                 {
-                                                    ptube[xPos + zn * ptube.logZoneSize + i, mrow * rows + row] = 0;
+                                                    ptube[xPos + zn * ptube.logZoneSize + i, mrow * rows + orderedRow] = 0;
                                                 }
                                                 else
                                                 {
-                                                    ptube[xPos + zn * ptube.logZoneSize + i, mrow * rows + row] = Math.Abs(this[mcol, sensorOrder[mrow], col, row,
+                                                    ptube[xPos + zn * ptube.logZoneSize + i, mrow * rows + orderedRow] = Math.Abs(this[mcol, sensorOrder[mrow], col, row,
                                                         _start + (zn - _znStart) * GetsectionsPerZone() + i] - sensorsAvgValues[mcol, sensorOrder[mrow], col, row]);
                                                 }
                                             }
                                             else if (xPos + zn * ptube.logZoneSize + i < ptube.Width)
-                                                ptube[xPos + zn * ptube.logZoneSize + i, mrow * rows + row] = 0;
+                                                ptube[xPos + zn * ptube.logZoneSize + i, mrow * rows + orderedRow] = 0;
                                         }
                                         catch (Exception ex)
                                         {
@@ -466,7 +474,7 @@ namespace CM
             {
                 #region Логирование 
                 {
-                    string msg = string.Format("Мало данных: currentSections = {0}, Надо {1}",currentSections,(_znStart + 1) * GetsectionsPerZone() + deadSectionsStart - 1);
+                    string msg = string.Format("Мало данных: currentSections = {0}, Надо {1}", currentSections, (_znStart + 1) * GetsectionsPerZone() + deadSectionsStart - 1);
                     string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                     Log.add(logstr, LogRecord.LogReason.info);
                     Debug.WriteLine(logstr, "Message");
