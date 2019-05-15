@@ -90,7 +90,7 @@ namespace CM
                 if (tube.ptube.endWritedX < tube.ptube.Width)
                 {
                     int currentSections = tube.sections;
-                    if (currentSections > Tube.GetsectionsPerZone() * (zone + 1)+ Program.settings.Current.DeadZoneStart - 1)
+                    if (currentSections > Tube.GetsectionsPerZone() * (zone + 1)+ Program.settings.Current.DeadZoneStart)
                     {
                         #region Логирование 
                         {

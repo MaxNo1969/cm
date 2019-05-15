@@ -389,7 +389,7 @@ namespace CM
 
         public bool raw2phys(int _start, int _sz, int _znStart, int _znCnt)
         {
-            if ((_znStart + _znCnt) * ptube.logZoneSize > ptube.Width)
+            if ((_znStart + _znCnt) * GetsectionsPerZone() > ptube.Width)
             {
                 #region Логирование 
                 {
@@ -474,7 +474,7 @@ namespace CM
             {
                 #region Логирование 
                 {
-                    string msg = string.Format("Мало данных: currentSections = {0}, Надо {1}", currentSections, (_znStart + 1) * GetsectionsPerZone() + deadSectionsStart - 1);
+                    string msg = string.Format("Мало данных: currentSections = {0}, Надо {1}", currentSections, (_znStart + 1) * GetsectionsPerZone() + deadSectionsStart);
                     string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                     Log.add(logstr, LogRecord.LogReason.info);
                     Debug.WriteLine(logstr, "Message");
