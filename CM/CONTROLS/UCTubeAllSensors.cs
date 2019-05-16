@@ -11,7 +11,7 @@ namespace CM
     /// Отображение каждого датчика отдельной строкой.
     /// </summary>
     /// <remarks>
-    /// Данные беруться из RawTube и нормализуются согласно SensorCorrectionData
+    /// Данные беруться из RawTube
     /// </remarks>
     public partial class UCTubeAllSensors : UserControl
     {
