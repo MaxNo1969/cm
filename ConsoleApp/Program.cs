@@ -13,7 +13,7 @@ namespace ConsoleApp
     {
         static void dump2tube(string _dumpName, string _tubeName, TypeSize _typeSize)
         {
-            Tube tube = new Tube(_typeSize, DefaultValues.TubeLen);
+            Tube tube = new Tube(_typeSize);
             Console.WriteLine("Set tube.typeSize.Sensors:{0}", tube.rtube.ts.sensors.ToString());
             Console.WriteLine(string.Format(@"Reading file: {0}...", _dumpName));
             DumpReader reader = new DumpReader(_dumpName);

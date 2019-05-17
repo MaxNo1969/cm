@@ -87,9 +87,9 @@ namespace CM
                 }
                 #endregion
                 if (settings.Current.Name != "Новый")
-                    tube = new Tube(settings.Current, settings.TubeLen);
+                    tube = new Tube(settings.Current);
                 else
-                    tube = new Tube(settings.TypeSizes[0], settings.TubeLen);
+                    tube = new Tube(settings.TypeSizes[0]);
                 tubeCount = 0;
                 Application.Run(new FRMain());
             }

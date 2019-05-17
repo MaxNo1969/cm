@@ -25,7 +25,7 @@ namespace CM
         /// </summary>
         public List<double> data;
 
-        public RawTube(TypeSize _ts,int _len)
+        public RawTube(TypeSize _ts)
         {
             #region Логирование 
             {

@@ -112,29 +112,25 @@ namespace CM
         /// Размер элемента по горизонали (мм)
         /// </summary>
         [DisplayName("Горизонтальный размер"), Description("Размер элемента по горизонали (мм)")]
-        [DefaultValue(5)]
-        [Browsable(false)]
+        [Browsable(true)]
         public int elementWidth { get; set; }
         /// <summary>
         /// Размер элемента по вертикали  (мм)
         /// </summary>
         [DisplayName("Вертикальный размер"), Description("Размер элемента по вертикали (мм)")]
-        [DefaultValue(8)]
-        [Browsable(false)]
+        [Browsable(true)]
         public int elementHeight { get; set; }
         /// <summary>
         /// Горизонтальный зазор между элементами (мм)
         /// </summary>
         [DisplayName("Горизонтальный зазор"), Description("Горизонтальный зазор между элементами (мм)")]
-        [DefaultValue(2)]
-        [Browsable(false)]
+        [Browsable(true)]
         public int xGap { get; set; }
         /// <summary>
         /// Вертикальный зазор между элементами
         /// </summary>
         [DisplayName("Вертикльный зазор"), Description("Вертикальный зазор между элементами (мм)")]
-        [DefaultValue(2)]
-        [Browsable(false)]
+        [Browsable(true)]
         public int yGap { get; set; }
         #endregion
         /// <summary>

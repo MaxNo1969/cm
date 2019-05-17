@@ -35,7 +35,7 @@ namespace TubeViewer
             };
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                Tube tube = new Tube(new TypeSize(),0);
+                Tube tube = new Tube(new TypeSize());
                 if (Tube.load(ref tube, ofd.FileName))
                 {
                     ViewAllSensors_Click(tube, null);

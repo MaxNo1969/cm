@@ -15,7 +15,7 @@ namespace CM.Tests
         public void TubeTest()
         {
             TypeSize ts = new TypeSize("СБТ 73 01");
-            Tube tube = new Tube(ts,DefaultValues.TubeLen);
+            Tube tube = new Tube(ts);
             Assert.IsNotNull(tube);
         }
     }

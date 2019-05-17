@@ -106,7 +106,7 @@ namespace CM
         /// </summary>
         /// <param name="_ts">Типоразмер</param>
         /// <param name="_len">Длина трубы</param>
-        public PhysTube(TypeSize _ts, int _len)
+        public PhysTube(TypeSize _ts)
         {
             #region Логирование 
             {
@@ -120,7 +120,6 @@ namespace CM
             //else
             //    speed = DefaultValues.Speed;
             ts = _ts;
-            len = _len;
             diameter = ts.diameter;
 
             endWritedX = 0;
@@ -134,6 +133,15 @@ namespace CM
                 //if (Program.settings.ZoneSize == 0) Program.settings.ZoneSize = DefaultValues.ZoneSize;
                 //int zones = (int)len / Program.settings.ZoneSize;
                 reset();
+                #region Логирование 
+                {
+                    string msg = string.Format("Width={0}, Height={1},cellXSize={2},cellYSize={3}, cellTime={4}",
+                        Width, Height, cellXSize, cellYSize, cellTime);
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.info);
+                    Debug.WriteLine(logstr, "Message");
+                }
+                #endregion
             }
             catch (InsufficientMemoryException ex)
             {
@@ -197,15 +205,14 @@ namespace CM
         /// </summary>
         public double cellXSize
         {
-            //get
-            //{
-            //    if (ts.sensors.hallSensors.elementWidth == 0) return DefaultValues.hallSensorWidth;
-            //    return ts.sensors.hallSensors.elementWidth+ts.sensors.hallSensors.xGap;
-            //}
             get
             {
-                return Program.settings.ZoneSize / Tube.GetsectionsPerZone();
+                if (ts.sensors.hallSensors.elementWidth == 0) return DefaultValues.hallSensorWidth;
+                return ts.sensors.hallSensors.elementWidth + ts.sensors.hallSensors.xGap;
             }
+            //get
+            //{
+            //    return Program.settings.ZoneSize / Tube.GetsectionsPerZone();            //}
         }
 
         /// <summary>
@@ -226,7 +233,8 @@ namespace CM
         {
             get
             {
-                return (int)Math.Ceiling(len / cellXSize);
+                return (int)Math.Ceiling(Program.settings.TubeLen / cellXSize);
+                //return Tube.GetsectionsPerZone() * Program.settings.TubeLen / Program.settings.ZoneSize;
             }
         }
         /// <summary>

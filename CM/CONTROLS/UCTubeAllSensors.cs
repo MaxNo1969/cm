@@ -48,7 +48,7 @@ namespace CM
         {
             tube = _tube;
             tube.onDataChanged += new DataChanged(x => Invalidate());
-            bitmapWidth = (int)((double)tube.len / tube.ptube.speed * Program.mtdadcFreq / Tube.sectionSize / 1000);
+            bitmapWidth = (int)((double)tube.zones*Tube.GetsectionsPerZone() / tube.ptube.speed * Program.mtdadcFreq / Tube.sectionSize / 1000);
             if (bitmapWidth < tube.sections) bitmapWidth = tube.sections;
             if (tube.sections > 0)
             {
@@ -192,9 +192,8 @@ namespace CM
             //Pen p = new Pen(Color.White, 2);
             Pen p = new Pen(Color.Black, 2);
             Graphics g = Graphics.FromImage(backBuffer);
-            int zones = (int)tube.ptube.len / tube.ptube.zoneSize;
-            int zoneSize = backBuffer.Width / zones;
-            for (int x = 1; x < zones; x++)
+            int zoneSize = backBuffer.Width / tube.zones;
+            for (int x = 1; x < tube.zones; x++)
             {
                 g.DrawLine(p, x*zoneSize, 0, x*zoneSize, backBuffer.Height);
             }

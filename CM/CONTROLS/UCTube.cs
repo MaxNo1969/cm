@@ -112,6 +112,12 @@ namespace CM
         {
             drawType = DrawType.Gradient;
             InitializeComponent();
+            //Делаем настройки для быстрого рисования
+            //SetStyle(ControlStyles.DoubleBuffer, false);
+            //SetStyle(ControlStyles.UserPaint, true);
+            //SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            //SetStyle(ControlStyles.Opaque, true);
+
             editable = false;
 
             numZones = 5;
@@ -121,7 +127,9 @@ namespace CM
             winStart = 0;
             curCellX = 0;
             curCellY = 0;
-            //zoneBorderPen = new Pen(Color.White, 2f);
+
+            //Pen-ы для рисования границ датчиков и зон
+            //Можно вынести в настройку DesignTime
             zoneBorderPen = new Pen(Color.Black, 2f);
             cellBorderPen = new Pen(Color.Black, 2f);
             sensorBorderPen = new Pen(Color.Black, 2f);
@@ -213,43 +221,13 @@ namespace CM
 
                 using (Graphics g = Graphics.FromImage(backBuffer))
                 {
-                    //if (winStart + 1 < tube.ptube.Width)
-                    //    g.DrawLine(white2pix, winStart, 0, winStart, backBuffer.Height);
-                    //if (winStart + winWidth + 1 < tube.ptube.Width)
-                    //    g.DrawLine(white2pix, winStart + winWidth, 0, winStart + winWidth, backBuffer.Height);
                     if (winStart + 1 < tube.ptube.Width)
                         g.DrawLine(Pens.Black, winStart, 0, winStart, backBuffer.Height);
                     if (winStart + winWidth + 1 < tube.ptube.Width)
                         g.DrawLine(Pens.Black, winStart + winWidth, 0, winStart + winWidth, backBuffer.Height);
-                    //for (int i = 1; i < tube.ptube.mrows; i++)
-                    //    g.DrawLine(Pens.White, 0, i * tube.ptube.rows, backBuffer.Width, i * tube.ptube.rows);
                     for (int i = 1; i < tube.ptube.mrows; i++)
                         g.DrawLine(bottomSensorBorderPen, 0, i * tube.ptube.rows, backBuffer.Width, i * tube.ptube.rows);
                 }
-                //if (winStart + 1 < tube.ptube.Width)
-                //{
-                //    for (int y = 0; y < tube.ptube.Height; y++)
-                //    {
-                //        (backBuffer as Bitmap).SetPixel(winStart, y, Color.White);
-                //        (backBuffer as Bitmap).SetPixel(winStart + 1, y, Color.White);
-                //    }
-                //}
-                //if (winStart + winWidth + 1 < tube.ptube.Width)
-                //{
-                //    for (int y = 0; y < tube.ptube.Height; y++)
-                //    {
-                //        (backBuffer as Bitmap).SetPixel(winStart + winWidth, y, Color.White);
-                //        (backBuffer as Bitmap).SetPixel(winStart + winWidth + 1, y, Color.White);
-                //    }
-                //}
-                //Рисуем границы матриц
-                //for (int i = 1; i < tube.ptube.mrows; i++)
-                //{
-                //    for (int x = 0; x < tube.ptube.Width; x++)
-                //    {
-                //        (backBuffer as Bitmap).SetPixel(x, i * tube.ptube.rows, Color.White);
-                //    }
-                //}
 
                 backBuffer = ImgHelper.ResizeImage(backBuffer, Width, height);
                 e.Graphics.DrawImage(backBuffer, 0, Height * upWinPercent / 100);

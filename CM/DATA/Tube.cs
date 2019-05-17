@@ -32,7 +32,7 @@ namespace CM
         public static int mrows { get { return Program.settings.Current.sensors.sensors.dim.rows; } }
         public static int cols { get { return Program.settings.Current.sensors.hallSensors.dim.cols; } }
         public static int rows { get { return Program.settings.Current.sensors.hallSensors.dim.rows; } }
-
+        public int zones { get { return rawDataSize / sections / GetsectionsPerZone(); } }
         public static int DeadSectionsEnd => deadSectionsEnd;
 
         public static int GetsectionsPerZone()
@@ -72,11 +72,10 @@ namespace CM
 
         public int len;
 
-        public Tube(TypeSize _ts,int _len)
+        public Tube(TypeSize _ts)
         {
-            len = _len;
-            rtube = new RawTube(_ts,_len);
-            ptube = new PhysTube(_ts,_len);
+            rtube = new RawTube(_ts);
+            ptube = new PhysTube(_ts);
             //loadAvg();
             Zones = new List<Zone>();
             //onDataChanged?.Invoke(null);
@@ -191,7 +190,7 @@ namespace CM
                     _tube.rtube = (RawTube)formatter.Deserialize(fs);
                 }
                 //_tube.fillSensorAvgValues(deadSectionsStart - 1, _tube.sections - deadSectionsStart);
-                _tube.ptube = new PhysTube(_tube.rtube.ts, Program.settings.TubeLen);
+                _tube.ptube = new PhysTube(_tube.rtube.ts);
                 int zone = 0;
                 for (int i = 0; i < _tube.sections; i += Tube.GetsectionsPerZone())
                 {
@@ -401,12 +400,11 @@ namespace CM
                 }
                 #endregion
                 ptube.expand(1);
-                return false;
+                //return false;
             }
             int[] sensorOrder = Program.settings.Current.sensors.sensors.getSensorOrder();
             int[] reversedSensors = Program.settings.Current.sensors.sensors.getReverseSensors();
             int currentSections = rtube.sections;
-            //if (currentSections > (_znStart+1)*GetsectionsPerZone()+deadSectionsStart-1)
             if (currentSections > (_znStart + _znCnt) * GetsectionsPerZone() + deadSectionsStart)
             {
                 fillSensorAvgValues(deadSectionsStart, currentSections - deadSectionsStart);
@@ -550,7 +548,7 @@ namespace CM
 
         #region IDataWriter implementation
         int startWriteZoneSection = 0;
-        int zones = 0;
+        //int zones = 0;
         public int Write(IEnumerable<double> _data)
         {
             //int measesPerZone = (int)((double)Program.settings.ZoneSize * Program.settings.lCardSettings.FrequencyCollect / DefaultValues.Speed/1000);
@@ -570,7 +568,7 @@ namespace CM
                 raw2phys(startWriteZoneSection, sections-startWriteZoneSection, zones, 1);
                 //Здесь надо проанализировать зону и выдать сигналы для результата
                 startWriteZoneSection = sections;
-                zones++;
+                //zones++;
             }
             onDataChanged?.Invoke(_data);
             return _data.Count();
@@ -592,6 +590,7 @@ namespace CM
             rtube.reset();
             ptube.reset(_val);
             Zones.Clear();
+            onDataChanged?.Invoke(null);
         }
     }
 }

@@ -345,7 +345,7 @@ namespace CM
         {
             if (Program.lCard is LCardVirtual)
             {
-                Tube emulTube = new Tube(Program.settings.Current, Program.settings.TubeLen);
+                Tube emulTube = new Tube(Program.settings.Current);
                 if (loadTube(ref emulTube))
                 {
                     LCardVirtual lCardVirtual = (LCardVirtual)Program.lCard;
@@ -364,7 +364,7 @@ namespace CM
 
         private void emulToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FREmul frm = new FREmul(Program.lCard as LCardVirtual, new Tube(Program.settings.Current, Program.settings.TubeLen),this)
+            FREmul frm = new FREmul(Program.lCard as LCardVirtual, new Tube(Program.settings.Current),this)
             {
                 parentMenu = emulToolStripMenuItem,
                 MdiParent = this,

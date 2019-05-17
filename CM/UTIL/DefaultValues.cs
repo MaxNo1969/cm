@@ -15,7 +15,7 @@ namespace CM
 
         public const int freq = 2000000;
 
-        public const int hallSensorWidth = 5;
+        public const int hallSensorWidth = 8;
         public const int hallSensorHeight = 8;
         public const int xGap = 2;
         public const int yGap = 2;
