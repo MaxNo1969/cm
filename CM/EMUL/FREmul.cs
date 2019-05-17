@@ -327,6 +327,11 @@ namespace CM
                     IDataWriter<double> writer = tm;
                     writer.Write(reader.Read());
                     //Program.tube.raw2phys(0, Program.tube.sections, 0, Program.tube.ptube.Width / Program.tube.ptube.logZoneSize);
+                    FRAllSensorsView frm = new FRAllSensorsView(fRMain, tm)
+                    {
+                        Text = string.Format("Труба - модель (Дамп:{0})", ofd.FileName),
+                    };
+                    frm.Show();
                 }
                 catch (Exception ex)
                 {

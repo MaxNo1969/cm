@@ -25,7 +25,7 @@ namespace CM
         double[] y;
         Dt sens = null;
         //сколько данных за раз выводим на график
-        int size = 512;
+        int size = 2048;
 
         //static int start = 0;
         /// <summary>

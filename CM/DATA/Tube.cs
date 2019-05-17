@@ -32,13 +32,15 @@ namespace CM
         public static int mrows { get { return Program.settings.Current.sensors.sensors.dim.rows; } }
         public static int cols { get { return Program.settings.Current.sensors.hallSensors.dim.cols; } }
         public static int rows { get { return Program.settings.Current.sensors.hallSensors.dim.rows; } }
-        public int zones { get { return rawDataSize / sections / GetsectionsPerZone(); } }
+        public int zones { get { return sections / GetsectionsPerZone(); } }
         public static int DeadSectionsEnd => deadSectionsEnd;
 
         public static int GetsectionsPerZone()
         {
-            return (int)((double)Program.settings.ZoneSize * Program.mtdadcFreq / 
-                (Program.settings.TubeSpeed * 1000) / Program.settings.Current.sensors.sectionSize);
+            //return (int)((double)Program.settings.ZoneSize * Program.mtdadcFreq / 
+            //    (Program.settings.TubeSpeed * 1000) / Program.settings.Current.sensors.sectionSize);
+            return (int)((double)Program.settings.ZoneSize / 
+                (Program.settings.Current.sensors.hallSensors.elementWidth + Program.settings.Current.sensors.hallSensors.xGap));
         }
         public double[,,,] sensorsAvgValues;
 
@@ -548,27 +550,27 @@ namespace CM
 
         #region IDataWriter implementation
         int startWriteZoneSection = 0;
-        //int zones = 0;
+        int startZone = 0;
         public int Write(IEnumerable<double> _data)
         {
             //int measesPerZone = (int)((double)Program.settings.ZoneSize * Program.settings.lCardSettings.FrequencyCollect / DefaultValues.Speed/1000);
             //int measesPerZone = (int)((double)Program.settings.ZoneSize * Program.mtdadcFreq / (ptube.speed*1000));
             int measesPerZone = GetsectionsPerZone()*sectionSize;
             rtube.Write(_data);
-            if (rawDataSize / measesPerZone > zones)
+            if (rawDataSize / measesPerZone >= startZone)
             {
                 #region Логирование 
                 {
-                    string msg = string.Format("Достигнута граница зоны {0} - {1}({2})", zones, sections, sections-startWriteZoneSection );
+                    string msg = string.Format("Достигнута граница зоны {0} - {1}({2})", startZone, sections, sections-startWriteZoneSection );
                     string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                     Log.add(logstr, LogRecord.LogReason.info);
                     Debug.WriteLine(logstr, "Message");
                 }
                 #endregion
-                raw2phys(startWriteZoneSection, sections-startWriteZoneSection, zones, 1);
+                raw2phys(startWriteZoneSection, sections-startWriteZoneSection, startZone, 1);
                 //Здесь надо проанализировать зону и выдать сигналы для результата
                 startWriteZoneSection = sections;
-                //zones++;
+                startZone++;
             }
             onDataChanged?.Invoke(_data);
             return _data.Count();
@@ -590,6 +592,7 @@ namespace CM
             rtube.reset();
             ptube.reset(_val);
             Zones.Clear();
+            startZone = 0;
             onDataChanged?.Invoke(null);
         }
     }
