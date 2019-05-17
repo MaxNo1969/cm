@@ -251,11 +251,11 @@ namespace CM
                         Debug.WriteLine(logstr, "Error");
                     }
                     #endregion
-                    _tube = null;
+                    _tube.reset();
                     return false;
                 }
             }
-            _tube = null;
+            _tube.reset();
             return false;
         }
 
@@ -271,10 +271,6 @@ namespace CM
                     Program.settings.Current = Program.tube.rtube.ts;
                 }
                 viewTubeToolStripMenuItem_Click(this, null);
-            }
-            else
-            {
-                MessageBox.Show(string.Format("Не удалось загрузить трубу."), "Ошибка");
             }
         }
 
@@ -312,6 +308,7 @@ namespace CM
             {
                 try
                 {
+                    Program.tube.reset();
                     DumpReader reader = new DumpReader(ofd.FileName);
                     IDataWriter<double> writer = Program.tube;
                     writer.Write(reader.Read());

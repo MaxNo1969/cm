@@ -191,7 +191,7 @@ namespace CM
                     _tube.rtube = (RawTube)formatter.Deserialize(fs);
                 }
                 //_tube.fillSensorAvgValues(deadSectionsStart - 1, _tube.sections - deadSectionsStart);
-                _tube.ptube = new PhysTube(_tube.rtube.ts, _tube.rtube.len);
+                _tube.ptube = new PhysTube(_tube.rtube.ts, Program.settings.TubeLen);
                 int zone = 0;
                 for (int i = 0; i < _tube.sections; i += Tube.GetsectionsPerZone())
                 {
@@ -340,14 +340,14 @@ namespace CM
 
         internal void fillSensorAvgValues(int _start,int _count)
         {
-            #region Логирование 
-            {
-                string msg = string.Format("start={0}, count={1}", _start, _count);
-                string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
-                Log.add(logstr, LogRecord.LogReason.info);
-                Debug.WriteLine(logstr, "Message");
-            }
-            #endregion
+            //#region Логирование 
+            //{
+            //    string msg = string.Format("start={0}, count={1}", _start, _count);
+            //    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+            //    Log.add(logstr, LogRecord.LogReason.info);
+            //    Debug.WriteLine(logstr, "Message");
+            //}
+            //#endregion
             sensorsAvgValues = new double[mcols, mrows, cols, rows];
             //for (int mcol = 0; mcol < mcols; mcol++)
             //{
@@ -554,7 +554,8 @@ namespace CM
         public int Write(IEnumerable<double> _data)
         {
             //int measesPerZone = (int)((double)Program.settings.ZoneSize * Program.settings.lCardSettings.FrequencyCollect / DefaultValues.Speed/1000);
-            int measesPerZone = (int)((double)Program.settings.ZoneSize * Program.mtdadcFreq / (ptube.speed*1000));
+            //int measesPerZone = (int)((double)Program.settings.ZoneSize * Program.mtdadcFreq / (ptube.speed*1000));
+            int measesPerZone = GetsectionsPerZone()*sectionSize;
             rtube.Write(_data);
             if (rawDataSize / measesPerZone > zones)
             {
