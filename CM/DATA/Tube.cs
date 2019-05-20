@@ -200,7 +200,7 @@ namespace CM
                     _tube.onDataChanged?.Invoke(null);
                 }
                 //_tube.raw2phys(0, _tube.sections, 0, _tube.ptube.Width / _tube.ptube.logZoneSize);
-                _tube.onDataChanged?.Invoke(null);
+                //_tube.onDataChanged?.Invoke(null);
                 return true;
 
             }
@@ -567,10 +567,12 @@ namespace CM
                     Debug.WriteLine(logstr, "Message");
                 }
                 #endregion
-                raw2phys(startWriteZoneSection, sections-startWriteZoneSection, startZone, 1);
+                int cntSections = sections - startWriteZoneSection;
+                int cntZones = cntSections / GetsectionsPerZone();
+                raw2phys(startWriteZoneSection, cntSections, startZone, cntZones);
                 //Здесь надо проанализировать зону и выдать сигналы для результата
                 startWriteZoneSection = sections;
-                startZone++;
+                startZone+=cntZones;
             }
             onDataChanged?.Invoke(_data);
             return _data.Count();
