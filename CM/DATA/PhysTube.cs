@@ -233,7 +233,7 @@ namespace CM
         {
             get
             {
-                return (int)Math.Ceiling(Program.settings.TubeLen / cellXSize);
+                return (int)Math.Ceiling(Program.settings.TubeLen / cellXSize)+p2lx(Program.settings.sensorsDistance);
                 //return Tube.GetsectionsPerZone() * Program.settings.TubeLen / Program.settings.ZoneSize;
             }
         }

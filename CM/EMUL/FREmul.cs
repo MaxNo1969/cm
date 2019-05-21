@@ -325,8 +325,9 @@ namespace CM
                 {
                     DumpReader reader = new DumpReader(ofd.FileName);
                     IDataWriter<double> writer = tm;
+                    tm.reset();
                     writer.Write(reader.Read());
-                    //Program.tube.raw2phys(0, Program.tube.sections, 0, Program.tube.ptube.Width / Program.tube.ptube.logZoneSize);
+                    Program.tube.raw2phys(0, Program.tube.sections, 0, Program.tube.ptube.Width / Program.tube.ptube.logZoneSize);
                     FRAllSensorsView frm = new FRAllSensorsView(fRMain, tm)
                     {
                         Text = string.Format("Труба - модель (Дамп:{0})", ofd.FileName),

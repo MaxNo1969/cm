@@ -412,8 +412,8 @@ namespace CM
                     {
 
                         case Keys.Enter:
-                            FRRowAllSensorsView frm = new FRRowAllSensorsView(frTubeView.MdiParent, tube, curCellY / Tube.rows, curCellY % Tube.rows);
-                            //FRHallSensorView frm = new FRHallSensorView(tube, curCellY / Tube.rows, curCellY % Tube.rows, 0, 0, tube.sections);
+                            //FRRowAllSensorsView frm = new FRRowAllSensorsView(frTubeView.MdiParent, tube, curCellY / Tube.rows, curCellY % Tube.rows);
+                            FRHallSensorView frm = new FRHallSensorView(frTubeView.MdiParent, tube, curCellY / Tube.rows, curCellY % Tube.rows, 0, 0, tube.sections);
                             frm.Show();
                             break;
                         default:
@@ -445,7 +445,7 @@ namespace CM
                 int mrow = row / tube.ptube.rows;
                 row = row % tube.ptube.rows;
                 //FRRowAllSensorsView frm = new FRRowAllSensorsView(frTubeView.MdiParent, tube, mrow, row);
-                FRHallSensorView frm = new FRHallSensorView(tube, mrow, row, 0, 0, tube.sections);
+                FRHallSensorView frm = new FRHallSensorView(frTubeView.MdiParent, tube, mrow, row, 0, 0, tube.sections);
                 frm.Show();
             }
         }

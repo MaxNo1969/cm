@@ -134,6 +134,7 @@
     <Compile Include="ADC\LCardReal.cs" />
     <Compile Include="ADC\LCardVirtual.cs" />
     <Compile Include="ADC\MTADC.cs" />
+    <Compile Include="MATH\MedianFilter.cs" />
     <Compile Include="PCIE1730\FRSignals.cs">
       <SubType>Form</SubType>
     </Compile>

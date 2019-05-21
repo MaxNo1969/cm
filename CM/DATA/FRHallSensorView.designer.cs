@@ -34,11 +34,14 @@
             this.cbSensorNum = new System.Windows.Forms.ToolStripComboBox();
             this.lblRow = new System.Windows.Forms.ToolStripLabel();
             this.cbRow = new System.Windows.Forms.ToolStripComboBox();
-            this.lblStartMeas = new System.Windows.Forms.ToolStripLabel();
-            this.txtStartMeas = new System.Windows.Forms.ToolStripTextBox();
-            this.lblCntMeas = new System.Windows.Forms.ToolStripLabel();
-            this.txtCountMeas = new System.Windows.Forms.ToolStripTextBox();
+            this.lblStart = new System.Windows.Forms.ToolStripLabel();
+            this.txtStart = new System.Windows.Forms.ToolStripTextBox();
+            this.lblEnd = new System.Windows.Forms.ToolStripLabel();
+            this.txtEnd = new System.Windows.Forms.ToolStripTextBox();
             this.ch = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.tb.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ch)).BeginInit();
             this.SuspendLayout();
@@ -58,10 +61,13 @@
             this.cbSensorNum,
             this.lblRow,
             this.cbRow,
-            this.lblStartMeas,
-            this.txtStartMeas,
-            this.lblCntMeas,
-            this.txtCountMeas});
+            this.lblStart,
+            this.txtStart,
+            this.toolStripLabel1,
+            this.toolStripSeparator1,
+            this.lblEnd,
+            this.txtEnd,
+            this.toolStripLabel2});
             this.tb.Location = new System.Drawing.Point(0, 0);
             this.tb.Name = "tb";
             this.tb.Size = new System.Drawing.Size(1065, 25);
@@ -94,31 +100,33 @@
             this.cbRow.Size = new System.Drawing.Size(50, 23);
             this.cbRow.SelectedIndexChanged += new System.EventHandler(this.selectedIndexChanged);
             // 
-            // lblStartMeas
+            // lblStart
             // 
-            this.lblStartMeas.Name = "lblStartMeas";
-            this.lblStartMeas.Size = new System.Drawing.Size(134, 22);
-            this.lblStartMeas.Text = "Начальное измерение:";
+            this.lblStart.Name = "lblStart";
+            this.lblStart.Size = new System.Drawing.Size(52, 22);
+            this.lblStart.Text = "Начало:";
             // 
-            // txtStartMeas
+            // txtStart
             // 
-            this.txtStartMeas.AutoSize = false;
-            this.txtStartMeas.Name = "txtStartMeas";
-            this.txtStartMeas.Size = new System.Drawing.Size(50, 25);
-            this.txtStartMeas.TextChanged += new System.EventHandler(this.selectedIndexChanged);
+            this.txtStart.AutoSize = false;
+            this.txtStart.Name = "txtStart";
+            this.txtStart.ReadOnly = true;
+            this.txtStart.Size = new System.Drawing.Size(50, 25);
+            this.txtStart.TextChanged += new System.EventHandler(this.selectedIndexChanged);
             // 
-            // lblCntMeas
+            // lblEnd
             // 
-            this.lblCntMeas.Name = "lblCntMeas";
-            this.lblCntMeas.Size = new System.Drawing.Size(75, 22);
-            this.lblCntMeas.Text = "Количество:";
+            this.lblEnd.Name = "lblEnd";
+            this.lblEnd.Size = new System.Drawing.Size(44, 22);
+            this.lblEnd.Text = "Конец:";
             // 
-            // txtCountMeas
+            // txtEnd
             // 
-            this.txtCountMeas.AutoSize = false;
-            this.txtCountMeas.Name = "txtCountMeas";
-            this.txtCountMeas.Size = new System.Drawing.Size(50, 25);
-            this.txtCountMeas.TextChanged += new System.EventHandler(this.selectedIndexChanged);
+            this.txtEnd.AutoSize = false;
+            this.txtEnd.Name = "txtEnd";
+            this.txtEnd.ReadOnly = true;
+            this.txtEnd.Size = new System.Drawing.Size(50, 25);
+            this.txtEnd.TextChanged += new System.EventHandler(this.selectedIndexChanged);
             // 
             // ch
             // 
@@ -127,6 +135,23 @@
             this.ch.Name = "ch";
             this.ch.Size = new System.Drawing.Size(1065, 403);
             this.ch.TabIndex = 2;
+            // 
+            // toolStripLabel1
+            // 
+            this.toolStripLabel1.Name = "toolStripLabel1";
+            this.toolStripLabel1.Size = new System.Drawing.Size(25, 22);
+            this.toolStripLabel1.Text = "мм";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // toolStripLabel2
+            // 
+            this.toolStripLabel2.Name = "toolStripLabel2";
+            this.toolStripLabel2.Size = new System.Drawing.Size(25, 22);
+            this.toolStripLabel2.Text = "мм";
             // 
             // FRHallSensorView
             // 
@@ -155,9 +180,12 @@
         private System.Windows.Forms.ToolStripLabel lblRow;
         private System.Windows.Forms.ToolStripComboBox cbRow;
         private System.Windows.Forms.DataVisualization.Charting.Chart ch;
-        private System.Windows.Forms.ToolStripLabel lblStartMeas;
-        private System.Windows.Forms.ToolStripLabel lblCntMeas;
-        private System.Windows.Forms.ToolStripTextBox txtStartMeas;
-        private System.Windows.Forms.ToolStripTextBox txtCountMeas;
+        private System.Windows.Forms.ToolStripLabel lblStart;
+        private System.Windows.Forms.ToolStripLabel lblEnd;
+        private System.Windows.Forms.ToolStripTextBox txtStart;
+        private System.Windows.Forms.ToolStripTextBox txtEnd;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel2;
     }
 }

@@ -594,6 +594,7 @@ namespace CM
             rtube.reset();
             ptube.reset(_val);
             Zones.Clear();
+            startWriteZoneSection = 0;
             startZone = 0;
             onDataChanged?.Invoke(null);
         }

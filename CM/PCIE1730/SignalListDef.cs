@@ -201,6 +201,7 @@ namespace CM
             set(iSTRB, false);
         }
 
+        const int signalTime = 200;
         //Сообщаем результат контроля
         public void ControlResult(Tube.TubeRes _res, bool isGlobRes = false)
         {
@@ -209,20 +210,20 @@ namespace CM
                 case Tube.TubeRes.Good:
                     oSTRB.Val = true;
                     oZONRES.Val = true;
-                    WaitHelper.Wait(200);
+                    WaitHelper.Wait(signalTime);
                     oSTRB.Val = false;
                     oZONRES.Val = false;
                     break;
                 case Tube.TubeRes.Class2:
                     oSTRB.Val = false;
                     oZONRES.Val = true;
-                    WaitHelper.Wait(200);
+                    WaitHelper.Wait(signalTime);
                     oZONRES.Val = false;
                     break;
                 case Tube.TubeRes.Bad:
                     oSTRB.Val = true;
                     oZONRES.Val = false;
-                    WaitHelper.Wait(200);
+                    WaitHelper.Wait(signalTime);
                     oSTRB.Val = false;
                     break;
             }
