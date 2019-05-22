@@ -119,7 +119,7 @@ namespace CM
             fSignals.Visible = FormPosSaver.visible(fSignals);
             viewSignalsToolStripMenuItem.Checked = fSignals.Visible;
 
-            //Настраиваем окно сигналов
+            //Настраиваем окно мониторинга блока питания
             // Окно создаем сразу оно будет существовать 
             // всё время работы программы
             fRectifier = new FRRectifier(Program.rectifier)
@@ -281,18 +281,12 @@ namespace CM
 
         public void viewTube()
         {
-            if (Program.tube == null)
-            {
-                MessageBox.Show("Не загружена труба...");
-                return;
-            }
             tubeView = new FRTubeView(Program.tube, this)
             {
                 MdiParent = this,
                 parentMenu = viewTubeToolStripMenuItem,
             };
             tubeView.Show();
-
         }
 
         private void importDumpToolStripMenuItem_Click(object sender, EventArgs e)
@@ -472,13 +466,13 @@ namespace CM
 
         private void adcRawDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (Program.tube == null)
-            {
-                MessageBox.Show("Не загружена труба...");
-                return;
-            }
             FRTubeRawView frm = new FRTubeRawView(Program.tube,this, adcRawDataToolStripMenuItem);
             frm.Show();
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
         }
     }
 }

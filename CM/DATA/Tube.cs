@@ -105,8 +105,7 @@ namespace CM
         {
             get
             {
-                int ind = (_mc * mrows * cols * rows) + _mr * cols * rows + _r * cols + _c;
-                return rtube.data[ind + _i * sectionSize]; ;
+                return rtube[_mc, _mr, _c, _r, _i];
             }
         }
 

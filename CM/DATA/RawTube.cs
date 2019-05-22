@@ -62,7 +62,8 @@ namespace CM
         {
             get
             {
-                int ind = _mc * mrows * cols * rows + _mr * cols * rows + _r * cols + _c;
+                //int ind = _mc * mrows * cols * rows + _mr * cols * rows + _r * cols + _c;
+                int ind = _mc * mrows * cols * rows + _mr * cols * rows + _c * rows + _r;
                 double val = 0;
                 if (ind + _i * sectionSize < data.Count)
                 {
@@ -72,11 +73,13 @@ namespace CM
             }
             set
             {
-                int ind = _mc * mrows * cols * rows + _mr * cols * rows + _r * cols + _c;
+                //int ind = _mc * mrows * cols * rows + _mr * cols * rows + _r * cols + _c;
+                int ind = _mc * mrows * cols * rows + _mr * cols * rows + _c * rows + _r;
                 while (ind + _i * sectionSize < data.Count) data.Add(0);
-                data[ind + _i * sectionSize]=value;
+                data[ind + _i * sectionSize] = value;
             }
         }
+
         #region Сериализация
         /// <summary>
         /// Сериализация в файл для сохранения данных по трубе 
