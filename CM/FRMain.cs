@@ -306,7 +306,7 @@ namespace CM
                     DumpReader reader = new DumpReader(ofd.FileName);
                     IDataWriter<double> writer = Program.tube;
                     writer.Write(reader.Read());
-                    Program.tube.raw2phys(0, Program.tube.sections, 0, Program.tube.ptube.Width / Program.tube.ptube.logZoneSize);
+                    //Program.tube.raw2phys(0, Program.tube.sections, 0, Program.tube.ptube.Width / Program.tube.ptube.logZoneSize);
                     //viewTubeToolStripMenuItem_Click(this, null);
                     viewAllSensorsToolStripMenuItem_Click(this, null);
                 }

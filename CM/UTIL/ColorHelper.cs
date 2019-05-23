@@ -46,6 +46,7 @@ namespace CM
             }
             return Color.FromArgb(r, g, 0);
         }
+        private static int rColorVal = 230;
         public static Color getColor1(double _val)
         {
             if (double.IsNaN(_val) || double.IsNegativeInfinity(_val) || double.IsPositiveInfinity(_val)) return Color.Gray;
@@ -57,13 +58,13 @@ namespace CM
             if (_val > 0)
             {
                 _val = _val / (Program.settings.Current.Border1 - Program.settings.Current.Border2);
-                r = 255;
+                r = rColorVal;
                 g = (int)Math.Ceiling(255 * (1 - _val));
             }
             else
             {
                 _val = _val / Program.settings.Current.Border2;
-                r = (int)Math.Ceiling(255 * (1 + _val));
+                r = (int)Math.Ceiling(rColorVal * (1 + _val));
                 g = 255;
             }
             return Color.FromArgb(r, g, 0);

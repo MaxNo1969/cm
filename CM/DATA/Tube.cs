@@ -33,7 +33,6 @@ namespace CM
         public static int cols { get { return Program.settings.Current.sensors.hallSensors.dim.cols; } }
         public static int rows { get { return Program.settings.Current.sensors.hallSensors.dim.rows; } }
         public int zones { get { return sections / GetsectionsPerZone(); } }
-        public static int DeadSectionsEnd => deadSectionsEnd;
 
         public static int GetsectionsPerZone()
         {
@@ -43,6 +42,7 @@ namespace CM
                 (Program.settings.Current.sensors.hallSensors.elementWidth + Program.settings.Current.sensors.hallSensors.xGap));
         }
         public double[,,,] sensorsAvgValues;
+        public double[,,,] sensorsDeviationValues;
 
         static readonly int deadSectionsStart = Program.settings.Current.DeadZoneStart * GetsectionsPerZone() / Program.settings.ZoneSize;
         static readonly int deadSectionsEnd = Program.settings.Current.DeadZoneFinish * GetsectionsPerZone() / Program.settings.ZoneSize;
@@ -81,6 +81,8 @@ namespace CM
             //loadAvg();
             Zones = new List<Zone>();
             //onDataChanged?.Invoke(null);
+            sensorsAvgValues = new double[mcols, mrows, cols, rows];
+            sensorsDeviationValues = new double[mcols, mrows, cols, rows];
             #region Логирование 
             {
                 string msg = string.Format("rawDataSize={0}, sectionSize={1}, sections={2}, mcols={3}, mrows={4}, cols={5}, rows={6}, sectionsPerZone={7}",
@@ -266,6 +268,30 @@ namespace CM
             }
             return ret;
         }
+
+        /// <summary>
+        /// Получить данные по датчику
+        /// </summary>
+        /// <param name="_mc">Колонка матрицы</param>
+        /// <param name="_mr">Строка матрицы</param>
+        /// <param name="_c">Колонка датчика</param>
+        /// <param name="_r">Строка датчика</param>
+        /// <param name="_start">Начальный срез</param>
+        /// <param name="_count">Количество срезов</param>
+        /// <returns>Массив с данными по датчику</returns>
+        public double[] getSensorDataAbs(int _mc, int _mr, int _c, int _r, int _start, int _count)
+        {
+            if (_start < 0 || _start > sections - 1 || _count < 0 || _start + _count > sections)
+            {
+                return null;
+            }
+            double[] ret = new double[_count];
+            for (int i = 0; i < _count; i++)
+            {
+                ret[i] = Math.Abs(this[_mc, _mr, _c, _r, _start + i]);
+            }
+            return ret;
+        }
         /// <summary>
         /// Получить данные по датчику
         /// </summary>
@@ -289,56 +315,22 @@ namespace CM
             return ret;
         }
 
-        public double getSensorAvg(int _mc, int _mr, int _c, int _r)
-        {
-            return getSensorData(_mc, _mr, _c, _r).Average();
-        }
-
         public double getSensorAvg(int _mc, int _mr, int _c, int _r, int _start, int _count)
         {
             return getSensorData(_mc, _mr, _c, _r,_start,_count).Average();
         }
 
-        internal void fillSensorAvgValues()
+        public double getSensorDeviation(int _mc, int _mr, int _c, int _r, int _start, int _count)
         {
-            #region Логирование 
+            double[] tmp = getSensorData(_mc, _mr, _c, _r, _start, _count);
+            for(int i=0;i<tmp.Length;i++)
             {
-                string logstr = string.Format("{0}: {1}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-                Log.add(logstr, LogRecord.LogReason.info);
-                Debug.WriteLine(logstr, "Message");
+                tmp[i] = Math.Abs(tmp[i] - sensorsAvgValues[_mc, _mr, _c, _r]);
             }
-            #endregion
-            sensorsAvgValues = new double[mcols, mrows, cols, rows];
-            //for (int mcol = 0; mcol < mcols; mcol++)
-            //{
-            //    for (int mrow = 0; mrow < mrows; mrow++)
-            //    {
-            //        for (int col = 0; col < cols; col++)
-            //        {
-            //            for (int row = 0; row < rows; row++)
-            //            {
-            //                sensorsAvgValues[mcol, mrow, col, row] = getSensorAvg(mcol, mrow, col, row);
-            //            }
-            //        }
-            //    }
-            //}
-            Parallel.For(0, mcols, mcol =>
-                 {
-                     Parallel.For(0, mrows, mrow =>
-                       {
-                           Parallel.For(0, cols, col =>
-                             {
-                                 Parallel.For(0, rows, row =>
-                                   {
-                                       sensorsAvgValues[mcol, mrow, col, row] = getSensorAvg(mcol, mrow, col, row);
-                                   });
-                             });
-                       });
-                 });
+            return tmp.Max();
         }
 
-
-        internal void fillSensorAvgValues(int _start,int _count)
+        internal void fillSensorAvgValues(int _count)
         {
             //#region Логирование 
             //{
@@ -348,7 +340,7 @@ namespace CM
             //    Debug.WriteLine(logstr, "Message");
             //}
             //#endregion
-            sensorsAvgValues = new double[mcols, mrows, cols, rows];
+            DateTime tm = DateTime.Now;
             //for (int mcol = 0; mcol < mcols; mcol++)
             //{
             //    for (int mrow = 0; mrow < mrows; mrow++)
@@ -357,8 +349,9 @@ namespace CM
             //        {
             //            for (int row = 0; row < rows; row++)
             //            {
-            //                if (_start + _count > sections - deadSectionsEnd) _count = sections - deadSectionsEnd - _start;
-            //                sensorsAvgValues[mcol, mrow, col, row] = getSensorAvg(mcol, mrow, col, row, _start, _count);
+            //                if (deadSectionsStart + _count > sections - deadSectionsEnd) _count = sections - deadSectionsEnd - deadSectionsStart;
+            //                //sensorsAvgValues[mcol, mrow, col, row] = getSensorData(mcol, mrow, col, row, _start, _count).Average();
+            //                sensorsAvgValues[mcol, mrow, col, row] = getSensorAvg(mcol, mrow, col, row, deadSectionsStart, _count);
             //            }
             //        }
             //    }
@@ -371,20 +364,21 @@ namespace CM
                     {
                         Parallel.For(0, rows, row =>
                         {
-                            if (_start + _count > sections - deadSectionsEnd) _count = sections - deadSectionsEnd - _start;
-                            sensorsAvgValues[mcol, mrow, col, row] = getSensorData(mcol, mrow, col, row, _start, _count).Average();
+                            if (deadSectionsStart + _count > sections - deadSectionsEnd) _count = sections - deadSectionsEnd - deadSectionsStart;
+                            sensorsAvgValues[mcol, mrow, col, row] = getSensorAvg(mcol, mrow, col, row, deadSectionsStart, _count);
+                            sensorsDeviationValues[mcol, mrow, col, row] = getSensorDeviation(mcol, mrow, col, row, deadSectionsStart, _count);
                         });
                     });
                 });
             });
-        }
-
-        static string printAccum(double[] _accum)
-        {
-            string ret = string.Empty;
-            for (int i = 0; i < _accum.Length; i++)
-                ret += string.Format("{0}; ", _accum[i]);
-            return ret;
+            #region Логирование 
+            {
+                string msg = string.Format("Время {0}", (DateTime.Now - tm).ToString());
+                string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                Log.add(logstr, LogRecord.LogReason.info);
+                Debug.WriteLine(logstr, "Message");
+            }
+            #endregion
         }
 
         public bool raw2phys(int _start, int _sz, int _znStart, int _znCnt)
@@ -406,10 +400,12 @@ namespace CM
             int[] sensorOrder = Program.settings.Current.sensors.sensors.getSensorOrder();
             int[] reversedSensors = Program.settings.Current.sensors.sensors.getReverseSensors();
             int currentSections = rtube.sections;
-            if (currentSections > (_znStart + _znCnt) * GetsectionsPerZone() + deadSectionsStart)
+            int sectionsPerZone = GetsectionsPerZone();
+            if (currentSections >= (_znStart + _znCnt) * sectionsPerZone/* + deadSectionsStart*/)
             {
-                fillSensorAvgValues(deadSectionsStart, currentSections - deadSectionsStart);
+                fillSensorAvgValues(currentSections - deadSectionsStart);
                 int distLogSize = (int)(Program.settings.sensorsDistance / ptube.cellXSize);
+                DateTime tm = DateTime.Now;
                 for (int zn = _znStart; zn < _znStart + _znCnt; zn++)
                 {
                     for (int i = 0; i < ptube.logZoneSize; i++)
@@ -441,7 +437,8 @@ namespace CM
                                                 else
                                                 {
                                                     ptube[xPos + zn * ptube.logZoneSize + i, mrow * rows + orderedRow] = Math.Abs(this[mcol, sensorOrder[mrow], col, row,
-                                                        _start + (zn - _znStart) * GetsectionsPerZone() + i] - sensorsAvgValues[mcol, sensorOrder[mrow], col, row]);
+                                                        _start + (zn - _znStart) * GetsectionsPerZone() + i] - sensorsAvgValues[mcol, sensorOrder[mrow], col, row])/
+                                                        sensorsDeviationValues[mcol, sensorOrder[mrow], col, row];
                                                 }
                                             }
                                             else if (xPos + zn * ptube.logZoneSize + i < ptube.Width)
@@ -458,7 +455,6 @@ namespace CM
                                                 string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                                                 Log.add(logstr, LogRecord.LogReason.error);
                                                 Debug.WriteLine(logstr, "Error");
-
                                             }
                                             #endregion
                                         }
@@ -468,12 +464,20 @@ namespace CM
                         }
                     }
                 }
+                #region Логирование 
+                {
+                    string msg = string.Format("Время {0}", (DateTime.Now-tm).ToString());
+                    string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
+                    Log.add(logstr, LogRecord.LogReason.info);
+                    Debug.WriteLine(logstr, "Message");
+                }
+                #endregion
             }
             else
             {
                 #region Логирование 
                 {
-                    string msg = string.Format("Мало данных: currentSections = {0}, Надо {1}", currentSections, (_znStart + 1) * GetsectionsPerZone() + deadSectionsStart);
+                    string msg = string.Format("Мало данных: currentSections = {0}, Надо {1}", currentSections, (_znStart+ _znCnt) * GetsectionsPerZone() + deadSectionsStart);
                     string logstr = string.Format("{0}: {1}: {2}", GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, msg);
                     Log.add(logstr, LogRecord.LogReason.info);
                     Debug.WriteLine(logstr, "Message");

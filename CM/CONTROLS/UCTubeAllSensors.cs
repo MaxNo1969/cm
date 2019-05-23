@@ -82,7 +82,8 @@ namespace CM
                             {
                                 int y = mcol * Tube.rows * Tube.cols * Tube.rows +
                                     mrow * Tube.cols * Tube.rows + row * Tube.cols + col;
-                                double val = Math.Abs(tube[mcol, mrow, col, row, sect]-tube.sensorsAvgValues[mcol,mrow,col,row]);
+                                double val = Math.Abs(tube[mcol, mrow, col, row, sect]-tube.sensorsAvgValues[mcol,mrow,col,row])/ 
+                                    tube.sensorsDeviationValues[mcol, mrow, col, row];
                                 Color c = ColorHelper.getColor1(val);
                                 int ind = tube.sections * 4 * y + sect * 4;
                                 bitmap[ind + 3] = c.A;
@@ -113,7 +114,8 @@ namespace CM
                                 {
                                     int y = mcol * Tube.rows * Tube.cols * Tube.rows +
                                         mrow * Tube.cols * Tube.rows + row * Tube.cols + col;
-                                    double val = Math.Abs(tube[mcol, mrow, col, row, sect]-tube.sensorsAvgValues[mcol, mrow, col, row]);
+                                    double val = Math.Abs(tube[mcol, mrow, col, row, sect]-tube.sensorsAvgValues[mcol, mrow, col, row]) /
+                                    tube.sensorsDeviationValues[mcol, mrow, col, row];
                                     Color c = ColorHelper.getColor1(val);
                                     int ind = tube.sections * 4 * y + sect * 4;
                                     bitmap[ind + 3] = c.A;
@@ -156,7 +158,8 @@ namespace CM
                             {
                                 int y = mcol * Tube.rows * Tube.cols * Tube.rows +
                                     mrow * Tube.cols * Tube.rows + row * Tube.cols + col;
-                                double val = Math.Abs(tube[mcol, mrow, col, row, sect]-tube.sensorsAvgValues[mcol, mrow, col, row]);
+                                double val = Math.Abs(tube[mcol, mrow, col, row, sect]-tube.sensorsAvgValues[mcol, mrow, col, row]) /
+                                    tube.sensorsDeviationValues[mcol, mrow, col, row];
                                 backBuffer.SetPixel(sect, y, ColorHelper.getColor1(val));
                             }
                         }

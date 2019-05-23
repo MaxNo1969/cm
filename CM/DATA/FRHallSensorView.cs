@@ -82,9 +82,10 @@ namespace CM
             ch.addAreaGraph("HallSensorData", Color.Green, x, y);
             ch.addGraph("badBound", Color.Red, x, badBound);
             ch.addGraph("z2Bound", Color.Yellow, x, c2Bound);
-            ch.setYInterval(0.01);
+            ch.setYInterval(0.1);
             ch.ChartAreas[0].AxisY.Minimum = 0;
-            ch.ChartAreas[0].AxisY.Maximum = Program.settings.Current.Border1 * 2;
+            //ch.ChartAreas[0].AxisY.Maximum = Program.settings.Current.Border1 * 2;
+            ch.ChartAreas[0].AxisY.Maximum = 1;
             ch.setXInterval(100);
             ch.ChartAreas[0].AxisX.Minimum = start; 
             ch.ChartAreas[0].AxisX.Maximum = end; 

@@ -229,6 +229,7 @@
     <Compile Include="UTIL\DefaultValues.cs" />
     <Compile Include="UTIL\DumpHelper.cs" />
     <Compile Include="UTIL\ImgHelper.cs" />
+    <Compile Include="UTIL\MsgCrecker.cs" />
     <Compile Include="UTIL\PropGridHelper.cs" />
     <Compile Include="CONTROLS\UCGraph.cs">
       <SubType>UserControl</SubType>
